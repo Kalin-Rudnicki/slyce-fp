@@ -20,39 +20,43 @@ final case class Span(
 
 object Span {
 
-  def join(spans: Span*): Maybe[Span] =
+  def joinNE(span0: Span, spanN: Span*): Span = {
+    import Ordering.Implicits._
+
+    @tailrec
+    def loop(
+        start: Span.Pos,
+        end: Span.Pos,
+        queue: List[Span],
+    ): Span =
+      queue match {
+        case Span(_start, _end) :: rest =>
+          loop(
+            start.min(_start),
+            end.min(_end),
+            rest,
+          )
+        case Nil =>
+          Span(start, end)
+      }
+
+    loop(
+      span0.start,
+      span0.end,
+      spanN.toList,
+    )
+  }
+
+  def joinId(spans: Span*): Maybe[Span] =
     spans.toList match {
-      case Span(start, end) :: rest =>
-        import Ordering.Implicits._
-
-        @tailrec
-        def loop(
-            start: Span.Pos,
-            end: Span.Pos,
-            queue: List[Span],
-        ): Span =
-          queue match {
-            case Span(_start, _end) :: rest =>
-              loop(
-                start.min(_start),
-                end.min(_end),
-                rest,
-              )
-            case Nil =>
-              Span(start, end)
-          }
-
-        loop(
-          start,
-          end,
-          rest,
-        ).some
+      case head :: tail =>
+        joinNE(head, tail: _*).some
       case Nil =>
         None
     }
 
-  def join(spans: Maybe[Span]*): Maybe[Span] =
-    join(spans.flatMap(_.toOption): _*)
+  def joinM(spans: Maybe[Span]*): Maybe[Span] =
+    joinId(spans.flatMap(_.toOption): _*)
 
   final case class Pos private (
       absolutePos: Int,

@@ -1,10 +1,10 @@
 package slyce
 
 import klib.fp.types._
+import slyce.core._
 
 package object generate {
 
-  // TODO (KR) :
-  type Attempt[T] = ErrorAccumulator[Nothing, Nothing, T]
+  type Attempt[T] = ErrorAccumulator[Marked[Msg], Marked[Msg], T]
 
 }

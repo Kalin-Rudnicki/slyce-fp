@@ -17,13 +17,13 @@ object Marked {
         Marked(f(t.value), t.span)
 
       override def apply[A, B](t: Marked[A], f: Marked[A => B]): Marked[B] =
-        Marked(f.value(t.value), Span.join(t.span, f.span))
+        Marked(f.value(t.value), Span.joinM(t.span, f.span))
 
       override def pure[A](a: A): Marked[A] =
         Marked(a)
 
       override def flatten[A](t: Marked[Marked[A]]): Marked[A] =
-        Marked(t.value.value, Span.join(t.span, t.value.span))
+        Marked(t.value.value, Span.joinM(t.span, t.value.span))
 
     }
 
