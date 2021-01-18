@@ -1,6 +1,9 @@
 package slyce.core
 
-import klib.Implicits.BooleanOps
+import klib.Implicits._
+import klib.fp.types._
+
+import scala.annotation.tailrec
 
 trait Token {
 
@@ -14,6 +17,27 @@ object Token {
       start: Span.Pos,
       end: Span.Pos,
   ) {
+
+    // NOTE : `spans` are assumed to already be in order
+    def join(spans: List[Maybe[Span]]): Maybe[Span] =
+      spans.flatMap(_.toOption) match {
+        case first :: rest =>
+          @tailrec
+          def loop(
+              current: Span,
+              remaining: List[Span],
+          ): Span =
+            remaining match {
+              case head :: tail =>
+                loop(head, tail)
+              case Nil =>
+                Span(first.start, current.end)
+            }
+
+          loop(first, rest).some
+        case Nil =>
+          None
+      }
 
     def toString(showAbsolute: Boolean): String =
       s"Span(${start.toString(showAbsolute)} -> ${end.toString(showAbsolute)})"
