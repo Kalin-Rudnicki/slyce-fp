@@ -1,9 +1,30 @@
 package slyce.generate
 
-import klib.fp.types.{Maybe, NonEmptyList}
+import klib.Implicits._
+import klib.fp.types._
 import klib.utils.InfiniteSet
 
-sealed trait Regex {}
+sealed trait Regex {
+
+  def repeat(min: Int, max: Maybe[Int]): Regex =
+    Regex.Repeat(this, min, max)
+
+  def maybe: Regex =
+    repeat(0, 1.some)
+
+  def exactly(n: Int): Regex =
+    repeat(n, n.some)
+
+  def atLeastN(n: Int): Regex =
+    repeat(n, None)
+
+  def anyAmount: Regex =
+    atLeastN(0)
+
+  def atLeastOnce: Regex =
+    atLeastN(1)
+
+}
 
 object Regex {
 

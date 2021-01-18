@@ -1,7 +1,7 @@
 //
 
 val SlyceVersion = "0.1.0"
-val MyScalaVersion = "2.13.4"
+val MyScalaVersion = "2.12.10"
 
 lazy val `slyce-core` =
   project
@@ -9,7 +9,7 @@ lazy val `slyce-core` =
     .settings(
       name := "slyce-core",
       version := SlyceVersion,
-      scalaVersion := MyScalaVersion
+      scalaVersion := MyScalaVersion,
     )
 
 lazy val `slyce-generate` =
@@ -18,7 +18,7 @@ lazy val `slyce-generate` =
     .settings(
       name := "slyce-generate",
       version := SlyceVersion,
-      scalaVersion := MyScalaVersion
+      scalaVersion := MyScalaVersion,
     )
     .dependsOn(`slyce-core`)
 
@@ -28,7 +28,7 @@ lazy val `slyce-parse` =
     .settings(
       name := "slyce-parse",
       version := SlyceVersion,
-      scalaVersion := MyScalaVersion
+      scalaVersion := MyScalaVersion,
     )
     .dependsOn(`slyce-core`)
 
@@ -38,6 +38,6 @@ lazy val `slyce-test` =
     .settings(
       name := "slyce-test",
       version := SlyceVersion,
-      scalaVersion := MyScalaVersion
+      scalaVersion := MyScalaVersion,
     )
     .dependsOn(`slyce-generate`, `slyce-parse`)
