@@ -1,0 +1,11 @@
+
+.idea/
+.bsp/
+
+slyce-core/lib/
+
+target/
+slyce-core/target
+slyce-generate/target
+slyce-parse/target
+slyce-test/target
