@@ -6,7 +6,15 @@ import klib.fp.types._
 final case class Marked[+T](
     value: T,
     span: Maybe[Span] = None,
-)
+) {
+
+  def toString(showAbsolute: Boolean): String =
+    s"${span.cata(s => s"[${s.toString(showAbsolute)}]; ", "")}$value"
+
+  override def toString: String =
+    toString(false)
+
+}
 
 object Marked {
 

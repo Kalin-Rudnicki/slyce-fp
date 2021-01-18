@@ -19,7 +19,7 @@ object Nfa {
   def fromLexer(lexer: Lexer): Attempt[Nfa] = {
     val startMode: Attempt[String] =
       lexer.startMode.value
-        .aliveIf(lexer.modes.contains)(lexer.startMode.map(m => Msg.userError(s"Invalid start mode: $m")))
+        .aliveIf(m => lexer.modes.exists(_.name.value == m))(lexer.startMode.map(m => Msg.userError(s"Invalid start mode: $m")))
 
     val modes: Attempt[Map[String, Marked[Pointer[Nfa.State]]]] =
       lexer.modes
@@ -115,12 +115,23 @@ object Nfa {
 
                     def doRegexOrSkip(
                         times: Int,
-                        next: Pointer[State],
+                        _next: Pointer[State],
                     ): Attempt[Pointer[State]] =
-                      if (times > 0)
-                        fromRegex(reg, next).flatMap(doRegexOrSkip(times - 1, _))
-                      else
-                        next.alive
+                      if (times > 0) {
+                        fromRegex(reg, _next).flatMap { _next =>
+                          doRegexOrSkip(
+                            times - 1,
+                            Pointer(
+                              State(
+                                None,
+                                Set(_next, next),
+                                None,
+                              ),
+                            ),
+                          )
+                        }
+                      } else
+                        _next.alive
 
                     ado[Attempt]
                       .join(

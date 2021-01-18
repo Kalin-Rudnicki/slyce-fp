@@ -5,7 +5,12 @@ import klib.fp.types._
 final case class Msg(
     messageType: Maybe[Msg.Type],
     message: String,
-)
+) {
+
+  override def toString: String =
+    s"${messageType.cata(t => s"$t; ", "")}$message"
+
+}
 
 object Msg {
 

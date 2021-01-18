@@ -1,5 +1,7 @@
 package slyce.generate.examples.list
 
+import klib.Implicits._
+import klib.fp.types._
 import slyce.generate.examples.run
 import slyce.generate._, input._
 import slyce.core._
@@ -40,6 +42,18 @@ object Generate extends App {
               priority = 3,
               regex = Marked(
                 `\\d`.atLeastOnce,
+              ),
+              yields = Yields(
+                yields = List(Marked(Terminal("int"))),
+              ),
+            ),
+            Line(
+              priority = 4,
+              regex = Marked(
+                Sequence(
+                  `[A-Z]` | `[a-z]`,
+                  `[A-Za-z_\\d]`.repeat(4, 9.some),
+                ),
               ),
               yields = Yields(
                 yields = List(Marked(Terminal("int"))),
