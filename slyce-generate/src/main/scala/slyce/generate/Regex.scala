@@ -84,6 +84,9 @@ object Regex {
     def apply(regs: Regex*): Sequence =
       Sequence(regs.toList)
 
+    def apply(str: String): Sequence =
+      Sequence(str.map(CharClass.inclusive(_)): _*)
+
   }
 
   final case class Group(seqs: NonEmptyList[Sequence]) extends Regex

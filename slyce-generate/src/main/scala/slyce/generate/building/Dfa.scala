@@ -73,7 +73,7 @@ object Dfa {
           }
 
       val missingTransitions: Map[String, Set[Maybe[Span]]] =
-        modeTransitions.filterNot(t => !nfa.modes.contains(t._1))
+        modeTransitions.filterNot(t => nfa.modes.contains(t._1))
 
       val msgs: List[Marked[Msg]] =
         missingTransitions.toList.flatMap {
