@@ -2,11 +2,11 @@ package slyce.generate.building
 
 import klib.Implicits._
 import klib.fp.types._
-import klib.fp.utils.ado
+import klib.fp.utils._
 import klib.utils.Pointer
 import slyce.core._
-import slyce.generate.Regex.CharClass
 import slyce.generate._
+import slyce.generate.Regex.CharClass
 import slyce.generate.input.Lexer
 
 final case class Nfa private (

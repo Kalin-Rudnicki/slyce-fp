@@ -21,52 +21,8 @@ object Lexer {
     final case class Line(
         priority: Int,
         regex: Marked[Regex],
-        yields: Line.Yields,
+        yields: Yields[String],
     )
-
-    object Line {
-
-      final case class Yields(
-          yields: List[Marked[Yields.Yield]],
-          toMode: Marked[Yields.ToMode] = Marked(Yields.ToMode.Same),
-      )
-
-      object Yields {
-
-        sealed trait Yield {
-
-          val subString: (Maybe[Int], Maybe[Int])
-
-        }
-        object Yield {
-
-          final case class Text(
-              subString: (Maybe[Int], Maybe[Int]) = (None, None),
-          ) extends Yield
-
-          final case class Terminal(
-              name: String,
-              subString: (Maybe[Int], Maybe[Int]) = (None, None),
-          ) extends Yield
-
-        }
-
-        sealed trait ToMode
-        object ToMode {
-
-          case object Same extends ToMode
-
-          final case class To(modeName: String) extends ToMode
-
-          final case class Push(modeName: String) extends ToMode
-
-          case object Pop extends ToMode
-
-        }
-
-      }
-
-    }
 
   }
 

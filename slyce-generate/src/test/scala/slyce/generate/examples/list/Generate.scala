@@ -9,7 +9,6 @@ import slyce.core._
 object Generate extends App {
   import Lexer.Mode
   import Mode.Line
-  import Line.Yields
   import Yields.Yield._
   import Regex._, CharClass._
 
