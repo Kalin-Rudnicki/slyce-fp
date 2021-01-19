@@ -123,6 +123,7 @@ object Dfa {
                     case (k, v) =>
                       k -> v.nonEmpty.maybe(Lazy(lazyMap(v)))
                   },
+                  elseTransition = v.elseTransition.map(ss => Lazy(lazyMap(ss))),
                   end = v.end.map(_.map(modeName => Lazy(lazyMap(modeMap(modeName)._1)))),
                 )
           }
@@ -154,6 +155,7 @@ object Dfa {
 
   private final case class IState private (
       transitions: Map[Set[Char], Set[Nfa.State]],
+      elseTransition: Maybe[Set[Nfa.State]],
       end: Maybe[Yields[String]],
   )
 
@@ -181,18 +183,25 @@ object Dfa {
             v.map(_._1).toSet -> k
         }
 
+      val fromExclusive: Set[Nfa.State] =
+        transitionPairs.collect {
+          case (InfiniteSet.Exclusive(_), state) =>
+            state
+        }.toSet
+
       val end: Maybe[Yields[String]] = {
         val ends: List[Lexer.Mode.Line] = initialStates.toList.flatMap(_.end.toOption)
         ends.nonEmpty.maybe(ends.minBy(_.priority).yields)
       }
 
-      initialStates -> IState(charMap, end)
+      initialStates -> IState(charMap, fromExclusive.nonEmpty.maybe(fromExclusive), end)
     }
 
   }
 
   final case class State private[Dfa] (
       transitions: Map[Set[Char], Maybe[Lazy[State]]],
+      elseTransition: Maybe[Lazy[State]],
       end: Maybe[Yields[Lazy[State]]],
   )
 
