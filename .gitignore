@@ -2,8 +2,6 @@
 .idea/
 .bsp/
 
-slyce-core/lib/
-
 target/
 slyce-core/target
 slyce-generate/target
