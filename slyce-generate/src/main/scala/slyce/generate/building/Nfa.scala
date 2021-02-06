@@ -24,7 +24,7 @@ object Nfa {
     val modes: Attempt[Map[String, Marked[Pointer[Nfa.State]]]] =
       lexer.modes
         .map(mode => State.fromMode(mode).map(state => (mode.name.value, mode.name.map(_ => state))))
-        .traverseErrs
+        .traverse
         .map(_.toMap)
 
     ado[Attempt]
@@ -90,7 +90,7 @@ object Nfa {
 
                 rec(seq.reverse, next)
               case Regex.Group(seqs) =>
-                seqs.toList.map(fromRegex(_, next)).traverseErrs.map(list => joinStates(list: _*))
+                seqs.toList.map(fromRegex(_, next)).traverse.map(list => joinStates(list: _*))
               case Regex.Repeat(reg, _min, _max) =>
                 val min: Attempt[Int] =
                   _min.aliveIf(_ >= 0)(err(Msg.userError(s"min (${_min}) < 0")))
@@ -196,7 +196,7 @@ object Nfa {
             ),
           )
         }
-        .traverseErrs
+        .traverse
         .flatMap[Pointer[State]] { states =>
           // TODO (KR) : Do extra checks
 

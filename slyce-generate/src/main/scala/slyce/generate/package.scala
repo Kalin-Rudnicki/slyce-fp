@@ -10,13 +10,6 @@ package object generate {
 
   type Attempt[T] = ErrorAccumulator[Marked[Msg], Marked[Msg], T]
 
-  implicit class AttemptOps[T](attempts: List[Attempt[T]]) {
-
-    def traverseErrs: Attempt[List[T]] =
-      attempts.traverseErrors
-
-  }
-
   implicit class CharSetOps(chars: Set[Char]) {
 
     def prettyChars: String =
