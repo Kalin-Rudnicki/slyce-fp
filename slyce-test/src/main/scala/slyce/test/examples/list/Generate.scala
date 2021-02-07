@@ -1,4 +1,4 @@
-package slyce.generate.examples.list
+package slyce.test.examples.list
 
 import klib.Implicits._
 import klib.fp.types._

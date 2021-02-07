@@ -12,9 +12,6 @@ object Main {
           Executable.fromSubCommands(
             "list" -> list.Generate.executable,
           ),
-        "parse" ->
-          Executable.fromSubCommands(
-          ),
       )(args)
       .runSync
   }
