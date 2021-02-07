@@ -66,15 +66,20 @@ package object examples {
   def makeExecutable(
       lexer: Lexer,
       // TODO (KR) : Grammar
-  ): Executable = { (logger, _) =>
+  ): Executable = { (logger, _) => // TODO (KR) : args
     val res: Res =
       for {
-        nfa <- Nfa.fromLexer(lexer)
-        dfa <- Dfa.fromNfa(nfa)
-      } yield (
-        nfa,
-        dfa,
-      )
+        tmp1 <- for {
+          nfa <- Nfa.fromLexer(lexer)
+          dfa <- Dfa.fromNfa(nfa)
+        } yield (
+          nfa,
+          dfa,
+        )
+        (nfa, dfa) = tmp1
+
+        // TODO (KR) : Grammar
+      } yield (nfa, dfa)
 
     convertRes(logger, res)
   }
