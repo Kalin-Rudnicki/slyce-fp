@@ -1,7 +1,6 @@
 package slyce.test.examples.list
 
 import klib.Implicits._
-import klib.fp.types._
 import slyce.generate.examples._
 import slyce.generate._
 import input._
@@ -15,7 +14,7 @@ object Generate {
   import Yields.Yield._
   import Regex._, CharClass._
 
-  val executable: Executable =
+  lazy val executable: Executable =
     makeExecutable(
       lexer = Lexer(
         startMode = Marked("General"),
@@ -101,6 +100,10 @@ object Generate {
             ),
           ),
         ),
+      ),
+      grammar = Grammar(
+        startNt = ???, // TODO (KR) :
+        nts = ???, // TODO (KR) :
       ),
     )
 

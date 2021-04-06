@@ -3,9 +3,8 @@ package slyce.generate
 import klib.Implicits._
 import klib.fp.types._
 import klib.utils._
-import slyce.generate._
-import input._
-import building._
+
+import input._, building._
 import slyce.core._
 
 package object examples {
@@ -65,7 +64,7 @@ package object examples {
   // TODO (KR) : Will need something different once it comes to reading/writing files
   def makeExecutable(
       lexer: Lexer,
-      // TODO (KR) : Grammar
+      grammar: Grammar,
   ): Executable = { (logger, _) => // TODO (KR) : args
     val res: Res =
       for {

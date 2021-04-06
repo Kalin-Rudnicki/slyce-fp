@@ -1,7 +1,9 @@
-package slyce.generate.examples
+package slyce.test.examples
 
 import klib.Implicits._
+import klib.fp.types._
 import klib.utils._
+import slyce.generate.building.AugmentedGrammar
 
 object Main {
 
@@ -10,7 +12,7 @@ object Main {
       .fromSubCommands(
         "generate" ->
           Executable.fromSubCommands(
-            "list" -> list.Generate.executable,
+            // "list" -> list.Generate.executable,
           ),
       )(args)
       .runSync
