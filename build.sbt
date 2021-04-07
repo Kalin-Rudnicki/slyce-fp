@@ -13,7 +13,7 @@ lazy val `slyce-core` =
       version := SlyceVersion,
       scalaVersion := MyScalaVersion,
       resolvers += Resolver.mavenLocal,
-      libraryDependencies += MyOrg %% "klib-core" % "0.1.6",
+      libraryDependencies += MyOrg %% "klib-core" % "0.1.8",
     )
 
 lazy val `slyce-generate` =
@@ -25,6 +25,9 @@ lazy val `slyce-generate` =
       version := SlyceVersion,
       scalaVersion := MyScalaVersion,
       resolvers += Resolver.mavenLocal,
+      libraryDependencies ++= Seq(
+        "com.lihaoyi" %% "scalatags" % "0.9.2",
+      ),
     )
     .dependsOn(
       `slyce-core` % "compile->compile;test->test",
