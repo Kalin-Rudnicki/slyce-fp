@@ -10,12 +10,12 @@ import slyce.generate.input.Grammar
 final case class ExpandedGrammar private (
     startNt: Marked[String], // TODO (KR) : Remove?
     nts: List[ExpandedGrammar.NT],
-    aliases: ExpandedGrammar.Aliases,
+    aliases: List[ExpandedGrammar.Alias],
 )
 
 object ExpandedGrammar {
 
-  type Aliases = List[(Identifier.NonTerminal, Identifier.NonTerminal)]
+  type Alias = (Identifier.NonTerminal, Identifier.NonTerminal)
 
   /*
     NOTE (KR) : Types of identifiers
@@ -103,7 +103,7 @@ object ExpandedGrammar {
     final case class Expansion[+T](
         data: T,
         generatedNts: List[NT],
-        aliases: Aliases,
+        aliases: List[Alias],
     )
     object Expansion {
 
@@ -205,26 +205,38 @@ object ExpandedGrammar {
         name: Maybe[Grammar.Identifier.NonTerminal],
         lnt: Grammar.ListNonTerminal,
     ): Attempt[Expansion[Identifier]] = {
-      def createMyId: Identifier.NonTerminal =
+      def createMyId: (Maybe[Alias], Identifier.NonTerminal) =
         name match {
           case Some(name) =>
-            Identifier.NonTerminal.ListNt(name.name, Identifier.NonTerminal.ListType.Simple)
+            val id = Identifier.NonTerminal.ListNt(name.name, Identifier.NonTerminal.ListType.Simple)
+
+            (
+              (Identifier.NonTerminal.NamedNt(name.name), id).some,
+              id,
+            )
           case None =>
             val key = new Identifier.NonTerminal.Key
 
-            Identifier.NonTerminal.AnonListNt(key, Identifier.NonTerminal.ListType.Simple)
+            (
+              None,
+              Identifier.NonTerminal.AnonListNt(key, Identifier.NonTerminal.ListType.Simple),
+            )
         }
-      def createMyIds: (Identifier.NonTerminal, Identifier.NonTerminal) =
+      def createMyIds: (Maybe[Alias], Identifier.NonTerminal, Identifier.NonTerminal) =
         name match {
           case Some(name) =>
+            val headId = Identifier.NonTerminal.ListNt(name.name, Identifier.NonTerminal.ListType.Head)
+
             (
-              Identifier.NonTerminal.ListNt(name.name, Identifier.NonTerminal.ListType.Head),
+              (Identifier.NonTerminal.NamedNt(name.name), headId).some,
+              headId,
               Identifier.NonTerminal.ListNt(name.name, Identifier.NonTerminal.ListType.Tail),
             )
           case None =>
             val key = new Identifier.NonTerminal.Key
 
             (
+              None,
               Identifier.NonTerminal.AnonListNt(key, Identifier.NonTerminal.ListType.Head),
               Identifier.NonTerminal.AnonListNt(key, Identifier.NonTerminal.ListType.Tail),
             )
@@ -232,7 +244,7 @@ object ExpandedGrammar {
 
       (lnt.`type`, lnt.repeat) match {
         case (Grammar.ListNonTerminal.Type.*, None) =>
-          val myId = createMyId
+          val (ma, myId) = createMyId
 
           for {
             eStart <- expandIgnoredList(lnt.start)
@@ -241,10 +253,10 @@ object ExpandedGrammar {
           } yield Expansion(
             myId,
             sNt :: eStart.generatedNts,
-            eStart.aliases,
+            ma.toList ::: eStart.aliases,
           )
         case (Grammar.ListNonTerminal.Type.*, Some(repeat)) =>
-          val (myHeadId, myTailId) = createMyIds
+          val (ma, myHeadId, myTailId) = createMyIds
 
           for {
             eStart <- expandIgnoredList(lnt.start)
@@ -256,10 +268,10 @@ object ExpandedGrammar {
           } yield Expansion(
             myHeadId,
             sNt :: rNt :: eStart.generatedNts ::: eRepeat.generatedNts,
-            eStart.aliases ::: eRepeat.aliases,
+            ma.toList ::: eStart.aliases ::: eRepeat.aliases,
           )
         case (Grammar.ListNonTerminal.Type.+, None) =>
-          val (myHeadId, myTailId) = createMyIds
+          val (ma, myHeadId, myTailId) = createMyIds
 
           for {
             eStart <- expandIgnoredList(lnt.start)
@@ -269,10 +281,10 @@ object ExpandedGrammar {
           } yield Expansion(
             myHeadId,
             sNt :: rNt :: eStart.generatedNts,
-            eStart.aliases,
+            ma.toList ::: eStart.aliases,
           )
         case (Grammar.ListNonTerminal.Type.+, Some(repeat)) =>
-          val (myHeadId, myTailId) = createMyIds
+          val (ma, myHeadId, myTailId) = createMyIds
 
           for {
             eStart <- expandIgnoredList(lnt.start)
@@ -284,7 +296,7 @@ object ExpandedGrammar {
           } yield Expansion(
             myHeadId,
             sNt :: rNt :: eStart.generatedNts ::: eRepeat.generatedNts,
-            eStart.aliases ::: eRepeat.aliases,
+            ma.toList ::: eStart.aliases ::: eRepeat.aliases,
           )
       }
     }
@@ -336,10 +348,13 @@ object ExpandedGrammar {
             expandStandardNonTerminal(Identifier.NonTerminal.AssocNt(name.name, idx), ant.base)
         }
 
-      rec(
-        1,
-        ant.assocs.toList,
-      )
+      for {
+        expansion <- rec(
+          1,
+          ant.assocs.toList,
+        )
+      } yield expansion
+        .copy(aliases = (Identifier.NonTerminal.NamedNt(name.name), Identifier.NonTerminal.AssocNt(name.name, 1)) :: expansion.aliases)
     }
 
     def expandList(l: List[Marked[Grammar.Element]]): Attempt[Expansion[NT.Reduction]] =

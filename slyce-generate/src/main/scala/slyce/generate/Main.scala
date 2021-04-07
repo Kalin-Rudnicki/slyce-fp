@@ -519,10 +519,81 @@ object Main {
         )
       }
 
+      def expandedGrammarToHtml(expandedGrammar: ExpandedGrammar): Frag =
+        subSection("ExpandedGrammar")(
+          setting("StartNt")(
+            p(expandedGrammar.startNt.value),
+          ),
+          br,
+          setting("Nts")(
+            table(
+              tr(
+                th("Reductions")(
+                  width := "350px",
+                ),
+                th("LiftIdx")(
+                  width := "150px",
+                ),
+              ),
+              expandedGrammar.nts.map { nt =>
+                List[Frag](
+                  tr(
+                    td(nt.name.toString)(
+                      colspan := 2,
+                    )(
+                      textAlign := "center",
+                    ),
+                  ),
+                  nt.reductions.toList.map { r =>
+                    tr(
+                      td(
+                        div(
+                          ul(
+                            r.elements.map { e =>
+                              li(e.toString)
+                            },
+                          ),
+                        )(
+                          minHeight := "25px",
+                        ),
+                      ),
+                      td(
+                        r.liftIdx.toList,
+                      ),
+                    )
+                  },
+                )
+              },
+            ),
+          ),
+          br,
+          setting("Aliases")(
+            table(
+              tr(
+                th("Identifier")(
+                  width := "250px",
+                ),
+                th("References")(
+                  width := "250px",
+                ),
+              ),
+              expandedGrammar.aliases.map {
+                case (identifier, references) =>
+                  tr(
+                    td(identifier.toString),
+                    td(references.toString),
+                  )
+              },
+            ),
+          ),
+        )
+
       section(
         "BuildOutput",
       )(
         dfaToHtml(buildOutput.dfa),
+        br,
+        expandedGrammarToHtml(buildOutput.expandedGrammar),
       )
     }
 
