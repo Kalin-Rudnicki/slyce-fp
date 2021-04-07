@@ -29,6 +29,9 @@ package object examples {
         src.info("Writing result...")
       }.wrap
       _ <- MainMain.outputDebug(name, buildInput, aBuildResult).wrap
+      _ <- logger() { src =>
+        src.info("Done...")
+      }.wrap
     } yield ()
   }
 

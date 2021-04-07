@@ -1,12 +1,12 @@
 package slyce.test.examples.list
 
 import klib.Implicits._
-import slyce.generate.examples._
 import slyce.generate._
 import input._
 import klib.utils._
 import slyce.core._
 import slyce.generate.Yields.ToMode
+import slyce.test.examples._
 
 object Generate {
   import Lexer.Mode
@@ -15,7 +15,8 @@ object Generate {
   import Regex._, CharClass._
 
   lazy val executable: Executable =
-    makeExecutable(
+    debugExecutable(
+      name = "list",
       lexer = Lexer(
         startMode = Marked("General"),
         modes = List(

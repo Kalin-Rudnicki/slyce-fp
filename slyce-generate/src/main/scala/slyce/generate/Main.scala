@@ -54,6 +54,7 @@ object Main {
 
   private val DebugOutputDir: File = new File("target/slyce/debug")
 
+  /*
   // TODO (KR) : Delete...
   private type Res = Attempt[(Nfa, Dfa)]
   private def convertRes(logger: Logger, res: Res): ??[Unit] = {
@@ -105,32 +106,104 @@ object Main {
       }.wrap
     } yield ()
   }
+   */
 
   def outputDebug(
       name: String,
       buildInput: BuildInput,
       aBuildOutput: Attempt[BuildOutput],
   ): IO[Unit] = {
-    import scalatags.Text.all._
+    import scalatags.Text.all.{name => _, _}
+
+    // =====| Helpers |=====
+
+    val TODO = h3("TODO", color := "red")
+
+    // ...
+
+    def pageHeader(text: String): Frag =
+      h1(text)
+
+    def sectionHeader(text: String): Frag =
+      h2(text)
+
+    def subSectionHeader(text: String): Frag =
+      h3(text)
+
+    // ...
+
+    def page(header: String)(_body: Frag*): Frag =
+      body(
+        pageHeader(header),
+        div(
+          _body: _*,
+        )(
+          marginLeft := "25px",
+        ),
+      )(
+        marginTop := "25px",
+        marginLeft := "25px",
+      )
+
+    def section(header: String)(body: Frag*): Frag =
+      div(
+        sectionHeader(header),
+        div(
+          body: _*,
+        )(
+          marginLeft := "25px",
+        ),
+      )
+
+    def subSection(header: String)(body: Frag*): Frag =
+      div(
+        subSectionHeader(header),
+        div(
+          body: _*,
+        )(
+          marginLeft := "25px",
+        ),
+      )
+
+    // =====| Sections |=====
 
     def messagesToHtml(
         title: String,
         messages: List[Marked[Msg]],
     ): Frag = {
 
-      div(
-        h1(s"$title [${messages.size}]:"),
-        h3("TODO", color := "red"),
+      section(
+        s"$title [${messages.size}]:",
+      )(
+        TODO,
       )
     }
 
     def inputToHtml(
         buildInput: BuildInput,
     ): Frag = {
+      def lexerToHtml(lexer: Lexer): Frag = {
 
-      div(
-        h1("BuildInput"),
-        h3("TODO", color := "red"),
+        subSection(
+          "Lexer",
+        )(
+          TODO,
+        )
+      }
+      def grammarToHtml(grammar: Grammar): Frag = {
+
+        subSection(
+          "Grammar",
+        )(
+          TODO,
+        )
+      }
+
+      section(
+        "BuildInput",
+      )(
+        lexerToHtml(buildInput.lexer),
+        grammarToHtml(buildInput.grammar),
       )
     }
 
@@ -138,11 +211,14 @@ object Main {
         buildOutput: BuildOutput,
     ): Frag = {
 
-      div(
-        h1("BuildOutput"),
-        h3("TODO", color := "red"),
+      section(
+        "BuildOutput",
+      )(
+        TODO,
       )
     }
+
+    // =====| Usage |=====
 
     val (mRes, warnings, errors) = aBuildOutput.toTuple
 
@@ -150,14 +226,16 @@ object Main {
       html(
         head(
         ),
-        body(
+        page(
+          s"Debug output for: $name",
+        )(
           messagesToHtml("Error(s)", errors),
           br,
           messagesToHtml("Warning(s)", warnings),
           br,
           inputToHtml(buildInput),
           br,
-          mRes.map(outputToHtml).toOption,
+          mRes.map(outputToHtml).toList,
         ),
       )
 

@@ -1,13 +1,11 @@
 package slyce.test.examples.calc
 
-import klib.Implicits._
 import klib.fp.types._
 import klib.utils._
 import slyce.generate._
 import input._
 import slyce.core._
-import slyce.generate.examples._
-import slyce.generate.Yields.ToMode
+import slyce.test.examples._
 
 object Generate {
   import Lexer.Mode
@@ -17,7 +15,8 @@ object Generate {
   import Yields.Yield._
 
   lazy val executable: Executable =
-    makeExecutable(
+    debugExecutable(
+      name = "calc",
       lexer = Lexer(
         startMode = Marked("General"),
         modes = List(
