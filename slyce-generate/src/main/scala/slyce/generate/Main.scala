@@ -152,6 +152,13 @@ object Main {
           margin := "0px",
         ),
       )
+      ".setting" - (
+        borderLeft := "3px solid red",
+        padding := "10px",
+        &("h4") - (
+          margin := "0px",
+        ),
+      )
 
     }
 
@@ -164,6 +171,7 @@ object Main {
       val page = "page"
       val section = "section"
       val subSection = "sub-section"
+      val setting = "setting"
 
     }
 
@@ -173,20 +181,9 @@ object Main {
 
     // ...
 
-    def pageHeader(text: String): Frag =
-      h1(text)
-
-    def sectionHeader(text: String): Frag =
-      h2(text)
-
-    def subSectionHeader(text: String): Frag =
-      h3(text)
-
-    // ...
-
     def page(header: String)(_body: Frag*): Frag =
       body(
-        pageHeader(header),
+        h1(header),
         div(
           _body: _*,
         )(
@@ -198,7 +195,7 @@ object Main {
 
     def section(header: String)(body: Frag*): Frag =
       div(
-        sectionHeader(header),
+        h2(header),
         br,
         div(
           body: _*,
@@ -211,7 +208,7 @@ object Main {
 
     def subSection(header: String)(body: Frag*): Frag =
       div(
-        subSectionHeader(header),
+        h3(header),
         br,
         div(
           body: _*,
@@ -220,6 +217,19 @@ object Main {
         ),
       )(
         `class` := C.subSection,
+      )
+
+    def setting(header: String)(body: Frag*): Frag =
+      div(
+        h4(header),
+        br,
+        div(
+          body: _*,
+        )(
+          `class` := C.internal,
+        ),
+      )(
+        `class` := C.setting,
       )
 
     // =====| Sections |=====
@@ -261,7 +271,52 @@ object Main {
         subSection(
           "Lexer",
         )(
-          TODO,
+          setting("StartMode")(
+            p(lexer.startMode.value),
+          ),
+          br,
+          setting("Modes")(
+            table(
+              tr(
+                th("Priority")(
+                  width := "100px",
+                ),
+                th("Regex")(
+                  width := "750px",
+                ),
+                th("Yields")(
+                  width := "350px",
+                ),
+                th("ToMode")(
+                  width := "250px",
+                ),
+              ),
+              lexer.modes.map { mode =>
+                tr(
+                  td(b(mode.name.value))(
+                    colspan := 4,
+                    textAlign := "center",
+                  ),
+                ) ::
+                  List[Frag](
+                    mode.lines.map { line =>
+                      tr(
+                        td(line.priority),
+                        td(line.regex.value.toString),
+                        td(
+                          ul(
+                            line.yields.yields.map { y =>
+                              li(y.value.toString)
+                            },
+                          ),
+                        ),
+                        td(line.yields.toMode.value.toString),
+                      )
+                    },
+                  )
+              },
+            ),
+          ),
         )
       }
       def grammarToHtml(grammar: Grammar): Frag = {
