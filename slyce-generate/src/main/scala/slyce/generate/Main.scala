@@ -7,7 +7,9 @@ import klib.fp.types._
 import klib.fp.utils.ado
 import klib.utils._
 import slyce.core._
-import slyce.generate._, input._, building._
+import slyce.generate._
+import input._
+import building._
 
 object Main {
 
@@ -321,6 +323,118 @@ object Main {
       }
 
       def grammarToHtml(grammar: Grammar): Frag = {
+        def ntToHtml(nt: Grammar.NonTerminal): Frag = {
+          def elementListToHtml(elements: List[Marked[Grammar.Element]]): Frag = {
+
+            ul(
+              elements.map { re =>
+                li(elementToHtml(re.value))
+              },
+            )
+          }
+
+          def ignoredListToHtml(iList: IgnoredList[Marked[Grammar.Element]]): Frag = {
+
+            ul(
+              li(
+                "Before",
+                elementListToHtml(iList.before),
+              ),
+              li(
+                "UnIgnored",
+                elementListToHtml(iList.unIgnored :: Nil),
+              ),
+              li(
+                "After",
+                elementListToHtml(iList.after),
+              ),
+            )
+          }
+
+          nt match {
+            case standardNT: Grammar.StandardNonTerminal =>
+              standardNT match {
+                case Grammar.StandardNonTerminal.`:`(reductions) =>
+                  div(
+                    b("StandardNonTerminal.`:`"),
+                    ol(
+                      reductions.toList.map { reduction =>
+                        li(
+                          elementListToHtml(reduction),
+                        )
+                      },
+                    ),
+                  )
+                case Grammar.StandardNonTerminal.^(reductions) =>
+                  div(
+                    b("StandardNonTerminal.`^`"),
+                    ol(
+                      reductions.toList.map { reduction =>
+                        li(
+                          ignoredListToHtml(reduction),
+                        )
+                      },
+                    ),
+                  )
+              }
+            case Grammar.ListNonTerminal(_type, start, repeat) =>
+              div(
+                b(s"ListNonTerminal.${_type}"),
+                ul(
+                  li(
+                    "Start",
+                    ignoredListToHtml(start),
+                  ),
+                  repeat.map { il =>
+                    li(
+                      "Repeat",
+                      ignoredListToHtml(il),
+                    )
+                  }.toList,
+                ),
+              )
+            case Grammar.AssocNonTerminal(assocs, base) =>
+              div(
+                b("AssocNonTerminal"),
+                ul(
+                  li(
+                    "Assocs",
+                    ol(
+                      assocs.toList.map {
+                        case (aType, element) =>
+                          li(
+                            ul(
+                              li(aType.value.toString),
+                              li(elementToHtml(element.value)),
+                            ),
+                          )
+                      },
+                    ),
+                  ),
+                  li(
+                    "Base",
+                    ntToHtml(base),
+                  ),
+                ),
+              )
+          }
+        }
+        def elementToHtml(element: Grammar.Element): Frag = {
+
+          val (isOpt, elem) = element.toNonOpt
+          if (isOpt)
+            div(
+              b("Optional"),
+              elementToHtml(elem),
+            )
+          else
+            elem match {
+              case identifier: Grammar.Identifier =>
+                identifier.toString
+              case lnt: Grammar.ListNonTerminal =>
+                ntToHtml(lnt)
+            }
+        }
 
         subSection(
           "Grammar",
@@ -330,7 +444,22 @@ object Main {
           ),
           br,
           setting("Nts")(
-            TODO,
+            table(
+              tr(
+                th("Name")(
+                  width := "150px",
+                ),
+                th("NonTerminal")(
+                  width := "fit-content",
+                ),
+              ),
+              grammar.nts.map { nt =>
+                tr(
+                  td(nt.name.value.toString),
+                  td(ntToHtml(nt.nt)),
+                )
+              },
+            ),
           ),
         )
       }
