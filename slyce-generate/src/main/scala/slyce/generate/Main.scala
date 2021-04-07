@@ -56,60 +56,6 @@ object Main {
 
   private val DebugOutputDir: File = new File("target/slyce/debug")
 
-  /*
-  // TODO (KR) : Delete...
-  private type Res = Attempt[(Nfa, Dfa)]
-  private def convertRes(logger: Logger, res: Res): ??[Unit] = {
-    def convertMarkedMsg(mMsg: Marked[Msg]): Throwable =
-      Message(mMsg.toString)
-
-    // TODO (KR) :
-    for {
-      tmp1 <- res.mapWE(convertMarkedMsg, convertMarkedMsg).wrap[IO]
-      (nfa, dfa) = tmp1
-
-      _ <- logger() { src =>
-        src.info("Modes:")
-        src.indented() { src =>
-          dfa.modeStarts.foreach {
-            case (k, v) =>
-              src.info(s"$k: ${dfa.stateId(v)}")
-          }
-        }
-
-        src.info("States:")
-        src.indented() { src =>
-          dfa.states.toList.map(_._1).foreach { state =>
-            src.info(s"${dfa.stateId(state)}:")
-            src.indented() { src =>
-              src.info("Transitions:")
-              src.indented() { src =>
-                state.transitions.foreach {
-                  case (k, v) =>
-                    src.info(s"${k.prettyChars} => ${v.map(v => dfa.stateId(v.value))}")
-                }
-              }
-              src.info("ElseTransition:")
-              src.indented() { src =>
-                state.elseTransition.foreach { v =>
-                  src.info(dfa.stateId(v.value))
-                }
-              }
-              src.info("End:")
-              src.indented() { src =>
-                state.end.foreach { y =>
-                  src.info(s"Yields (${y.yields.size}): ${y.yields.map(_.value).mkString(", ")}")
-                  src.info(s"ToMode: ${y.toMode.value.map(v => dfa.stateId(v.value))}")
-                }
-              }
-            }
-          }
-        }
-      }.wrap
-    } yield ()
-  }
-   */
-
   def outputDebug(
       name: String,
       buildInput: BuildInput,
