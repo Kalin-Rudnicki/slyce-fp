@@ -12,6 +12,7 @@ object Main {
           Executable.fromSubCommands(
             // "list" -> list.Generate.executable,
             "calc" -> calc.Generate.executable,
+            "grammar" -> grammar.Generate.executable,
           ),
       )(args)
       .runSync

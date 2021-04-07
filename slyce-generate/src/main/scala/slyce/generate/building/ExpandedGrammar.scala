@@ -57,7 +57,12 @@ object ExpandedGrammar {
         case object Tail extends ListType
       }
 
-      final class Key
+      final class Key {
+
+        override def toString: String =
+          s"Key(${super.toString.split("@").last})"
+
+      }
 
       final case class NamedNt(name: String) extends NonTerminal
       final case class ListNt(name: String, `type`: ListType) extends NonTerminal
