@@ -288,7 +288,7 @@ object Main {
                   width := "350px",
                 ),
                 th("ToMode")(
-                  width := "250px",
+                  width := "150px",
                 ),
               ),
               lexer.modes.map { mode =>
@@ -319,6 +319,7 @@ object Main {
           ),
         )
       }
+
       def grammarToHtml(grammar: Grammar): Frag = {
 
         subSection(
@@ -346,11 +347,105 @@ object Main {
     def outputToHtml(
         buildOutput: BuildOutput,
     ): Frag = {
+      def dfaToHtml(dfa: Dfa): Frag = {
+
+        subSection("Dfa")(
+          setting("Modes")(
+            table(
+              tr(
+                th("Name")(
+                  width := "150px",
+                ),
+                th("State")(
+                  width := "150px",
+                ),
+              ),
+              dfa.modeStarts.toList.map {
+                case (name, dfaState) =>
+                  tr(
+                    td(name),
+                    td(dfa.stateId(dfaState)),
+                  )
+              },
+            ),
+          ),
+          br,
+          setting("States")(
+            table(
+              tr(
+                th("State")(
+                  width := "150px",
+                ),
+                th("Transitions")(
+                  width := "fit-content",
+                ),
+                th("ElseTransition")(
+                  width := "150px",
+                ),
+                th("Yields")(
+                  width := "350px",
+                ),
+                th("ToMode")(
+                  width := "150px",
+                ),
+              ),
+              dfa.states.toList.map {
+                case (state, _) =>
+                  tr(
+                    td(dfa.stateId(state)),
+                    td(
+                      table(
+                        tr(
+                          th("On")(
+                            width := "250px",
+                          ),
+                          th("ToState")(
+                            width := "150px",
+                          ),
+                        ),
+                        state.transitions.toList.map {
+                          case (on, toState) =>
+                            tr(
+                              td(on.prettyChars),
+                              td(
+                                toState.map { ts =>
+                                  dfa.stateId(ts.value)
+                                }.toList,
+                              ),
+                            )
+                        },
+                      ),
+                    ),
+                    td(
+                      state.elseTransition.map { e =>
+                        dfa.stateId(e.value)
+                      }.toList,
+                    ),
+                    td(
+                      ul(
+                        state.end.toList.flatMap { e =>
+                          e.yields.map { y =>
+                            li(y.value.toString)
+                          }
+                        },
+                      ),
+                    ),
+                    td(
+                      state.end.toList.map { e =>
+                        e.toMode.value.map(ls => dfa.stateId(ls.value)).toString
+                      },
+                    ),
+                  )
+              },
+            ),
+          ),
+        )
+      }
 
       section(
         "BuildOutput",
       )(
-        TODO,
+        dfaToHtml(buildOutput.dfa),
       )
     }
 
