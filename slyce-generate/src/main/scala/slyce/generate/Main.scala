@@ -414,6 +414,8 @@ object Main {
                               ),
                             )
                         },
+                      )(
+                        border := "none",
                       ),
                     ),
                     td(
