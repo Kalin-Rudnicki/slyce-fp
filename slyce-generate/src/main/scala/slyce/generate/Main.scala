@@ -115,6 +115,58 @@ object Main {
   ): IO[Unit] = {
     import scalatags.Text.all.{name => _, _}
 
+    // =====| Css |=====
+
+    val CssSettings = scalacss.devOrProdDefaults
+    import CssSettings._
+
+    object MyStyles extends StyleSheet.Standalone {
+      import dsl._
+
+      "table, th, td" - (
+        border := "1px solid black",
+      )
+
+      ".section-header" - (
+        margin := "0px",
+      )
+
+      ".internal" - (
+        marginLeft := "25px",
+      )
+      ".page" - (
+        marginTop := "25px",
+        marginLeft := "25px",
+      )
+      ".section" - (
+        borderLeft := "3px solid green",
+        padding := "10px",
+        &("h2") - (
+          margin := "0px",
+        ),
+      )
+      ".sub-section" - (
+        borderLeft := "3px solid blue",
+        padding := "10px",
+        &("h3") - (
+          margin := "0px",
+        ),
+      )
+
+    }
+
+    object C {
+
+      def apply(classes: String*): String =
+        classes.mkString(" ")
+
+      val internal = "internal"
+      val page = "page"
+      val section = "section"
+      val subSection = "sub-section"
+
+    }
+
     // =====| Helpers |=====
 
     val TODO = h3("TODO", color := "red")
@@ -138,31 +190,36 @@ object Main {
         div(
           _body: _*,
         )(
-          marginLeft := "25px",
+          `class` := C.internal,
         ),
       )(
-        marginTop := "25px",
-        marginLeft := "25px",
+        `class` := C.page,
       )
 
     def section(header: String)(body: Frag*): Frag =
       div(
         sectionHeader(header),
+        br,
         div(
           body: _*,
         )(
-          marginLeft := "25px",
+          `class` := C.internal,
         ),
+      )(
+        `class` := C.section,
       )
 
     def subSection(header: String)(body: Frag*): Frag =
       div(
         subSectionHeader(header),
+        br,
         div(
           body: _*,
         )(
-          marginLeft := "25px",
+          `class` := C.internal,
         ),
+      )(
+        `class` := C.subSection,
       )
 
     // =====| Sections |=====
@@ -171,11 +228,28 @@ object Main {
         title: String,
         messages: List[Marked[Msg]],
     ): Frag = {
+      def convertMessage(msg: Marked[Msg]): Frag = {
+
+        tr(
+          td(msg.value.toString),
+          td(msg.span.map(_.toString).toList),
+        )
+      }
 
       section(
         s"$title [${messages.size}]:",
       )(
-        TODO,
+        table(
+          tr(
+            th("Message")(
+              width := "350px",
+            ),
+            th("Span")(
+              width := "200px",
+            ),
+          ),
+          messages.map(convertMessage),
+        ),
       )
     }
 
@@ -203,6 +277,7 @@ object Main {
         "BuildInput",
       )(
         lexerToHtml(buildInput.lexer),
+        br,
         grammarToHtml(buildInput.grammar),
       )
     }
@@ -225,6 +300,7 @@ object Main {
     val htmlFrag =
       html(
         head(
+          tag("style")(MyStyles.render),
         ),
         page(
           s"Debug output for: $name",

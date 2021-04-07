@@ -27,6 +27,7 @@ lazy val `slyce-generate` =
       resolvers += Resolver.mavenLocal,
       libraryDependencies ++= Seq(
         "com.lihaoyi" %% "scalatags" % "0.9.2",
+        "com.github.japgolly.scalacss" %% "ext-scalatags" % "0.7.0",
       ),
     )
     .dependsOn(

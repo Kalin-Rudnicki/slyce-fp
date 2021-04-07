@@ -102,7 +102,7 @@ object ExpandedGrammar {
     }
 
     // TODO (KR) :
-    Alive(null)
+    Dead(Marked(Msg("Test")) :: Nil)
   }
 
 }
