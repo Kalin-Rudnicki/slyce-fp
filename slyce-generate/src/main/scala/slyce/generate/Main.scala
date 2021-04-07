@@ -324,7 +324,13 @@ object Main {
         subSection(
           "Grammar",
         )(
-          TODO,
+          setting("StartNt")(
+            p(grammar.startNt.value),
+          ),
+          br,
+          setting("Nts")(
+            TODO,
+          ),
         )
       }
 
