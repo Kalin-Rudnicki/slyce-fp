@@ -13,7 +13,7 @@ lazy val `slyce-core` =
       version := SlyceVersion,
       scalaVersion := MyScalaVersion,
       resolvers += Resolver.mavenLocal,
-      libraryDependencies += MyOrg %% "klib-core" % "0.1.8",
+      libraryDependencies += MyOrg %% "klib-core" % "0.2.3",
     )
 
 lazy val `slyce-generate` =
@@ -31,7 +31,7 @@ lazy val `slyce-generate` =
       ),
     )
     .dependsOn(
-      `slyce-core` % "compile->compile;test->test",
+      `slyce-core`,
     )
 
 lazy val `slyce-parse` =
@@ -45,7 +45,7 @@ lazy val `slyce-parse` =
       resolvers += Resolver.mavenLocal,
     )
     .dependsOn(
-      `slyce-core` % "compile->compile;test->test",
+      `slyce-core`,
     )
 
 lazy val `slyce-test` =
@@ -59,6 +59,6 @@ lazy val `slyce-test` =
       resolvers += Resolver.mavenLocal,
     )
     .dependsOn(
-      `slyce-generate` % "compile->compile;test->test",
-      `slyce-parse` % "compile->compile;test->test",
+      `slyce-generate`,
+      `slyce-parse`,
     )

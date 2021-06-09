@@ -12,7 +12,9 @@ final case class Yields[I](
 
 object Yields {
 
-  sealed trait Yield {
+  sealed trait Yield
+
+  sealed trait HasSubStr {
 
     val subString: (Maybe[Int], Maybe[Int])
 
@@ -26,10 +28,16 @@ object Yields {
     final case class Text(
         subString: (Maybe[Int], Maybe[Int]) = (None, None),
     ) extends Yield
+        with HasSubStr
 
     final case class Terminal(
         name: String,
         subString: (Maybe[Int], Maybe[Int]) = (None, None),
+    ) extends Yield
+        with HasSubStr
+
+    final case class Const(
+        text: String,
     ) extends Yield
 
   }

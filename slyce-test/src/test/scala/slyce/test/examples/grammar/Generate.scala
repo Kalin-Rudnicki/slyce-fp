@@ -26,9 +26,11 @@ object Generate {
             lines = List(
               Line(
                 priority = 1,
-                regex = Marked(Sequence("@start")),
+                regex = Marked(
+                  Sequence("@start:"),
+                ),
                 yields = Yields(
-                  yields = List(Marked(Text())),
+                  yields = List(Marked(Text((None, (-2).some)))),
                 ),
               ),
             ),
@@ -43,14 +45,14 @@ object Generate {
             nt = Grammar.StandardNonTerminal.`:`(
               reductions = NonEmptyList.nel(
                 List(
-                  Marked(Grammar.Identifier.raw("@start")),
+                  Marked(Grammar.Identifier.raw("@start:")),
                   Marked(Grammar.Identifier("nonTerminal")),
                   Marked(
                     Grammar.ListNonTerminal(
                       `type` = Grammar.ListNonTerminal.Type.*,
                       start = IgnoredList(
                         before = Nil,
-                        unIgnored = Marked(Grammar.Identifier("Mode")),
+                        unIgnored = Marked(Grammar.Identifier("NonTerminal")),
                         after = Nil,
                       ),
                       repeat = None,

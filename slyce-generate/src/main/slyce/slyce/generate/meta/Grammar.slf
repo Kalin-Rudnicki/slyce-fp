@@ -1,0 +1,11 @@
+
+@start General
+
+@mode General
+\/\/[^\n]*\n                                         ;
+/\*([^*]|\*[^/])*\*/                                 ;
+[ \t\n]+                                             ;
+\@start[ \t\n]                                       ; @[,-2]
+[A-Z][A-Za-z_\d]*                                    ; nonTerminal
+[a-z][A-Za-z_\d]*                                    ; terminal
+TODO ; raw
