@@ -9,7 +9,6 @@ import klib.fp.typeclass.Functor
 import klib.fp.types._
 import slyce.core._
 import slyce.generate._
-import slyce.generate.building.ExpandedGrammar.Identifier.NonTerminal
 import slyce.generate.input.Grammar
 
 final case class ExpandedGrammar private (
@@ -436,7 +435,7 @@ object ExpandedGrammar {
           nt.reductions.toList.exists { r =>
             r.elements.exists {
               case al: Identifier.NonTerminal.AnonListNt =>
-                !completedUUIDs.contains(al.key)
+                al.key != nt.name.key && !completedUUIDs.contains(al.key)
               case _ =>
                 false
             }
@@ -448,7 +447,14 @@ object ExpandedGrammar {
       anonListUUIDMap.values.toList.filter(validAnonList)
     }
 
-    def dereferenceNtId(id: Identifier.NonTerminal, found: Map[UUID, UUID]): id.type =
+    def mDereferenceNtId(key: UUID, id: Identifier.NonTerminal, found: Map[UUID, UUID]): Maybe[Identifier.NonTerminal] =
+      id match {
+        case al: Identifier.NonTerminal.AnonListNt =>
+          (al.key != key).maybe(dereferenceNtId(id, found))
+        case _ =>
+          id.some
+      }
+    def dereferenceNtId(id: Identifier.NonTerminal, found: Map[UUID, UUID]): Identifier.NonTerminal =
       id match {
         case al: Identifier.NonTerminal.AnonListNt =>
           Identifier.NonTerminal
@@ -458,18 +464,25 @@ object ExpandedGrammar {
           id
       }
 
+    def mDereferenceId(key: UUID, id: Identifier, found: Map[UUID, UUID]): Maybe[Identifier] =
+      id match {
+        case terminal: Identifier.NonTerminal =>
+          mDereferenceNtId(key, terminal, found)
+        case _ =>
+          id.some
+      }
     def dereferenceId(id: Identifier, found: Map[UUID, UUID]): Identifier =
       id match {
-        case terminal: NonTerminal =>
+        case terminal: Identifier.NonTerminal =>
           dereferenceNtId(terminal, found)
         case _ =>
           id
       }
 
-    def dereferenceNt[N <: Identifier.NonTerminal](
-        nt: NT[N],
+    def dereferenceNt(
+        nt: NT[Identifier.NonTerminal],
         found: Map[UUID, UUID],
-    ): NT[N] =
+    ): NT[Identifier.NonTerminal] =
       NT(
         dereferenceNtId(nt.name, found),
         nt.reductions.map(r => NT.Reduction(r.elements.map(dereferenceId(_, found)), r.liftIdx)),
@@ -482,22 +495,42 @@ object ExpandedGrammar {
       val completedUUIDs = found.keys.toSet
       val nonBlockedNts = getNonBlockedNts(completedUUIDs)
 
+      println(completedUUIDs)
+      println((anonListUUIDMap.size, completedUUIDs.size, nonBlockedNts.size))
+
       if (nonBlockedNts.isEmpty)
         found
       else {
-        val nonBlockedDereferenced = nonBlockedNts.map(dereferenceNt(_, found))
-        val duplicateLists = nonBlockedDereferenced.groupMap(_.reductions)(_.name.key).values.toList
+        val nonBlockedDereferenced = nonBlockedNts.map { nt =>
+          (
+            nt.name.key,
+            nt.reductions.map(r => (r.elements.map(mDereferenceId(nt.name.key, _, found)), r.liftIdx)),
+          )
+        }
+        val duplicateLists = nonBlockedDereferenced.groupMap(_._2)(_._1).values.toList
         val newMap = duplicateLists.flatMap(dl => dl.map((_, dl.head))).toMap
 
         findDuplicates(found ++ newMap)
       }
     }
 
+    def filterRedundantAnonListNts(nts: List[NT[Identifier.NonTerminal]], valid: Set[UUID]): List[NT[Identifier.NonTerminal]] =
+      nts.filter { nt =>
+        nt.name match {
+          case al: Identifier.NonTerminal.AnonListNt =>
+            valid.contains(al.key)
+          case _ =>
+            true
+        }
+      }
+
     val duplicateMap = findDuplicates(Map.empty)
+    println
+    duplicateMap.foreach(println)
 
     ExpandedGrammar(
       startNt = expandedGrammar.startNt,
-      nts = expandedGrammar.nts.map(dereferenceNt(_, duplicateMap)),
+      nts = filterRedundantAnonListNts(expandedGrammar.nts, duplicateMap.values.toSet).map(dereferenceNt(_, duplicateMap)),
       aliases = expandedGrammar.aliases.map(t => (dereferenceNtId(t._1, duplicateMap), dereferenceNtId(t._2, duplicateMap))),
     )
   }

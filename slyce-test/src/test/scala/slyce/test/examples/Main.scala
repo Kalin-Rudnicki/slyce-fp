@@ -13,6 +13,7 @@ object Main {
             // "list" -> list.Generate.executable,
             "calc" -> calc.Generate.executable,
             "grammar" -> grammar.Generate.executable,
+            "tmp" -> tmp.Generate.executable,
           ),
       )(args)
       .runSync

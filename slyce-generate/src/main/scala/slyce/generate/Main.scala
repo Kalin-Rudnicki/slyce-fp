@@ -391,7 +391,7 @@ object Main {
             p(grammar.startNt.value),
           ),
           br,
-          setting("Nts")(
+          setting(s"Nts (${grammar.nts.size})")(
             table(
               tr(
                 th("Name")(
@@ -527,7 +527,7 @@ object Main {
             p(expandedGrammar.startNt.value),
           ),
           br,
-          setting("Nts")(
+          setting(s"Nts (${expandedGrammar.nts.size})")(
             table(
               tr(
                 th("Reductions")(
@@ -569,7 +569,7 @@ object Main {
             ),
           ),
           br,
-          setting("Aliases")(
+          setting(s"Aliases (${expandedGrammar.aliases.size})")(
             table(
               tr(
                 th("Identifier")(
