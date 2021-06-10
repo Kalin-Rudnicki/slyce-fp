@@ -22,6 +22,7 @@ object Main {
       nfa: Nfa,
       dfa: Dfa,
       expandedGrammar: ExpandedGrammar,
+      expandedGrammar2: ExpandedGrammar,
   )
 
   def build(buildInput: BuildInput): Attempt[BuildOutput] = {
@@ -51,6 +52,7 @@ object Main {
       nfa = nfa,
       dfa = dfa,
       expandedGrammar = expandedGrammar,
+      expandedGrammar2 = ExpandedGrammar.simplifyAnonLists(expandedGrammar),
     )
   }
 
@@ -594,6 +596,8 @@ object Main {
         dfaToHtml(buildOutput.dfa),
         br,
         expandedGrammarToHtml(buildOutput.expandedGrammar),
+        br,
+        expandedGrammarToHtml(buildOutput.expandedGrammar2),
       )
     }
 

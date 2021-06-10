@@ -1,15 +1,20 @@
 package slyce.generate.building
 
+import java.util.UUID
+
+import scala.annotation.tailrec
+
 import klib.Implicits._
 import klib.fp.typeclass.Functor
 import klib.fp.types._
 import slyce.core._
 import slyce.generate._
+import slyce.generate.building.ExpandedGrammar.Identifier.NonTerminal
 import slyce.generate.input.Grammar
 
 final case class ExpandedGrammar private (
     startNt: Marked[String], // TODO (KR) : Remove?
-    nts: List[ExpandedGrammar.NT],
+    nts: List[ExpandedGrammar.NT[ExpandedGrammar.Identifier.NonTerminal]],
     aliases: List[ExpandedGrammar.Alias],
 )
 
@@ -57,16 +62,9 @@ object ExpandedGrammar {
         case object Tail extends ListType
       }
 
-      final class Key {
-
-        override def toString: String =
-          s"Key(${super.toString.split("@").last})"
-
-      }
-
       final case class NamedNt(name: String) extends NonTerminal
       final case class ListNt(name: String, `type`: ListType) extends NonTerminal
-      final case class AnonListNt(key: Key, `type`: ListType) extends NonTerminal
+      final case class AnonListNt(key: UUID, `type`: ListType) extends NonTerminal
       final case class AssocNt(name: String, idx: Int) extends NonTerminal
       final case class AnonOptNt(identifier: Identifier) extends NonTerminal
     }
@@ -76,17 +74,17 @@ object ExpandedGrammar {
 
   }
 
-  final case class NT(
-      name: Identifier.NonTerminal,
+  final case class NT[+N <: Identifier.NonTerminal](
+      name: N,
       reductions: NonEmptyList[NT.Reduction],
   )
   object NT {
 
-    def apply(
-        name: Identifier.NonTerminal,
+    def apply[N <: Identifier.NonTerminal](
+        name: N,
         reduction0: Reduction,
         reductionN: Reduction*,
-    ): NT =
+    ): NT[N] =
       NT(
         name,
         NonEmptyList(reduction0, reductionN.toList),
@@ -107,7 +105,7 @@ object ExpandedGrammar {
   def fromGrammar(grammar: Grammar): Attempt[ExpandedGrammar] = {
     final case class Expansion[+T](
         data: T,
-        generatedNts: List[NT],
+        generatedNts: List[NT[Identifier.NonTerminal]],
         aliases: List[Alias],
     )
     object Expansion {
@@ -220,11 +218,9 @@ object ExpandedGrammar {
               id,
             )
           case None =>
-            val key = new Identifier.NonTerminal.Key
-
             (
               None,
-              Identifier.NonTerminal.AnonListNt(key, Identifier.NonTerminal.ListType.Simple),
+              Identifier.NonTerminal.AnonListNt(UUID.randomUUID, Identifier.NonTerminal.ListType.Simple),
             )
         }
       def createMyIds: (Maybe[Alias], Identifier.NonTerminal, Identifier.NonTerminal) =
@@ -238,12 +234,10 @@ object ExpandedGrammar {
               Identifier.NonTerminal.ListNt(name.name, Identifier.NonTerminal.ListType.Tail),
             )
           case None =>
-            val key = new Identifier.NonTerminal.Key
-
             (
               None,
-              Identifier.NonTerminal.AnonListNt(key, Identifier.NonTerminal.ListType.Head),
-              Identifier.NonTerminal.AnonListNt(key, Identifier.NonTerminal.ListType.Tail),
+              Identifier.NonTerminal.AnonListNt(UUID.randomUUID, Identifier.NonTerminal.ListType.Head),
+              Identifier.NonTerminal.AnonListNt(UUID.randomUUID, Identifier.NonTerminal.ListType.Tail),
             )
         }
 
@@ -419,6 +413,92 @@ object ExpandedGrammar {
       startNt = grammar.startNt,
       nts = combined.generatedNts,
       aliases = combined.aliases,
+    )
+  }
+
+  def simplifyAnonLists(expandedGrammar: ExpandedGrammar): ExpandedGrammar = {
+    val anonListUUIDMap: Map[UUID, NT[Identifier.NonTerminal.AnonListNt]] =
+      expandedGrammar.nts.flatMap { nt =>
+        nt.name match {
+          case anonList: Identifier.NonTerminal.AnonListNt =>
+            (anonList.key, nt.asInstanceOf[NT[Identifier.NonTerminal.AnonListNt]]).someOpt
+          case _ =>
+            scala.None
+        }
+      }.toMap
+
+    def getNonBlockedNts(completedUUIDs: Set[UUID]): List[NT[Identifier.NonTerminal.AnonListNt]] = {
+      def validAnonList(nt: NT[Identifier.NonTerminal.AnonListNt]): Boolean = {
+        def isAlreadyDone: Boolean =
+          completedUUIDs.contains(nt.name.key)
+
+        def isBlocked: Boolean =
+          nt.reductions.toList.exists { r =>
+            r.elements.exists {
+              case al: Identifier.NonTerminal.AnonListNt =>
+                !completedUUIDs.contains(al.key)
+              case _ =>
+                false
+            }
+          }
+
+        !(isAlreadyDone || isBlocked)
+      }
+
+      anonListUUIDMap.values.toList.filter(validAnonList)
+    }
+
+    def dereferenceNtId(id: Identifier.NonTerminal, found: Map[UUID, UUID]): id.type =
+      id match {
+        case al: Identifier.NonTerminal.AnonListNt =>
+          Identifier.NonTerminal
+            .AnonListNt(found.getOrElse(al.key, al.key), al.`type`)
+            .asInstanceOf[id.type]
+        case _ =>
+          id
+      }
+
+    def dereferenceId(id: Identifier, found: Map[UUID, UUID]): Identifier =
+      id match {
+        case terminal: NonTerminal =>
+          dereferenceNtId(terminal, found)
+        case _ =>
+          id
+      }
+
+    def dereferenceNt[N <: Identifier.NonTerminal](
+        nt: NT[N],
+        found: Map[UUID, UUID],
+    ): NT[N] =
+      NT(
+        dereferenceNtId(nt.name, found),
+        nt.reductions.map(r => NT.Reduction(r.elements.map(dereferenceId(_, found)), r.liftIdx)),
+      )
+
+    @tailrec
+    def findDuplicates(
+        found: Map[UUID, UUID],
+    ): Map[UUID, UUID] = {
+      val completedUUIDs = found.keys.toSet
+      val nonBlockedNts = getNonBlockedNts(completedUUIDs)
+
+      if (nonBlockedNts.isEmpty)
+        found
+      else {
+        val nonBlockedDereferenced = nonBlockedNts.map(dereferenceNt(_, found))
+        val duplicateLists = nonBlockedDereferenced.groupMap(_.reductions)(_.name.key).values.toList
+        val newMap = duplicateLists.flatMap(dl => dl.map((_, dl.head))).toMap
+
+        findDuplicates(found ++ newMap)
+      }
+    }
+
+    val duplicateMap = findDuplicates(Map.empty)
+
+    ExpandedGrammar(
+      startNt = expandedGrammar.startNt,
+      nts = expandedGrammar.nts.map(dereferenceNt(_, duplicateMap)),
+      aliases = expandedGrammar.aliases.map(t => (dereferenceNtId(t._1, duplicateMap), dereferenceNtId(t._2, duplicateMap))),
     )
   }
 
