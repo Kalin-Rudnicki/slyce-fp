@@ -4,7 +4,7 @@ import klib.Implicits._
 import klib.fp.types._
 import klib.utils._, Logger.{helpers => L}, L.Implicits._
 import slyce.generate.input._
-import slyce.generate.{Main => MainMain}
+import slyce.generate.main._
 
 package object examples {
 
@@ -22,12 +22,12 @@ package object examples {
           L.break(),
           L.log.info("Building..."),
         ),
-      ).wrap
-      buildInput = MainMain.BuildInput(lexer, grammar)
-      aBuildResult <- MainMain.build(buildInput).pure[??]
-      _ <- logger(L.log.info("Writing result...")).wrap
-      _ <- MainMain.outputDebug(name, buildInput, aBuildResult).wrap
-      _ <- logger(L.log.info("Done.")).wrap
+      )
+      buildInput = BuildInput(lexer, grammar)
+      aBuildResult = Build.build(buildInput)
+      _ <- logger(L.log.info("Writing result..."))
+      _ <- OutputDebug.outputDebug(name, buildInput, aBuildResult)
+      _ <- logger(L.log.info("Done."))
     } yield ()
   }
 

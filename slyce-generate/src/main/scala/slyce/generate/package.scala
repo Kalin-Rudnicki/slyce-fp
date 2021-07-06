@@ -8,7 +8,7 @@ import scala.annotation.tailrec
 
 package object generate {
 
-  type Attempt[T] = ErrorAccumulator[Marked[Msg], Marked[Msg], T]
+  type Attempt[T] = ErrorAccumulator[Marked[Msg], T]
 
   implicit class CharSetOps(chars: Set[Char]) {
 

@@ -1,4 +1,4 @@
-package slyce.generate
+package slyce.generate.main
 
 import java.io.File
 
@@ -8,53 +8,10 @@ import klib.fp.utils.ado
 import klib.utils._
 import slyce.core._
 import slyce.generate._
-import input._
-import building._
+import slyce.generate.input._
+import slyce.generate.building._
 
-object Main {
-
-  final case class BuildInput(
-      lexer: Lexer,
-      grammar: Grammar,
-  )
-
-  final case class BuildOutput(
-      nfa: Nfa,
-      dfa: Dfa,
-      expandedGrammar: ExpandedGrammar,
-      expandedGrammar2: ExpandedGrammar,
-  )
-
-  def build(buildInput: BuildInput): Attempt[BuildOutput] = {
-    type LexerItems = (Nfa, Dfa)
-    type GrammarItems = (ExpandedGrammar)
-
-    val lexerItems: Attempt[LexerItems] =
-      for {
-        nfa <- Nfa.fromLexer(buildInput.lexer)
-        dfa <- Dfa.fromNfa(nfa)
-      } yield (nfa, dfa)
-
-    val grammarItems: Attempt[GrammarItems] =
-      for {
-        expandedGrammar <- ExpandedGrammar.fromGrammar(buildInput.grammar)
-      } yield expandedGrammar
-
-    for {
-      joinedItems <- ado[Attempt].join(
-        lexerItems,
-        grammarItems,
-      )
-      ((nfa, dfa), expandedGrammar) = joinedItems
-
-      // TODO (KR) : Extra checks
-    } yield BuildOutput(
-      nfa = nfa,
-      dfa = dfa,
-      expandedGrammar = expandedGrammar,
-      expandedGrammar2 = ExpandedGrammar.simplifyAnonLists(expandedGrammar),
-    )
-  }
+object OutputDebug {
 
   private val DebugOutputDir: File = new File("target/slyce/debug")
 
@@ -69,6 +26,19 @@ object Main {
 
     val CssSettings = scalacss.devOrProdDefaults
     import CssSettings._
+
+    object C {
+
+      def apply(classes: String*): String =
+        classes.mkString(" ")
+
+      val internal = "internal"
+      val page = "page"
+      val section = "section"
+      val subSection = "sub-section"
+      val setting = "setting"
+
+    }
 
     object MyStyles extends StyleSheet.Standalone {
       import dsl._
@@ -112,19 +82,6 @@ object Main {
 
     }
 
-    object C {
-
-      def apply(classes: String*): String =
-        classes.mkString(" ")
-
-      val internal = "internal"
-      val page = "page"
-      val section = "section"
-      val subSection = "sub-section"
-      val setting = "setting"
-
-    }
-
     // =====| Helpers |=====
 
     val TODO = h3("TODO", color := "red")
@@ -132,54 +89,38 @@ object Main {
     // ...
 
     def page(header: String)(_body: Frag*): Frag =
-      body(
+      body(`class` := C.page)(
         h1(header),
-        div(
+        div(`class` := C.internal)(
           _body: _*,
-        )(
-          `class` := C.internal,
         ),
-      )(
-        `class` := C.page,
       )
 
     def section(header: String)(body: Frag*): Frag =
-      div(
+      div(`class` := C.section)(
         h2(header),
         br,
-        div(
+        div(`class` := C.internal)(
           body: _*,
-        )(
-          `class` := C.internal,
         ),
-      )(
-        `class` := C.section,
       )
 
     def subSection(header: String)(body: Frag*): Frag =
-      div(
+      div(`class` := C.subSection)(
         h3(header),
         br,
-        div(
+        div(`class` := C.internal)(
           body: _*,
-        )(
-          `class` := C.internal,
         ),
-      )(
-        `class` := C.subSection,
       )
 
     def setting(header: String)(body: Frag*): Frag =
-      div(
+      div(`class` := C.setting)(
         h4(header),
         br,
-        div(
+        div(`class` := C.internal)(
           body: _*,
-        )(
-          `class` := C.internal,
         ),
-      )(
-        `class` := C.setting,
       )
 
     // =====| Sections |=====
@@ -603,7 +544,13 @@ object Main {
 
     // =====| Usage |=====
 
-    val (mRes, warnings, errors) = aBuildOutput.toTuple
+    val (mRes, errors) =
+      aBuildOutput match {
+        case Alive(r) =>
+          (r.some, Nil)
+        case Dead(errors) =>
+          (None, errors)
+      }
 
     val htmlFrag =
       html(
@@ -614,8 +561,6 @@ object Main {
           s"Debug output for: $name",
         )(
           messagesToHtml("Error(s)", errors),
-          br,
-          messagesToHtml("Warning(s)", warnings),
           br,
           inputToHtml(buildInput),
           br,
@@ -630,14 +575,5 @@ object Main {
       _ <- IO.writeFile(outputFile, htmlText)
     } yield ()
   }
-
-  /*
-  TODO (KR) :
-
-  def main(args: Array[String]): Unit = {
-
-    ???
-  }
-   */
 
 }
