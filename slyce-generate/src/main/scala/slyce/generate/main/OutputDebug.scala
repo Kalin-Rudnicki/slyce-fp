@@ -16,7 +16,6 @@ object OutputDebug {
   private val DebugOutputDir: File = new File("target/slyce/debug")
 
   def outputDebug(
-      name: String,
       buildInput: BuildInput,
       aBuildOutput: Attempt[BuildOutput],
   ): IO[Unit] = {
@@ -366,7 +365,6 @@ object OutputDebug {
         buildOutput: BuildOutput,
     ): Frag = {
       def dfaToHtml(dfa: Dfa): Frag = {
-
         subSection("Dfa")(
           setting("Modes")(
             table(
@@ -462,8 +460,8 @@ object OutputDebug {
         )
       }
 
-      def expandedGrammarToHtml(expandedGrammar: ExpandedGrammar): Frag =
-        subSection("ExpandedGrammar")(
+      def expandedGrammarToHtml(label: String, expandedGrammar: ExpandedGrammar): Frag =
+        subSection(label)(
           setting("StartNt")(
             p(expandedGrammar.startNt.value),
           ),
@@ -536,9 +534,9 @@ object OutputDebug {
       )(
         dfaToHtml(buildOutput.dfa),
         br,
-        expandedGrammarToHtml(buildOutput.expandedGrammar),
+        expandedGrammarToHtml("ExpandedGrammar", buildOutput.expandedGrammar),
         br,
-        expandedGrammarToHtml(buildOutput.expandedGrammar2),
+        expandedGrammarToHtml("DeDuplicated ExpandedGrammar", buildOutput.deDuplicatedExpandedGrammar),
       )
     }
 
@@ -558,7 +556,7 @@ object OutputDebug {
           tag("style")(MyStyles.render),
         ),
         page(
-          s"Debug output for: $name",
+          s"Debug output for: ${buildInput.name}",
         )(
           messagesToHtml("Error(s)", errors),
           br,
@@ -570,7 +568,7 @@ object OutputDebug {
 
     for {
       _ <- DebugOutputDir.mkdirs.pure[IO]
-      outputFile = new File(DebugOutputDir, s"$name.html")
+      outputFile = new File(DebugOutputDir, s"${buildInput.name}.html")
       htmlText = htmlFrag.render
       _ <- IO.writeFile(outputFile, htmlText)
     } yield ()
