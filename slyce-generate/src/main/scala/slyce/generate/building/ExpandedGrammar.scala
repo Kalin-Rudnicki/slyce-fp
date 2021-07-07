@@ -495,9 +495,6 @@ object ExpandedGrammar {
       val completedUUIDs = found.keys.toSet
       val nonBlockedNts = getNonBlockedNts(completedUUIDs)
 
-      println(completedUUIDs)
-      println((anonListUUIDMap.size, completedUUIDs.size, nonBlockedNts.size))
-
       if (nonBlockedNts.isEmpty)
         found
       else {
@@ -525,8 +522,6 @@ object ExpandedGrammar {
       }
 
     val duplicateMap = findDuplicates(Map.empty)
-    println
-    duplicateMap.foreach(println)
 
     ExpandedGrammar(
       startNt = expandedGrammar.startNt,

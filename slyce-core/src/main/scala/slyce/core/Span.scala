@@ -66,8 +66,8 @@ object Span {
 
     def onChar(c: Char): Pos =
       c match {
-        case '\n' =>
-          Pos(absolutePos + 1, lineNo + 1, Pos.PosInLineStart)
+        case '\n' => Pos(absolutePos + 1, lineNo + 1, Pos.PosInLineStart)
+        case _    => Pos(absolutePos + 1, lineNo, posInLine + 1)
       }
 
     def toString(showAbsolute: Boolean): String =
