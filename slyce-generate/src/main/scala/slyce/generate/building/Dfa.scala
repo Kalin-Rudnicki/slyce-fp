@@ -14,7 +14,7 @@ final case class Dfa private (
     states: NonEmptyList[(Dfa.State, Int)],
 ) {
 
-  private val stateMap: Map[Dfa.State, Int] =
+  val stateMap: Map[Dfa.State, Int] =
     states.toList.toMap
 
   def stateId(state: Dfa.State): String =

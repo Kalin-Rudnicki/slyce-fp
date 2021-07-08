@@ -1,6 +1,7 @@
 package slyce.generate.main
 
 import klib.Implicits._
+import klib.fp.types._
 import klib.fp.utils.ado
 import klib.utils._
 
@@ -63,6 +64,8 @@ object Build {
 
     val imports: IndentedString = // TODO (KR) :
       inline(
+        "import klib.Implicits._",
+        "import klib.fp.types._",
         "import slyce.parse._",
       )
 
@@ -71,20 +74,93 @@ object Build {
         inline("type Tok = Nothing")
 
       val raw: IndentedString = // TODO (KR) :
-        indented("type Raw = Nothing")
+        inline(
+          "type Raw = Nothing",
+        )
 
       val parser: IndentedString = {
         val lexer: IndentedString = {
+          def makeState(idx: Int, state: slyce.generate.building.Dfa.State): IndentedString = {
+            inline(
+              s"lazy val s$idx: Lexer.State[Tok] =",
+              indented(
+                "Lexer.State[Tok](",
+                indented(
+                  s"$idx,",
+                  inline(
+                    "Map(",
+                    indented(
+                      state.transitions.toList
+                        .flatMap {
+                          case (chars, to) =>
+                            val to2 = to.map(t => output.dfa.stateMap(t.value))
+                            chars.toList.map((_, to2))
+                        }
+                        .sortBy(_._1)
+                        .map {
+                          case (c, to) =>
+                            s"${c.toInt}.toChar -> ${to.cata(to => s"s$to.some, /* ${c.unesc} */", "None,")}"
+                        },
+                    ),
+                    "),",
+                  ),
+                  state.elseTransition.cata(to => s"s${output.dfa.stateMap(to.value)}.some,", "None,"),
+                  state.end match {
+                    case Some(yields) =>
+                      inline(
+                        "Lexer.Yields[Tok](",
+                        indented(
+                          "List(",
+                          indented(
+                            yields.yields.map { y =>
+                              y.value match { // TODO (KR) :
+                                case Yields.Yield.Text(subString)           => "???, // TODO : text"
+                                case Yields.Yield.Terminal(name, subString) => "???, // TODO : terminal"
+                                case Yields.Yield.Const(text)               => "???, // TODO : const"
+                              }
+                            },
+                          ),
+                          "),",
+                          yields.toMode.value match {
+                            case Yields.ToMode.Same       => "Lexer.Yields.ToMode.Same,"
+                            case Yields.ToMode.To(mode)   => s"Lexer.Yields.ToMode.To[Tok](s${output.dfa.stateMap(mode.value)}),"
+                            case Yields.ToMode.Push(mode) => s"Lexer.Yields.ToMode.Push[Tok](s${output.dfa.stateMap(mode.value)}),"
+                            case Yields.ToMode.Pop        => "Lexer.Yields.ToMode.Pop,"
+                          },
+                        ),
+                        ").some,",
+                      )
+                    case None =>
+                      s"None,"
+                  },
+                ),
+                ")",
+              ),
+              Break,
+            )
+          }
 
           inline(
-            "???, // TODO : Lexer",
+            "Lexer[Tok] {",
+            indented(
+              output.dfa.states.toList.map {
+                case (state, i) =>
+                  makeState(i, state)
+              },
+              "s0",
+            ),
+            "},",
           )
         }
 
         val grammar: IndentedString = {
 
           inline(
-            "???, // TODO : Grammar",
+            "new Grammar[Tok, Raw] {",
+            indented(
+              "def buildTree(tokens: List[Tok]): Attempt[Raw] = ??? // TODO : ...",
+            ),
+            "},",
           )
         }
 
@@ -118,7 +194,6 @@ object Build {
 
     inline(
       headerNote,
-      Break,
       packageHeader,
       imports,
       Break,

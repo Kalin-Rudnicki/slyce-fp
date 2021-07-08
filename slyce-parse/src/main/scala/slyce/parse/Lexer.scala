@@ -66,7 +66,8 @@ final case class Lexer[Tok](state0: Lexer.State[Tok]) {
     @tailrec
     def loop(
         state: Lexer.State[Tok],
-        stateStack: List[Lexer.State[Tok]],
+        mode: Lexer.State[Tok],
+        modeStack: List[Lexer.State[Tok]],
         pos: Span.Pos,
         chars: List[Char],
         toks: List[Tok],
@@ -76,7 +77,7 @@ final case class Lexer[Tok](state0: Lexer.State[Tok]) {
       (
         chars match {
           case head :: tail =>
-            state.on.get(head).toMaybe.orElse(state.elseOn) match {
+            state.on.get(head).toMaybe.flatten.orElse(state.elseOn) match {
               case Some(newState) =>
                 val newPos = pos.onChar(head)
                 val newSeen = (head, pos) :: seen
@@ -91,7 +92,8 @@ final case class Lexer[Tok](state0: Lexer.State[Tok]) {
         case Right((newState, newPos, newSeen, tail)) =>
           loop(
             newState,
-            stateStack,
+            mode,
+            modeStack,
             newPos,
             tail,
             toks,
@@ -102,10 +104,22 @@ final case class Lexer[Tok](state0: Lexer.State[Tok]) {
           calcHit(hit, last) match {
             case Alive((toMode, pos, chars, newToks)) =>
               toMode match {
+                case Lexer.Yields.ToMode.Same =>
+                  loop(
+                    mode,
+                    mode,
+                    modeStack,
+                    pos,
+                    chars,
+                    newToks ::: toks,
+                    Nil,
+                    None,
+                  )
                 case Lexer.Yields.ToMode.To(toState) =>
                   loop(
                     toState,
-                    stateStack,
+                    toState,
+                    modeStack,
                     pos,
                     chars,
                     newToks ::: toks,
@@ -115,7 +129,8 @@ final case class Lexer[Tok](state0: Lexer.State[Tok]) {
                 case Lexer.Yields.ToMode.Push(toState) =>
                   loop(
                     toState,
-                    state :: stateStack,
+                    toState,
+                    mode :: modeStack,
                     pos,
                     chars,
                     newToks ::: toks,
@@ -123,11 +138,12 @@ final case class Lexer[Tok](state0: Lexer.State[Tok]) {
                     None,
                   )
                 case Lexer.Yields.ToMode.Pop =>
-                  stateStack match {
-                    case ssHead :: ssTail =>
+                  modeStack match {
+                    case msHead :: msTail =>
                       loop(
-                        ssHead,
-                        ssTail,
+                        msHead,
+                        msHead,
+                        msTail,
                         pos,
                         chars,
                         newToks ::: toks,
@@ -144,6 +160,7 @@ final case class Lexer[Tok](state0: Lexer.State[Tok]) {
       }
 
     loop(
+      state0,
       state0,
       Nil,
       Span.Pos.Start,
@@ -170,6 +187,7 @@ object Lexer {
 
     sealed trait ToMode[+Tok]
     object ToMode {
+      case object Same extends ToMode[Nothing]
       final case class To[Tok](state: State[Tok]) extends ToMode[Tok]
       final case class Push[Tok](state: State[Tok]) extends ToMode[Tok]
       case object Pop extends ToMode[Nothing]
@@ -179,9 +197,9 @@ object Lexer {
 
   final case class State[Tok](
       id: Int,
-      yields: Maybe[Yields[Tok]],
-      on: Map[Char, State[Tok]],
+      on: Map[Char, Maybe[State[Tok]]],
       elseOn: Maybe[State[Tok]],
+      yields: Maybe[Yields[Tok]],
   )
 
 }
