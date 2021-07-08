@@ -182,17 +182,21 @@ object Build {
         )
 
       val nts: IndentedString = {
-        def caseClass(name: String, reduction: ExpandedGrammar.NT.Reduction, `extends`: String): IndentedString =
-          inline(
-            s"final case class $name(",
-            indented(
-              reduction.elements.zipWithIndex.map {
-                case (element, i) =>
-                  s"_$i: ${scopedIdentifierName(element)},"
-              },
-            ),
-            s") extends ${`extends`}",
-          )
+        def typeSignature(name: String, reduction: ExpandedGrammar.NT.Reduction, `extends`: String): IndentedString =
+          reduction.elements.nonEmpty ?
+            inline(
+              s"final case class $name(",
+              indented(
+                reduction.elements.zipWithIndex.map {
+                  case (element, i) =>
+                    s"_$i: ${scopedIdentifierName(element)},"
+                },
+              ),
+              s") extends ${`extends`}",
+            ) |
+            inline(
+              s"case object $name extends ${`extends`}",
+            )
 
         inline(
           s"type NtRoot = NonTerminal.${output.deDuplicatedExpandedGrammar.startNt.value}",
@@ -209,7 +213,7 @@ object Build {
               inline(
                 (nt.reductions.size == 1) ?
                   inline(
-                    caseClass(ntName, nt.reductions.head, "NonTerminal"),
+                    typeSignature(ntName, nt.reductions.head, "NonTerminal"),
                   ) |
                   inline(
                     s"sealed trait $ntName extends NonTerminal",
@@ -217,7 +221,7 @@ object Build {
                     indented(
                       nt.reductions.toList.zipWithIndex.map {
                         case (reduction, i) =>
-                          caseClass(s"_${i + 1}", reduction, ntName)
+                          typeSignature(s"_${i + 1}", reduction, ntName)
                       },
                     ),
                     "}",
