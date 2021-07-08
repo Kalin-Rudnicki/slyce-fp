@@ -12,10 +12,14 @@ final case class ParsingTable(
 )
 object ParsingTable {
 
+  final case class First(
+      terminals: Set[ExpandedGrammar.Identifier.Term],
+      epsilon: Boolean,
+  )
+
   final case class Follow(
       terminals: Set[ExpandedGrammar.Identifier.Term],
       end: Boolean,
-      epsilon: Boolean,
   )
 
   final case class Production(
@@ -32,15 +36,15 @@ object ParsingTable {
     def unaliasNt(nt: ExpandedGrammar.Identifier.NonTerminal): ExpandedGrammar.Identifier.NonTerminal =
       expandedGrammar.aliases.find(_._1 == nt).toMaybe.cata(_._2, nt)
 
-    val followMap: Map[ExpandedGrammar.Identifier.NonTerminal, Follow] = {
+    val firstMap: Map[ExpandedGrammar.Identifier.NonTerminal, First] = {
       final case class Waiting(
           ntName: ExpandedGrammar.Identifier.NonTerminal,
           remaining: List[List[ExpandedGrammar.Identifier]],
-          follow: Waiting.Follow,
+          first: Waiting.First,
           madeProgress: Boolean,
       )
       object Waiting {
-        final case class Follow(
+        final case class First(
             terminals: Set[ExpandedGrammar.Identifier.Term],
             nonTerminals: Set[ExpandedGrammar.Identifier.NonTerminal],
             epsilon: Boolean,
@@ -48,10 +52,10 @@ object ParsingTable {
       }
 
       @tailrec
-      def findFollowMap(
-          known: Map[ExpandedGrammar.Identifier.NonTerminal, Waiting.Follow],
+      def findFirstMap(
+          known: Map[ExpandedGrammar.Identifier.NonTerminal, Waiting.First],
           waiting: List[Waiting],
-      ): Map[ExpandedGrammar.Identifier.NonTerminal, Follow] =
+      ): Map[ExpandedGrammar.Identifier.NonTerminal, First] =
         if (waiting.isEmpty) {
           known.map {
             case (k, v) =>
@@ -60,28 +64,27 @@ object ParsingTable {
 
               (
                 k,
-                Follow(
+                First(
                   follows.flatMap(_.terminals),
-                  false,
                   follows.exists(_.epsilon),
                 ),
               )
           }
         } else if (!waiting.exists(_.madeProgress))
-          findFollowMap(
+          findFirstMap(
             known ++ waiting.map { w =>
               (
                 w.ntName,
-                Waiting.Follow(
-                  w.follow.terminals,
-                  w.follow.nonTerminals |
+                Waiting.First(
+                  w.first.terminals,
+                  w.first.nonTerminals |
                     w.remaining.flatMap {
                       case (nonTerminal: ExpandedGrammar.Identifier.NonTerminal) :: _ =>
                         nonTerminal.some
                       case _ =>
                         None
                     }.toSet,
-                  w.follow.epsilon,
+                  w.first.epsilon,
                 ),
               )
             },
@@ -102,7 +105,7 @@ object ParsingTable {
               Set[ExpandedGrammar.Identifier.NonTerminal],
               List[ExpandedGrammar.Identifier],
               Boolean,
-          ) \/ Waiting.Follow =
+          ) \/ Waiting.First =
             elements match {
               case head :: tail =>
                 head match {
@@ -120,7 +123,7 @@ object ParsingTable {
                           )
                         else
                           Waiting
-                            .Follow(
+                            .First(
                               terminals,
                               nonTerminals + nonTerminal,
                               false,
@@ -129,7 +132,7 @@ object ParsingTable {
                       case None =>
                         val ntWaiting = waitingMap(unaliasedNt)
 
-                        if (ntWaiting.follow.epsilon)
+                        if (ntWaiting.first.epsilon)
                           attemptToAdvance(
                             tail,
                             terminals,
@@ -146,7 +149,7 @@ object ParsingTable {
                     }
                   case term: ExpandedGrammar.Identifier.Term =>
                     Waiting
-                      .Follow(
+                      .First(
                         terminals + term,
                         nonTerminals,
                         false,
@@ -155,7 +158,7 @@ object ParsingTable {
                 }
               case Nil =>
                 Waiting
-                  .Follow(
+                  .First(
                     terminals,
                     nonTerminals,
                     true,
@@ -170,14 +173,14 @@ object ParsingTable {
 
               val madeProgress = done.nonEmpty || notDone.exists(_._4)
               val newFollow =
-                Waiting.Follow(
-                  w.follow.terminals |
+                Waiting.First(
+                  w.first.terminals |
                     notDone.flatMap(_._1).toSet |
                     done.flatMap(_.terminals).toSet,
-                  w.follow.nonTerminals |
+                  w.first.nonTerminals |
                     notDone.flatMap(_._2).toSet |
                     done.flatMap(_.nonTerminals).toSet,
-                  w.follow.epsilon || done.exists(_.epsilon),
+                  w.first.epsilon || done.exists(_.epsilon),
                 )
 
               if (notDone.isEmpty)
@@ -186,19 +189,19 @@ object ParsingTable {
                 scala.Left(Waiting(w.ntName, notDone.map(_._3), newFollow, madeProgress))
             }
 
-          findFollowMap(
+          findFirstMap(
             known ++ done,
             notDone,
           )
         }
 
-      findFollowMap(
+      findFirstMap(
         Map.empty,
         expandedGrammar.nts.map { nt =>
           Waiting(
             nt.name,
             nt.reductions.toList.map(_.elements),
-            Waiting.Follow(Set.empty, Set.empty, false),
+            Waiting.First(Set.empty, Set.empty, false),
             true,
           )
         },
@@ -220,7 +223,7 @@ object ParsingTable {
                 produces,
                 head :: rSeen,
                 tail,
-                findFollow(tail, follow),
+                follow,
               ),
             ).some
           case Nil =>
@@ -264,22 +267,21 @@ object ParsingTable {
           case head :: tail =>
             head match {
               case nonTerminal: ExpandedGrammar.Identifier.NonTerminal =>
-                val ntFollow = followMap(unaliasNt(nonTerminal))
-                val newTerminals = ntFollow.terminals | terminals
-                val newEnd = ntFollow.end || end
-                if (ntFollow.epsilon)
+                val ntFirst = firstMap(unaliasNt(nonTerminal))
+                val newTerminals = ntFirst.terminals | terminals
+                if (ntFirst.epsilon)
                   loop(
                     tail,
                     newTerminals,
-                    newEnd,
+                    end,
                   )
                 else
-                  Follow(newTerminals, newEnd, false)
+                  Follow(newTerminals, end)
               case terminal: ExpandedGrammar.Identifier.Term =>
-                Follow(terminals + terminal, end, false)
+                Follow(terminals + terminal, end)
             }
           case Nil =>
-            Follow(follow.terminals | terminals, end | follow.end, follow.epsilon)
+            Follow(follow.terminals | terminals, end | follow.end)
         }
 
       loop(elements, Set.empty, false)
@@ -325,15 +327,13 @@ object ParsingTable {
             None,
             Nil,
             ExpandedGrammar.Identifier.NonTerminal.NamedNt(expandedGrammar.startNt.value) :: Nil,
-            Follow(Set.empty, true, false),
+            Follow(Set.empty, true),
           ),
         ),
       )
     val allStates: Set[State] =
-      findAll(Set(state0)) { s =>
-        val found = s.onToState.values.toSet
-        println(s"${s.hashCode} => ${found.size}")
-        found
+      findAll(Set(state0)) {
+        _.onToState.values.toSet
       }
 
     {
@@ -341,11 +341,11 @@ object ParsingTable {
 
       println {
         inline(
-          allStates.toList.map { s =>
+          allStates.toList.sortBy(_.entries.minByOption(_.produces.toString).map(_.produces.toString)).map { s =>
             inline(
               ">",
               indented(
-                s.entries.toList.map { e =>
+                s.entries.toList.sortBy(_.produces.toString).map { e =>
                   inline(
                     s"> ${e.produces}",
                     indented(
