@@ -257,7 +257,8 @@ object Build {
                         .sortBy(_._1)
                         .map {
                           case (c, to) =>
-                            s"${c.toInt}.toChar -> ${to.cata(to => s"s$to.some, /* ${c.unesc} */", "None,")}"
+                            val charComment = s"// ${c.unesc}"
+                            s"${c.toInt}.toChar -> ${to.cata(to => s"s$to.some, $charComment", "None,")}"
                         },
                     ),
                     "),",
@@ -275,7 +276,7 @@ object Build {
                                 "Lexer.Yields.Yield[Tok](",
                                 indented(
                                   s"${y.value.subString},",
-                                  y.value match { // TODO (KR) :
+                                  y.value match {
                                     case Yields.Yield.Text(_)           => s"Tok.findRawTerminal,"
                                     case Yields.Yield.Terminal(name, _) => s"Tok.$name(_, _).pure[Attempt]"
                                     case Yields.Yield.Const(text, _)    => s"Tok.${text.unesc("`")}(_, _).pure[Attempt]"
@@ -319,11 +320,39 @@ object Build {
         }
 
         val grammar: IndentedString = {
+          def makeState(state: ParsingTable.ParseState): IndentedString =
+            inline(
+              s"lazy val s${state.id}: Grammar.State[Tok, NonTerminal, NtRoot] =",
+              indented(
+                "Grammar.State[Tok, NonTerminal, NtRoot] {",
+                indented(
+                  "// --- Terminal Actions ---",
+                  state.terminalActions.toList.map {
+                    case (mTerm, termAction) =>
+                      s"// ${mTerm.cata(scopedIdentifierName, "$")} => $termAction"
+                  }.sorted,
+                  Break,
+                  "// --- NonTerminal Actions ---",
+                  state.nonTerminalActions.toList.map {
+                    case (nonTerminal, shift) =>
+                      s"// ${nonTerminalName(nonTerminal)} => ${shift.to.value.id}"
+                  }.sorted,
+                  Break,
+                  "// --- Finishes on ---",
+                  state.finishesOn.toList.map(mt => s"// ${mt.cata(scopedIdentifierName, "$")}").sorted,
+                  Break,
+                  "??? // TODO : ...",
+                ),
+                "}",
+              ),
+              Break,
+            )
 
           inline(
             "Grammar[Tok, NonTerminal, NtRoot] {",
             indented(
-              "??? // TODO : ...",
+              output.parsingTable.states.map(makeState),
+              s"s${output.parsingTable.startState.id}",
             ),
             "},",
           )

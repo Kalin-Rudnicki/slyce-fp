@@ -30,6 +30,7 @@ object ParsingTable {
   }
 
   final case class ParseState(
+      id: Int,
       terminalActions: Map[Maybe[ExpandedGrammar.Identifier.Term], ParseState.TerminalAction],
       nonTerminalActions: Map[ExpandedGrammar.Identifier.NonTerminal, ParseState.Shift],
       finishesOn: Set[Maybe[ExpandedGrammar.Identifier.Term]],
@@ -40,7 +41,12 @@ object ParsingTable {
 
     final case class Shift(
         to: Lazy[ParseState],
-    ) extends TerminalAction
+    ) extends TerminalAction {
+
+      override def toString: String =
+        s"Shift([${to.value.id}])"
+
+    }
 
     final case class Reduce(
         produces: ExpandedGrammar.Identifier.NonTerminal,
@@ -529,8 +535,8 @@ object ParsingTable {
     stateMap.map { stateMap =>
       val preParseStateMap: Map[PreParseState, ParseState] = {
         lazy val lazyMap: Map[PreParseState, ParseState] =
-          stateMap.map {
-            case (_, preParseState) =>
+          stateMap.toList.zipWithIndex.map {
+            case ((_, preParseState), i) =>
               def convertShift(shift: PreParseState.Shift): ParseState.Shift =
                 ParseState.Shift(Lazy(lazyMap(stateMap(shift.to))))
 
@@ -563,19 +569,21 @@ object ParsingTable {
               (
                 preParseState,
                 ParseState(
+                  id = i,
                   terminalActions.toMap,
                   nonTerminalActions,
                   finishesOn.toSet,
                 ),
               )
-          }
+          }.toMap
 
         lazyMap
       }
 
+      // TODO (KR) : Possibly force state0 to be id = 0
       ParsingTable(
         preParseStateMap(stateMap(state0)),
-        preParseStateMap.values.toList,
+        preParseStateMap.values.toList.sortBy(_.id),
       )
     }
 

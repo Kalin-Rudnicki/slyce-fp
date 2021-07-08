@@ -68,9 +68,9 @@ object ExpandedGrammar {
       final case class AnonOptNt(identifier: Identifier) extends NonTerminal
     }
 
-    sealed trait Term
-    final case class Terminal(name: String) extends Identifier with Term
-    final case class Raw(name: String) extends Identifier with Term
+    sealed trait Term extends Identifier
+    final case class Terminal(name: String) extends Term
+    final case class Raw(name: String) extends Term
 
   }
 
