@@ -172,11 +172,18 @@ object Build {
                           "List(",
                           indented(
                             yields.yields.map { y =>
-                              y.value match { // TODO (KR) :
-                                case Yields.Yield.Text(subString)           => "???, // TODO : text"
-                                case Yields.Yield.Terminal(name, subString) => "???, // TODO : terminal"
-                                case Yields.Yield.Const(text)               => "???, // TODO : const"
-                              }
+                              inline(
+                                "Lexer.Yields.Yield[Tok](",
+                                indented(
+                                  s"${y.value.subString},",
+                                  y.value match { // TODO (KR) :
+                                    case Yields.Yield.Text(_)           => s"Tok.findRawTerminal,"
+                                    case Yields.Yield.Terminal(name, _) => s"Tok.$name(_, _).pure[Attempt]"
+                                    case Yields.Yield.Const(text, _)    => s"Tok.${text.unesc("`")}(_, _).pure[Attempt]"
+                                  },
+                                ),
+                                "),",
+                              )
                             },
                           ),
                           "),",

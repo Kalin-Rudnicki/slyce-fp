@@ -12,34 +12,21 @@ final case class Yields[I](
 
 object Yields {
 
-  sealed trait Yield
-
-  sealed trait HasSubStr {
-
+  sealed trait Yield {
     val subString: (Maybe[Int], Maybe[Int])
-
-    def subStr: (Int, Int) =
-      (subString._1.getOrElse(0), subString._2.getOrElse(-1))
-
   }
-
   object Yield {
-
     final case class Text(
         subString: (Maybe[Int], Maybe[Int]) = (None, None),
     ) extends Yield
-        with HasSubStr
-
     final case class Terminal(
         name: String,
         subString: (Maybe[Int], Maybe[Int]) = (None, None),
     ) extends Yield
-        with HasSubStr
-
     final case class Const(
         text: String,
+        subString: (Maybe[Int], Maybe[Int]) = (None, None),
     ) extends Yield
-
   }
 
   sealed trait ToMode[+I]
