@@ -86,7 +86,7 @@ final case class Lexer[Tok](state0: Lexer.State[Tok]) {
                 (head, pos).some.left
             }
           case Nil =>
-            None.left
+            None.left // TODO (KR) : Make sure Nil with nothing seen returns success
         }
       ) match {
         case Right((newState, newPos, newSeen, tail)) =>

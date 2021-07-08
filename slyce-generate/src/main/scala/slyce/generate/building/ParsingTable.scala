@@ -4,11 +4,15 @@ import scala.annotation.tailrec
 
 import klib.Implicits._
 import klib.fp.types._
+import klib.fp.utils.ado
 import klib.utils._
 
+import slyce.core._
 import slyce.generate._
 
 final case class ParsingTable(
+    startState: ParsingTable.ParseState,
+    states: List[ParsingTable.ParseState],
 )
 object ParsingTable {
 
@@ -26,8 +30,24 @@ object ParsingTable {
   }
 
   final case class ParseState(
+      terminalActions: Map[Maybe[ExpandedGrammar.Identifier.Term], ParseState.TerminalAction],
+      nonTerminalActions: Map[ExpandedGrammar.Identifier.NonTerminal, ParseState.Shift],
+      finishesOn: Set[Maybe[ExpandedGrammar.Identifier.Term]],
   )
-  object ParseState {}
+  object ParseState {
+
+    sealed trait TerminalAction
+
+    final case class Shift(
+        to: Lazy[ParseState],
+    ) extends TerminalAction
+
+    final case class Reduce(
+        produces: ExpandedGrammar.Identifier.NonTerminal,
+        rIdentifiers: List[ExpandedGrammar.Identifier],
+    ) extends TerminalAction
+
+  }
 
   // =====|  |=====
 
@@ -208,6 +228,8 @@ object ParsingTable {
       )
     }
 
+    // ---  ---
+
     final case class Entry(
         produces: Maybe[ExpandedGrammar.Identifier.NonTerminal],
         rSeen: List[ExpandedGrammar.Identifier],
@@ -321,9 +343,28 @@ object ParsingTable {
           }
         }
 
+      // NOTE : This might change if I end up doing CLR(N), maybe not though
+      val combinedEntries =
+        allEntries
+          .groupMap(e => (e.produces, e.rSeen, e.unseen))(_.lookahead)
+          .toList
+          .map {
+            case ((produces, rSeen, unseen), lookaheads) =>
+              Entry(
+                produces,
+                rSeen,
+                unseen,
+                Follow(
+                  lookaheads.flatMap(_.terminals),
+                  lookaheads.exists(_.end),
+                ),
+              )
+          }
+          .toSet
+
       State(
-        allEntries,
-        allEntries.toList
+        combinedEntries,
+        combinedEntries.toList
           .flatMap(_.maybeAdvance)
           .groupMap(_._1)(_._2)
           .map { case (k, v) => (k, v.toSet) },
@@ -346,6 +387,9 @@ object ParsingTable {
         _.onToState.values.toSet
       }
 
+    // ---  ---
+
+    // REMOVE : ...
     {
       import IndentedString._
 
@@ -359,17 +403,32 @@ object ParsingTable {
                 inline(
                   s"${i + 1} >",
                   indented(
-                    s.entries.toList
-                      .sortBy(_.produces.toString)
-                      .zipWithIndex
-                      .map {
-                        case (e, i) =>
-                          val produces = e.produces.cata(_.toString, "[RawTree]")
-                          val seen = e.rSeen.reverseMap(_.toString)
-                          val unseen = e.unseen.map(_.toString)
-                          val lookahead = e.lookahead
-                          s"${i + 1}) $produces -> ${seen.mkString(" ")}${seen.isEmpty ? "" | " "}.${unseen.isEmpty ? "" | " "}${unseen.mkString(" ")}; $lookahead"
-                      },
+                    {
+                      val pairs =
+                        s.entries.toList
+                          .sortBy(_.produces.toString)
+                          .zipWithIndex
+                          .map {
+                            case (e, i) =>
+                              val idx = (i + 1).toString
+                              val produces = e.produces.cata(_.toString, "[RawTree]")
+                              val seen = e.rSeen.reverseMap(_.toString).mkString(" ")
+                              val unseen = e.unseen.map(_.toString).mkString(" ")
+                              val lookahead = e.lookahead.toString
+                              (idx, produces, seen, unseen, lookahead)
+                          }
+                      val idxMax = pairs.maxBy(_._1.length)._1.length
+                      val producesMax = pairs.maxBy(_._2.length)._2.length
+                      val seenMax = pairs.maxBy(_._3.length)._3.length
+                      val unseenMax = pairs.maxBy(_._4.length)._4.length
+                      val lookaheadMax = pairs.maxBy(_._5.length)._5.length
+
+                      pairs.map {
+                        case (idx, produces, seen, unseen, lookahead) =>
+                          s"${idx.padTo(idxMax, ' ')}) ${produces.padTo(producesMax, ' ')} -> ${seen.padTo(seenMax, ' ')} . ${unseen
+                            .padTo(unseenMax, ' ')} ; ${lookahead.padTo(lookaheadMax, ' ')}"
+                      }
+                    },
                   ),
                 )
             },
@@ -393,10 +452,133 @@ object ParsingTable {
       }
     }
 
-    // TODO (KR) : build table
+    // ---  ---
 
-    ParsingTable(
-    ).pure[Attempt]
+    final case class PreParseState(
+        terminalActions: Map[Maybe[ExpandedGrammar.Identifier.Term], PreParseState.TerminalAction],
+        nonTerminalActions: Map[ExpandedGrammar.Identifier.NonTerminal, PreParseState.Shift],
+    )
+    object PreParseState {
+
+      sealed trait TerminalAction
+
+      final case class Shift(
+          to: State,
+      ) extends TerminalAction
+
+      final case class Reduce(
+          produces: Maybe[ExpandedGrammar.Identifier.NonTerminal],
+          rIdentifiers: List[ExpandedGrammar.Identifier],
+      ) extends TerminalAction
+
+    }
+
+    def attemptConvertState(state: State): Attempt[PreParseState] = {
+      val (onNt, onT) =
+        state.onToState.toList.partitionMap {
+          case (identifier, state) =>
+            identifier match {
+              case nonTerminal: ExpandedGrammar.Identifier.NonTerminal =>
+                scala.Left((nonTerminal, PreParseState.Shift(state)))
+              case terminal: ExpandedGrammar.Identifier.Term =>
+                scala.Right((terminal.some, PreParseState.Shift(state)))
+            }
+        }
+      val finished =
+        state.finished
+          .map {
+            case (lookahead, entry) =>
+              (lookahead, PreParseState.Reduce(entry.produces, entry.rSeen))
+          }
+
+      val combinedTerminals: List[(Maybe[ExpandedGrammar.Identifier.Term], PreParseState.TerminalAction)] =
+        onT ::: finished
+
+      def ensureSingleEntry[A, B](list: List[(A, B)])(onNot1: List[B] => String): Attempt[Map[A, B]] =
+        list
+          .groupMap(_._1)(_._2)
+          .toList
+          .map {
+            case (_1, _2s) =>
+              _2s match {
+                case head :: Nil =>
+                  (_1, head).pure[Attempt]
+                case _ =>
+                  Dead(Marked(Msg(onNot1(_2s))) :: Nil)
+              }
+          }
+          .traverse
+          .map(_.toMap)
+
+      ado[Attempt]
+        .join(
+          ensureSingleEntry(combinedTerminals)(_ => "combinedTerminals"), // TODO (KR) : improve message
+          ensureSingleEntry(onNt)(_ => "onNt"), // TODO (KR) : improve message
+        )
+        .map {
+          case (terminalActions, nonTerminalActions) =>
+            PreParseState(terminalActions, nonTerminalActions)
+        }
+    }
+    val stateMap: Attempt[Map[State, PreParseState]] =
+      allStates.toList
+        .map(s => attemptConvertState(s).map((s, _)))
+        .traverse
+        .map(_.toMap)
+
+    stateMap.map { stateMap =>
+      val preParseStateMap: Map[PreParseState, ParseState] = {
+        lazy val lazyMap: Map[PreParseState, ParseState] =
+          stateMap.map {
+            case (_, preParseState) =>
+              def convertShift(shift: PreParseState.Shift): ParseState.Shift =
+                ParseState.Shift(Lazy(lazyMap(stateMap(shift.to))))
+
+              val (terminalActions, finishesOn) =
+                preParseState.terminalActions.toList
+                  .partitionMap {
+                    case (mTerm, action) =>
+                      action match {
+                        case shift @ PreParseState.Shift(_) =>
+                          scala.Left((mTerm, convertShift(shift)))
+                        case PreParseState.Reduce(produces, rIdentifiers) =>
+                          produces match {
+                            case Some(produces) =>
+                              scala.Left((mTerm, ParseState.Reduce(produces, rIdentifiers)))
+                            case None =>
+                              scala.Right(mTerm)
+                          }
+                      }
+                  }
+
+              val nonTerminalActions =
+                preParseState.nonTerminalActions.map {
+                  case (nonTerminal, shift) =>
+                    (
+                      nonTerminal,
+                      convertShift(shift),
+                    )
+                }
+
+              (
+                preParseState,
+                ParseState(
+                  terminalActions.toMap,
+                  nonTerminalActions,
+                  finishesOn.toSet,
+                ),
+              )
+          }
+
+        lazyMap
+      }
+
+      ParsingTable(
+        preParseStateMap(stateMap(state0)),
+        preParseStateMap.values.toList,
+      )
+    }
+
   }
 
 }
