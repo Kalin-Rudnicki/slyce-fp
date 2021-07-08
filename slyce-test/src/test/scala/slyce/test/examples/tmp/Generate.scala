@@ -6,7 +6,6 @@ import input._
 import klib.fp.types._
 import klib.utils._
 import slyce.core._
-import slyce.generate.Yields.ToMode
 import slyce.test.examples._
 
 object Generate {
@@ -26,11 +25,11 @@ object Generate {
             lines = List(
               Line(
                 priority = 1,
-                regex = Marked(Sequence("tmp")),
+                regex = Marked(inclusive('a', 'b')),
                 yields = Yields(
                   yields = List(
                     Marked(
-                      Yields.Yield.Terminal("tmp"),
+                      Yields.Yield.Text(),
                     ),
                   ),
                 ),
@@ -40,64 +39,29 @@ object Generate {
         ),
       ),
       grammar = Grammar(
-        startNt = Marked("Tmp"),
+        startNt = Marked("S"),
         nts = List(
           Grammar.NT(
-            name = Grammar.Identifier.unsafeNonTerminal(Marked("Tmp")),
+            name = Grammar.Identifier.unsafeNonTerminal(Marked("S")),
             nt = Grammar.StandardNonTerminal.`:`(
               reductions = NonEmptyList.nel(
                 List(
-                  Marked(
-                    Grammar.ListNonTerminal(
-                      `type` = Grammar.ListNonTerminal.Type.*,
-                      start = IgnoredList(
-                        before = Nil,
-                        unIgnored = Marked(
-                          Grammar.ListNonTerminal(
-                            `type` = Grammar.ListNonTerminal.Type.+,
-                            start = IgnoredList(
-                              before = Nil,
-                              unIgnored = Grammar.Identifier.unsafeTerminal(Marked("tmp")),
-                              after = Nil,
-                            ),
-                            repeat = None,
-                          ),
-                        ),
-                        after = Nil,
-                      ),
-                      repeat = None,
-                    ),
-                  ),
+                  Grammar.Identifier.unsafeNonTerminal(Marked("A")),
+                  Grammar.Identifier.unsafeNonTerminal(Marked("A")),
                 ),
               ),
             ),
           ),
           Grammar.NT(
-            name = Grammar.Identifier.unsafeNonTerminal(Marked("Tmp2")),
+            name = Grammar.Identifier.unsafeNonTerminal(Marked("A")),
             nt = Grammar.StandardNonTerminal.`:`(
               reductions = NonEmptyList.nel(
                 List(
-                  Marked(
-                    Grammar.ListNonTerminal(
-                      `type` = Grammar.ListNonTerminal.Type.*,
-                      start = IgnoredList(
-                        before = Nil,
-                        unIgnored = Marked(
-                          Grammar.ListNonTerminal(
-                            `type` = Grammar.ListNonTerminal.Type.+,
-                            start = IgnoredList(
-                              before = Nil,
-                              unIgnored = Grammar.Identifier.unsafeTerminal(Marked("tmp")),
-                              after = Nil,
-                            ),
-                            repeat = None,
-                          ),
-                        ),
-                        after = Nil,
-                      ),
-                      repeat = None,
-                    ),
-                  ),
+                  Marked(Grammar.Identifier.raw("a")),
+                  Grammar.Identifier.unsafeNonTerminal(Marked("A")),
+                ),
+                List(
+                  Marked(Grammar.Identifier.raw("b")),
                 ),
               ),
             ),

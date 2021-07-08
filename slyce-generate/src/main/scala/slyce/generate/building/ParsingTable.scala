@@ -20,14 +20,14 @@ object ParsingTable {
   final case class Follow(
       terminals: Set[ExpandedGrammar.Identifier.Term],
       end: Boolean,
-  )
+  ) {
+    override def toString: String =
+      s"Follow(${(terminals.toList.map(_.toString) ++ end.maybe("$")).mkString(", ")})"
+  }
 
-  final case class Production(
-      produces: ExpandedGrammar.Identifier.NonTerminal,
-      seen: List[ExpandedGrammar.Identifier],
-      unseen: List[ExpandedGrammar.Identifier],
-      follow: Follow,
+  final case class ParseState(
   )
+  object ParseState {}
 
   // =====|  |=====
 
@@ -212,7 +212,7 @@ object ParsingTable {
         produces: Maybe[ExpandedGrammar.Identifier.NonTerminal],
         rSeen: List[ExpandedGrammar.Identifier],
         unseen: List[ExpandedGrammar.Identifier],
-        follow: Follow,
+        lookahead: Follow,
     ) {
       lazy val maybeAdvance: Maybe[(ExpandedGrammar.Identifier, Entry)] =
         unseen match {
@@ -223,7 +223,7 @@ object ParsingTable {
                 produces,
                 head :: rSeen,
                 tail,
-                follow,
+                lookahead,
               ),
             ).some
           case Nil =>
@@ -243,6 +243,16 @@ object ParsingTable {
               expandEntries(entries),
             )
         }
+      lazy val finished: List[(Maybe[ExpandedGrammar.Identifier.Term], Entry)] =
+        entries.toList.flatMap { e =>
+          e.unseen.isEmpty
+            .maybe {
+              (e.lookahead.terminals.map(_.some) | e.lookahead.end.maybe(None).toSet).toList
+                .map((_, e))
+            }
+            .toList
+            .flatten
+        }
     }
 
     lazy val ntMap: Map[ExpandedGrammar.Identifier.NonTerminal, List[List[ExpandedGrammar.Identifier]]] =
@@ -253,7 +263,7 @@ object ParsingTable {
         )
       }.toMap
 
-    def findFollow(
+    def findLookahead(
         elements: List[ExpandedGrammar.Identifier],
         follow: Follow,
     ): Follow = {
@@ -291,7 +301,7 @@ object ParsingTable {
       val allEntries =
         findAll(entries) { e =>
           e.unseen match {
-            case head :: _ =>
+            case head :: tail =>
               head match {
                 case nonTerminal: ExpandedGrammar.Identifier.NonTerminal =>
                   val unaliasedNt = unaliasNt(nonTerminal)
@@ -300,7 +310,7 @@ object ParsingTable {
                       unaliasedNt.some,
                       Nil,
                       elements,
-                      findFollow(elements, e.follow),
+                      findLookahead(tail, e.lookahead),
                     )
                   }.toSet
                 case _ =>
@@ -341,26 +351,45 @@ object ParsingTable {
 
       println {
         inline(
+          allStates.toList
+            .sortBy(_.entries.minByOption(_.produces.toString).map(_.produces.toString))
+            .zipWithIndex
+            .map {
+              case (s, i) =>
+                inline(
+                  s"${i + 1} >",
+                  indented(
+                    s.entries.toList
+                      .sortBy(_.produces.toString)
+                      .zipWithIndex
+                      .map {
+                        case (e, i) =>
+                          val produces = e.produces.cata(_.toString, "[RawTree]")
+                          val seen = e.rSeen.reverseMap(_.toString)
+                          val unseen = e.unseen.map(_.toString)
+                          val lookahead = e.lookahead
+                          s"${i + 1}) $produces -> ${seen.mkString(" ")}${seen.isEmpty ? "" | " "}.${unseen.isEmpty ? "" | " "}${unseen.mkString(" ")}; $lookahead"
+                      },
+                  ),
+                )
+            },
+        ).toString("|   ")
+      }
+
+      println
+
+      println {
+        inline(
           allStates.toList.sortBy(_.entries.minByOption(_.produces.toString).map(_.produces.toString)).map { s =>
             inline(
               ">",
               indented(
-                s.entries.toList.sortBy(_.produces.toString).map { e =>
-                  inline(
-                    s"> ${e.produces}",
-                    indented(
-                      "rSeen:",
-                      indented(e.rSeen.map(_.toString)),
-                      "unseen:",
-                      indented(e.unseen.map(_.toString)),
-                      e.follow.toString,
-                    ),
-                  )
-                },
+                s.finished
+                  .map(_._1.toString),
               ),
             )
           },
-        ).toString("|   ")
+        ).toString("|    ")
       }
     }
 
