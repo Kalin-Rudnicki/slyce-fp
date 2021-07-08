@@ -19,6 +19,7 @@ package object main {
       raws: Set[String],
       expandedGrammar: ExpandedGrammar,
       deDuplicatedExpandedGrammar: ExpandedGrammar,
+      parsingTable: ParsingTable,
   )
 
 }

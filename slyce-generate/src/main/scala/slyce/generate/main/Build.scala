@@ -35,6 +35,7 @@ object Build {
       )
       ((nfa, dfa), expandedGrammar) = joinedItems
       deDuplicatedExpandedGrammar = ExpandedGrammar.simplifyAnonLists(expandedGrammar)
+      parsingTable <- ParsingTable.fromExpandedGrammar(deDuplicatedExpandedGrammar)
 
       tokens = dfa.states.toList.flatMap {
         case (state, _) =>
@@ -70,6 +71,7 @@ object Build {
       raws = raws,
       expandedGrammar = expandedGrammar,
       deDuplicatedExpandedGrammar = deDuplicatedExpandedGrammar,
+      parsingTable = parsingTable,
     )
   }
 
