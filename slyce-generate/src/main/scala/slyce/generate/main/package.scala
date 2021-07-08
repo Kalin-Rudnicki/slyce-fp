@@ -15,6 +15,8 @@ package object main {
       name: String,
       nfa: Nfa,
       dfa: Dfa,
+      tokens: Set[String],
+      raws: Set[String],
       expandedGrammar: ExpandedGrammar,
       deDuplicatedExpandedGrammar: ExpandedGrammar,
   )
