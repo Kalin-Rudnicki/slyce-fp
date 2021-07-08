@@ -205,6 +205,167 @@ object ParsingTable {
       )
     }
 
+    final case class Entry(
+        produces: Maybe[ExpandedGrammar.Identifier.NonTerminal],
+        rSeen: List[ExpandedGrammar.Identifier],
+        unseen: List[ExpandedGrammar.Identifier],
+        follow: Follow,
+    ) {
+      lazy val maybeAdvance: Maybe[(ExpandedGrammar.Identifier, Entry)] =
+        unseen match {
+          case head :: tail =>
+            (
+              head,
+              Entry(
+                produces,
+                head :: rSeen,
+                tail,
+                findFollow(tail, follow),
+              ),
+            ).some
+          case Nil =>
+            None
+        }
+    }
+
+    final case class State(
+        entries: Set[Entry],
+        on: Map[ExpandedGrammar.Identifier, Set[Entry]],
+    ) {
+      lazy val onToState: Map[ExpandedGrammar.Identifier, State] =
+        on.map {
+          case (identifier, entries) =>
+            (
+              identifier,
+              expandEntries(entries),
+            )
+        }
+    }
+
+    lazy val ntMap: Map[ExpandedGrammar.Identifier.NonTerminal, List[List[ExpandedGrammar.Identifier]]] =
+      expandedGrammar.nts.map { nt =>
+        (
+          nt.name,
+          nt.reductions.toList.map(_.elements),
+        )
+      }.toMap
+
+    def findFollow(
+        elements: List[ExpandedGrammar.Identifier],
+        follow: Follow,
+    ): Follow = {
+      @tailrec
+      def loop(
+          elements: List[ExpandedGrammar.Identifier],
+          terminals: Set[ExpandedGrammar.Identifier.Term],
+          end: Boolean,
+      ): Follow =
+        elements match {
+          case head :: tail =>
+            head match {
+              case nonTerminal: ExpandedGrammar.Identifier.NonTerminal =>
+                val ntFollow = followMap(unaliasNt(nonTerminal))
+                val newTerminals = ntFollow.terminals | terminals
+                val newEnd = ntFollow.end || end
+                if (ntFollow.epsilon)
+                  loop(
+                    tail,
+                    newTerminals,
+                    newEnd,
+                  )
+                else
+                  Follow(newTerminals, newEnd, false)
+              case terminal: ExpandedGrammar.Identifier.Term =>
+                Follow(terminals + terminal, end, false)
+            }
+          case Nil =>
+            Follow(follow.terminals | terminals, end | follow.end, follow.epsilon)
+        }
+
+      loop(elements, Set.empty, false)
+    }
+
+    def expandEntries(entries: Set[Entry]): State = {
+      val allEntries =
+        findAll(entries) { e =>
+          e.unseen match {
+            case head :: _ =>
+              head match {
+                case nonTerminal: ExpandedGrammar.Identifier.NonTerminal =>
+                  val unaliasedNt = unaliasNt(nonTerminal)
+                  ntMap(unaliasedNt).map { elements =>
+                    Entry(
+                      unaliasedNt.some,
+                      Nil,
+                      elements,
+                      findFollow(elements, e.follow),
+                    )
+                  }.toSet
+                case _ =>
+                  Set.empty
+              }
+            case Nil =>
+              Set.empty
+          }
+        }
+
+      State(
+        allEntries,
+        allEntries.toList
+          .flatMap(_.maybeAdvance)
+          .groupMap(_._1)(_._2)
+          .map { case (k, v) => (k, v.toSet) },
+      )
+    }
+
+    val state0: State =
+      expandEntries(
+        Set(
+          Entry(
+            None,
+            Nil,
+            ExpandedGrammar.Identifier.NonTerminal.NamedNt(expandedGrammar.startNt.value) :: Nil,
+            Follow(Set.empty, true, false),
+          ),
+        ),
+      )
+    val allStates: Set[State] =
+      findAll(Set(state0)) { s =>
+        val found = s.onToState.values.toSet
+        println(s"${s.hashCode} => ${found.size}")
+        found
+      }
+
+    {
+      import IndentedString._
+
+      println {
+        inline(
+          allStates.toList.map { s =>
+            inline(
+              ">",
+              indented(
+                s.entries.toList.map { e =>
+                  inline(
+                    s"> ${e.produces}",
+                    indented(
+                      "rSeen:",
+                      indented(e.rSeen.map(_.toString)),
+                      "unseen:",
+                      indented(e.unseen.map(_.toString)),
+                      e.follow.toString,
+                    ),
+                  )
+                },
+              ),
+            )
+          },
+        ).toString("|   ")
+      }
+    }
+
+    // TODO (KR) : build table
+
     ParsingTable(
     ).pure[Attempt]
   }
