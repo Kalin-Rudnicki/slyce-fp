@@ -321,9 +321,9 @@ object Build {
         val grammar: IndentedString = {
 
           inline(
-            "new Grammar[Tok, NonTerminal, NtRoot] {",
+            "Grammar[Tok, NonTerminal, NtRoot] {",
             indented(
-              "def buildTree(tokens: List[Tok]): Attempt[NtRoot] = ??? // TODO : ...",
+              "??? // TODO : ...",
             ),
             "},",
           )
