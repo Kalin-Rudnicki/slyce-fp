@@ -1,7 +1,7 @@
 package slyce.parse
 
-trait Grammar[Tok, Raw] {
+trait Grammar[Tok, Nt, NtRoot <: Nt] {
 
-  def buildTree(tokens: List[Tok]): Attempt[Raw]
+  def buildTree(tokens: List[Tok]): Attempt[NtRoot]
 
 }

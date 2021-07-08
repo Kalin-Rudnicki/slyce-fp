@@ -181,7 +181,7 @@ object Build {
           "}",
         )
 
-      val raw: IndentedString = {
+      val nts: IndentedString = {
         def caseClass(name: String, reduction: ExpandedGrammar.NT.Reduction, `extends`: String): IndentedString =
           inline(
             s"final case class $name(",
@@ -195,7 +195,7 @@ object Build {
           )
 
         inline(
-          "type Raw = Nothing",
+          s"type NtRoot = NonTerminal.${output.deDuplicatedExpandedGrammar.startNt.value}",
           "sealed trait NonTerminal",
           "object NonTerminal {",
           indented(
@@ -212,7 +212,7 @@ object Build {
                     caseClass(ntName, nt.reductions.head, "NonTerminal"),
                   ) |
                   inline(
-                    s"sealed trait $ntName",
+                    s"sealed trait $ntName extends NonTerminal",
                     s"object $ntName {",
                     indented(
                       nt.reductions.toList.zipWithIndex.map {
@@ -315,18 +315,18 @@ object Build {
         val grammar: IndentedString = {
 
           inline(
-            "new Grammar[Tok, Raw] {",
+            "new Grammar[Tok, NonTerminal, NtRoot] {",
             indented(
-              "def buildTree(tokens: List[Tok]): Attempt[Raw] = ??? // TODO : ...",
+              "def buildTree(tokens: List[Tok]): Attempt[NtRoot] = ??? // TODO : ...",
             ),
             "},",
           )
         }
 
         inline(
-          "val parser: Parser[Tok, Raw] =",
+          "val parser: Parser[Tok, NonTerminal, NtRoot] =",
           indented(
-            "Parser[Tok, Raw](",
+            "Parser[Tok, NonTerminal, NtRoot](",
             indented(
               lexer,
               grammar,
@@ -342,7 +342,7 @@ object Build {
           Break,
           tokens,
           Break,
-          raw,
+          nts,
           Break,
           parser,
           Break,
