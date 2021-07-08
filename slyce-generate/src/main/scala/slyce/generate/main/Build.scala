@@ -108,10 +108,26 @@ object Build {
             output.tokens.toList.map { tok =>
               s"final case class $tok(text: String, span: Span) extends Tok"
             },
-            output.raws.nonEmpty.maybe(Break),
-            output.raws.toList.map { raw =>
-              s"final case class ${raw.unesc("`")}(text: String, span: Span) extends Tok"
-            },
+            output.raws.nonEmpty ?
+              inline(
+                Break,
+                output.raws.toList.map { raw =>
+                  s"final case class ${raw.unesc("`")}(text: String, span: Span) extends Tok"
+                },
+                Break,
+                "def findRawTerminal(text: String, span: Span): Attempt[Tok] =",
+                indented(
+                  "text match {",
+                  indented(
+                    output.raws.toList.map { raw =>
+                      s"case ${raw.unesc} => ${raw.unesc("`")}(text, span).pure[Attempt]"
+                    },
+                    """case _ => Dead(Marked(s"Invalid raw-terminal : ${text.unesc}", span.some) :: Nil)""",
+                  ),
+                  "}",
+                ),
+              ) |
+              inline(),
           ),
           "}",
         )
