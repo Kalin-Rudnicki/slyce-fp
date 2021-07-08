@@ -1,5 +1,9 @@
 package slyce.generate.main
 
+import java.util.UUID
+
+import scala.annotation.tailrec
+
 import klib.Implicits._
 import klib.fp.types._
 import klib.fp.utils.ado
@@ -75,6 +79,51 @@ object Build {
   ): IndentedString = {
     import IndentedString._
 
+    // =====|  |=====
+
+    val anonListMap: Map[UUID, Int] =
+      output.deDuplicatedExpandedGrammar.nts
+        .flatMap {
+          _.name match {
+            case ExpandedGrammar.Identifier.NonTerminal.AnonListNt(key, _) => key.some
+            case _                                                         => None
+          }
+        }
+        .zipWithIndex
+        .map { case (uuid, i) => (uuid, i + 1) }
+        .toMap
+
+    def rawName(raw: String): String =
+      raw.unesc("`")
+
+    def terminalName(terminal: String): String =
+      terminal
+
+    @tailrec
+    def nonTerminalName(nonTerminal: ExpandedGrammar.Identifier.NonTerminal, prefix: String = ""): String =
+      nonTerminal match {
+        case ExpandedGrammar.Identifier.NonTerminal.NamedNt(name) =>
+          s"$prefix$name"
+        case ExpandedGrammar.Identifier.NonTerminal.ListNt(name, _type)    => s"$prefix$name${_type}"
+        case ExpandedGrammar.Identifier.NonTerminal.AnonListNt(key, _type) => s"${prefix}AnonList${anonListMap(key)}${_type}"
+        case ExpandedGrammar.Identifier.NonTerminal.AssocNt(name, idx)     => s"$prefix$name$idx"
+        case ExpandedGrammar.Identifier.NonTerminal.AnonOptNt(identifier) =>
+          identifier match {
+            case ExpandedGrammar.Identifier.Terminal(name)           => s"${prefix}Opt_$name"
+            case ExpandedGrammar.Identifier.Raw(name)                => s"${prefix}Opt_$name".unesc("`")
+            case nonTerminal: ExpandedGrammar.Identifier.NonTerminal => nonTerminalName(nonTerminal, s"${prefix}Opt")
+          }
+      }
+
+    def scopedIdentifierName(identifier: ExpandedGrammar.Identifier): String =
+      identifier match {
+        case ExpandedGrammar.Identifier.Terminal(name)           => s"Tok.${terminalName(name)}"
+        case ExpandedGrammar.Identifier.Raw(name)                => s"Tok.${rawName(name)}"
+        case nonTerminal: ExpandedGrammar.Identifier.NonTerminal => s"NonTerminal.${nonTerminalName(nonTerminal)}"
+      }
+
+    // =====|  |=====
+
     val headerNote: IndentedString =
       inline(
         "// !!! DO NOT MODIFY !!!",
@@ -91,7 +140,7 @@ object Build {
           Break,
         )
 
-    val imports: IndentedString = // TODO (KR) :
+    val imports: IndentedString =
       inline(
         "import klib.Implicits._",
         "import klib.fp.types._",
@@ -100,19 +149,19 @@ object Build {
       )
 
     val body: IndentedString = {
-      val tokens: IndentedString = // TODO (KR) :
+      val tokens: IndentedString =
         inline(
           "sealed trait Tok extends Token",
           "object Tok {",
           indented(
             output.tokens.toList.map { tok =>
-              s"final case class $tok(text: String, span: Span) extends Tok"
+              s"final case class ${terminalName(tok)}(text: String, span: Span) extends Tok"
             },
             output.raws.nonEmpty ?
               inline(
                 Break,
                 output.raws.toList.map { raw =>
-                  s"final case class ${raw.unesc("`")}(text: String, span: Span) extends Tok"
+                  s"final case class ${rawName(raw)}(text: String, span: Span) extends Tok"
                 },
                 Break,
                 "def findRawTerminal(text: String, span: Span): Attempt[Tok] =",
@@ -120,7 +169,7 @@ object Build {
                   "text match {",
                   indented(
                     output.raws.toList.map { raw =>
-                      s"case ${raw.unesc} => ${raw.unesc("`")}(text, span).pure[Attempt]"
+                      s"case ${raw.unesc} => ${rawName(raw)}(text, span).pure[Attempt]"
                     },
                     """case _ => Dead(Marked(s"Invalid raw-terminal : ${text.unesc}", span.some) :: Nil)""",
                   ),
@@ -132,10 +181,54 @@ object Build {
           "}",
         )
 
-      val raw: IndentedString = // TODO (KR) :
+      val raw: IndentedString = {
+        def caseClass(name: String, reduction: ExpandedGrammar.NT.Reduction, `extends`: String): IndentedString =
+          inline(
+            s"final case class $name(",
+            indented(
+              reduction.elements.zipWithIndex.map {
+                case (element, i) =>
+                  s"_$i: ${scopedIdentifierName(element)},"
+              },
+            ),
+            s") extends ${`extends`}",
+          )
+
         inline(
           "type Raw = Nothing",
+          "sealed trait NonTerminal",
+          "object NonTerminal {",
+          indented(
+            output.deDuplicatedExpandedGrammar.aliases.map {
+              case (from, to) =>
+                s"type ${nonTerminalName(from)} = ${nonTerminalName(to)}"
+            },
+            Break,
+            output.deDuplicatedExpandedGrammar.nts.map { nt =>
+              val ntName = nonTerminalName(nt.name)
+              inline(
+                (nt.reductions.size == 1) ?
+                  inline(
+                    caseClass(ntName, nt.reductions.head, "NonTerminal"),
+                  ) |
+                  inline(
+                    s"sealed trait $ntName",
+                    s"object $ntName {",
+                    indented(
+                      nt.reductions.toList.zipWithIndex.map {
+                        case (reduction, i) =>
+                          caseClass(s"_${i + 1}", reduction, ntName)
+                      },
+                    ),
+                    "}",
+                  ),
+                Break,
+              )
+            },
+          ),
+          "}",
         )
+      }
 
       val parser: IndentedString = {
         val lexer: IndentedString = {
@@ -257,6 +350,8 @@ object Build {
         "}",
       )
     }
+
+    // =====|  |=====
 
     inline(
       headerNote,

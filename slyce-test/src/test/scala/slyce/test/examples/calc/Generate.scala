@@ -118,11 +118,21 @@ object Generate {
             nt = Grammar.StandardNonTerminal.`:`(
               reductions = NonEmptyList.nel(
                 List(
-                  Marked(Grammar.Identifier("variable")),
-                  Marked(Grammar.Identifier("=")),
-                  Marked(Grammar.Identifier("Expr")),
+                  Marked(Grammar.Identifier("Assign")),
                 ),
                 List(
+                  Marked(Grammar.Identifier("Expr")),
+                ),
+              ),
+            ),
+          ),
+          Grammar.NT(
+            name = Grammar.Identifier.unsafeNonTerminal(Marked("Assign")),
+            nt = Grammar.StandardNonTerminal.`:`(
+              reductions = NonEmptyList.nel(
+                List(
+                  Marked(Grammar.Identifier("variable")),
+                  Marked(Grammar.Identifier("=")),
                   Marked(Grammar.Identifier("Expr")),
                 ),
               ),
