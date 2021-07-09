@@ -49,7 +49,7 @@ object ParsingTable {
     }
 
     final case class Reduce(
-        produces: ExpandedGrammar.Identifier.NonTerminal,
+        produces: (ExpandedGrammar.Identifier.NonTerminal, Int),
         rIdentifiers: List[ExpandedGrammar.Identifier],
     ) extends TerminalAction
 
@@ -237,7 +237,7 @@ object ParsingTable {
     // ---  ---
 
     final case class Entry(
-        produces: Maybe[ExpandedGrammar.Identifier.NonTerminal],
+        produces: Maybe[(ExpandedGrammar.Identifier.NonTerminal, Int)],
         rSeen: List[ExpandedGrammar.Identifier],
         unseen: List[ExpandedGrammar.Identifier],
         lookahead: Follow,
@@ -283,11 +283,11 @@ object ParsingTable {
         }
     }
 
-    lazy val ntMap: Map[ExpandedGrammar.Identifier.NonTerminal, List[List[ExpandedGrammar.Identifier]]] =
+    lazy val ntMap: Map[ExpandedGrammar.Identifier.NonTerminal, List[(List[ExpandedGrammar.Identifier], Int)]] =
       expandedGrammar.nts.map { nt =>
         (
           nt.name,
-          nt.reductions.toList.map(_.elements),
+          nt.reductions.toList.map(_.elements).zipWithIndex,
         )
       }.toMap
 
@@ -333,13 +333,14 @@ object ParsingTable {
               head match {
                 case nonTerminal: ExpandedGrammar.Identifier.NonTerminal =>
                   val unaliasedNt = unaliasNt(nonTerminal)
-                  ntMap(unaliasedNt).map { elements =>
-                    Entry(
-                      unaliasedNt.some,
-                      Nil,
-                      elements,
-                      findLookahead(tail, e.lookahead),
-                    )
+                  ntMap(unaliasedNt).map {
+                    case (elements, i) =>
+                      Entry(
+                        (unaliasedNt, i).some,
+                        Nil,
+                        elements,
+                        findLookahead(tail, e.lookahead),
+                      )
                   }.toSet
                 case _ =>
                   Set.empty
@@ -473,7 +474,7 @@ object ParsingTable {
       ) extends TerminalAction
 
       final case class Reduce(
-          produces: Maybe[ExpandedGrammar.Identifier.NonTerminal],
+          produces: Maybe[(ExpandedGrammar.Identifier.NonTerminal, Int)],
           rIdentifiers: List[ExpandedGrammar.Identifier],
       ) extends TerminalAction
 

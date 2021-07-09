@@ -57,6 +57,7 @@ object Grammar {
         ) \/
           NtRoot,
       ],
+      onNt: Nt => Attempt[State[Tok, Nt, NtRoot]],
   )
 
 }

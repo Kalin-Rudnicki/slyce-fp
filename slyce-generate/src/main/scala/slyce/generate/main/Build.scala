@@ -95,6 +95,18 @@ object Build {
         .map { case (uuid, i) => (uuid, i + 1) }
         .toMap
 
+    lazy val ntIsCollapsed: Map[ExpandedGrammar.Identifier.NonTerminal, Boolean] =
+      output.deDuplicatedExpandedGrammar.nts.map { nt =>
+        (
+          nt.name,
+          nt.reductions.size == 1,
+        )
+      }.toMap
+
+    // TODO (KR) : Possibly improve (?)
+    def unaliasNt(nt: ExpandedGrammar.Identifier.NonTerminal): ExpandedGrammar.Identifier.NonTerminal =
+      output.deDuplicatedExpandedGrammar.aliases.find(_._1 == nt).toMaybe.cata(_._2, nt)
+
     def rawName(raw: String): String =
       raw.unesc("`")
 
@@ -122,6 +134,12 @@ object Build {
         case ExpandedGrammar.Identifier.Terminal(name)           => s"Tok.${terminalName(name)}"
         case ExpandedGrammar.Identifier.Raw(name)                => s"Tok.${rawName(name)}"
         case nonTerminal: ExpandedGrammar.Identifier.NonTerminal => s"NonTerminal.${nonTerminalName(nonTerminal)}"
+      }
+
+    def leftRightScopedIdentifierName(idx: Int, identifier: ExpandedGrammar.Identifier): String =
+      identifier match {
+        case nonTerminal: ExpandedGrammar.Identifier.NonTerminal => s"Right(_${idx + 1}: ${scopedIdentifierName(nonTerminal)})"
+        case terminal: ExpandedGrammar.Identifier.Term           => s"Left(_${idx + 1}: ${scopedIdentifierName(terminal)})"
       }
 
     // =====|  |=====
@@ -320,33 +338,174 @@ object Build {
         }
 
         val grammar: IndentedString = {
-          def makeState(state: ParsingTable.ParseState): IndentedString =
+          def makeState(state: ParsingTable.ParseState): IndentedString = {
+            def makeReduce(reduce: ParsingTable.ParseState.Reduce): IndentedString = {
+              val ParsingTable.ParseState.Reduce((pNt, pIdx), rIdentifiers) = reduce
+              val ntName = s"${scopedIdentifierName(pNt)}${ntIsCollapsed(unaliasNt(pNt)) ? "" | s"._${pIdx + 1}"}"
+
+              rIdentifiers.toNel match {
+                case Some(rIdentifiers) =>
+                  val ntRef = s"$ntName${1.to(rIdentifiers.size).map(i => s"_$i").mkString("(", ", ", ")")}"
+                  val zipped = rIdentifiers.reverse.zipWithIndex
+                  val head = s"(${leftRightScopedIdentifierName(zipped.head._2, zipped.head._1)}, poppedState)"
+                  val tail = zipped.tail.map {
+                    case (identifier, i) =>
+                      s"(${leftRightScopedIdentifierName(i, identifier)}, _)"
+                  }
+                  inline(
+                    "stack match {",
+                    indented(
+                      s"case ${(head :: tail).reverse.mkString(" :: ")} :: stack =>",
+                      indented(
+                        s"val nt: NonTerminal = $ntRef",
+                        "poppedState.onNt(nt) match {",
+                        indented(
+                          "case Alive(to) =>",
+                          indented(
+                            "(",
+                            indented(
+                              "to,",
+                              "(nt.right, poppedState) :: stack,",
+                              "None,",
+                            ),
+                            ").left.pure[Attempt]",
+                          ),
+                          "case dead @ Dead(_) =>",
+                          indented(
+                            "dead",
+                          ),
+                        ),
+                        "}",
+                      ),
+                      "case _ =>",
+                      indented("""Dead(Marked("This should be impossible...") :: Nil)"""),
+                    ),
+                    "}",
+                  )
+                case None =>
+                  inline(
+                    s"val nt: NonTerminal = $ntName",
+                    s"s${state.id}.onNt(nt) match {",
+                    indented(
+                      "case Alive(to) =>",
+                      indented(
+                        "(",
+                        indented(
+                          "to,",
+                          "stack,",
+                          "None,",
+                        ),
+                        ").left.pure[Attempt]",
+                      ),
+                      "case dead @ Dead(_) =>",
+                      indented(
+                        "dead",
+                      ),
+                    ),
+                    "}",
+                  )
+              }
+            }
+
             inline(
               s"lazy val s${state.id}: Grammar.State[Tok, NonTerminal, NtRoot] =",
               indented(
-                "Grammar.State[Tok, NonTerminal, NtRoot] {",
+                "Grammar.State[Tok, NonTerminal, NtRoot](",
                 indented(
-                  "// --- Terminal Actions ---",
-                  state.terminalActions.toList.map {
-                    case (mTerm, termAction) =>
-                      s"// ${mTerm.cata(scopedIdentifierName, "$")} => $termAction"
-                  }.sorted,
-                  Break,
-                  "// --- NonTerminal Actions ---",
-                  state.nonTerminalActions.toList.map {
-                    case (nonTerminal, shift) =>
-                      s"// ${nonTerminalName(nonTerminal)} => ${shift.to.value.id}"
-                  }.sorted,
-                  Break,
-                  "// --- Finishes on ---",
-                  state.finishesOn.toList.map(mt => s"// ${mt.cata(scopedIdentifierName, "$")}").sorted,
-                  Break,
-                  "??? // TODO : ...",
+                  "{ (stack, tokens) =>",
+                  indented(
+                    "tokens match {",
+                    indented(
+                      "case Some(tokens) =>",
+                      indented(
+                        "tokens.head match {",
+                        indented(
+                          state.terminalActions.toList
+                            .flatMap {
+                              case (on, action) =>
+                                on.map((_, action))
+                            }
+                            .map {
+                              case (term, action) =>
+                                inline(
+                                  s"case tok: ${scopedIdentifierName(term)} =>",
+                                  indented(
+                                    action match {
+                                      case ParsingTable.ParseState.Shift(to) =>
+                                        inline(
+                                          "(",
+                                          indented(
+                                            s"s${to.value.id},",
+                                            s"(tok.left, s${state.id}) :: stack,",
+                                            "tokens.tail.toNel,",
+                                          ),
+                                          ").left.pure[Attempt]",
+                                        )
+                                      case reduce @ ParsingTable.ParseState.Reduce(_, _) =>
+                                        makeReduce(reduce)
+                                    },
+                                  ),
+                                )
+                            },
+                          "case tok =>",
+                          indented(
+                            """Dead(Marked("Unexpected token", tok.span.some) :: Nil)""",
+                          ),
+                        ),
+                        "}",
+                      ),
+                      "case None =>",
+                      indented(
+                        state.terminalActions.get(None).toMaybe match {
+                          case Some(terminalAction) =>
+                            inline(
+                              terminalAction match {
+                                case reduce @ ParsingTable.ParseState.Reduce(_, _) =>
+                                  makeReduce(reduce)
+                                case ParsingTable.ParseState.Shift(_) =>
+                                  "??? // NOTE : This should not be possible..."
+                              },
+                            )
+                          case None =>
+                            if (state.finishesOn.contains(None)) {
+                              inline(
+                                "stack match {",
+                                indented(
+                                  "case (Right(ntRoot: NtRoot), _) :: Nil =>",
+                                  indented("ntRoot.right.pure[Attempt]"),
+                                  "case _ =>",
+                                  indented("""Dead(Marked("This should be impossible...") :: Nil)"""),
+                                ),
+                                "}",
+                              )
+                            } else {
+                              """Dead(Marked("Unexpected EOF") :: Nil)"""
+                            }
+                        },
+                      ),
+                    ),
+                    "}",
+                  ),
+                  "},",
+                  "{",
+                  indented(
+                    state.nonTerminalActions.toList.map {
+                      case (nonTerminal, shift) =>
+                        inline(
+                          s"case _: ${scopedIdentifierName(nonTerminal)} =>",
+                          indented(s"s${shift.to.value.id}.pure[Attempt]"),
+                        )
+                    },
+                    "case _ =>",
+                    indented("""Dead(Marked("This should be impossible...") :: Nil)"""),
+                  ),
+                  "},",
                 ),
-                "}",
+                ")",
               ),
               Break,
             )
+          }
 
           inline(
             "Grammar[Tok, NonTerminal, NtRoot] {",
