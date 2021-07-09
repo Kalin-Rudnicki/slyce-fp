@@ -70,6 +70,17 @@ object Span {
         case _    => Pos(absolutePos + 1, lineNo, posInLine + 1)
       }
 
+    def onStr(str: String): Pos = {
+      @tailrec
+      def loop(pos: Pos, chars: List[Char]): Pos =
+        chars match {
+          case head :: tail => loop(pos.onChar(head), tail)
+          case Nil          => pos
+        }
+
+      loop(this, str.toList)
+    }
+
     def toString(showAbsolute: Boolean): String =
       s"${showAbsolute ? s"$absolutePos @ " | ""}$lineNo:$posInLine"
 
