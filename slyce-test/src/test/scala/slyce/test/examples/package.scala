@@ -13,7 +13,7 @@ import slyce.generate.main._
 
 package object examples {
 
-  def debugExecutable(
+  def debugGenerate(
       name: String,
       lexer: Lexer,
       grammar: Grammar,

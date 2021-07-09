@@ -4,6 +4,7 @@ import klib.fp.types._
 import klib.utils._
 import slyce.generate._
 import input._
+
 import slyce.core._
 import slyce.test.examples._
 
@@ -15,7 +16,7 @@ object Generate {
   import Yields.Yield._
 
   lazy val executable: Executable =
-    debugExecutable(
+    debugGenerate(
       name = "calc",
       lexer = Lexer(
         startMode = Marked("General"),

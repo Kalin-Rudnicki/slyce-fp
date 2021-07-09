@@ -15,7 +15,7 @@ object Generate {
   import Regex._, CharClass._
 
   val executable: Executable =
-    debugExecutable(
+    debugGenerate(
       name = "tmp",
       lexer = Lexer(
         startMode = Marked("General"),

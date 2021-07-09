@@ -3,9 +3,10 @@ package slyce.test.examples.grammar
 import klib.Implicits._
 import klib.fp.types._
 import klib.utils._
-import slyce.generate._
-import input._
+
 import slyce.core._
+import slyce.generate._
+import slyce.generate.input._
 import slyce.test.examples._
 
 object Generate {
@@ -16,7 +17,7 @@ object Generate {
   import Yields.Yield._
 
   val executable: Executable =
-    debugExecutable(
+    debugGenerate(
       "grammar",
       lexer = Lexer(
         startMode = Marked("General"),
