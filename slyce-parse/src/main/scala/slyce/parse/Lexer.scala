@@ -4,9 +4,10 @@ import scala.annotation.tailrec
 
 import klib.Implicits._
 import klib.fp.types._
+
 import slyce.core._
 
-final case class Lexer[Tok](state0: Lexer.State[Tok]) {
+final case class Lexer[Tok <: Token](state0: Lexer.State[Tok]) {
 
   def tokenize(source: Source): Attempt[List[Tok]] = {
     def calcHit(

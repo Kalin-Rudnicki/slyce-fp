@@ -1,10 +1,11 @@
 package slyce.parse
 
 import klib.Implicits._
+import klib.fp.types._
 
 import slyce.core._
 
-final case class Parser[Tok, Nt, NtRoot <: Nt](
+final case class Parser[Tok <: Token, Nt, NtRoot <: Nt](
     lexer: Lexer[Tok],
     grammar: Grammar[Tok, Nt, NtRoot],
 ) {
@@ -20,5 +21,28 @@ final case class Parser[Tok, Nt, NtRoot <: Nt](
       tokens <- tokenize(source)
       raw <- buildTree(tokens)
     } yield raw
+
+  def markTokens(source: Source): String =
+    tokenize(source) match {
+      case Alive(tokens) =>
+        def tokLabel(tok: Tok): String =
+          tok.getClass.getSimpleName
+
+        source.mark(
+          tokens.map { tok =>
+            Marked(tokLabel(tok), tok.span.some)
+          },
+        )
+      case Dead(errors) =>
+        source.mark(errors)
+    }
+
+  def parseAndMarkErrors(source: Source): String \/ NtRoot =
+    parse(source) match {
+      case Alive(r) =>
+        r.right
+      case Dead(errors) =>
+        source.mark(errors).left
+    }
 
 }

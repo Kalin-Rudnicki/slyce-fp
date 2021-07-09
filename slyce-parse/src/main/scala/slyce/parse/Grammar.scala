@@ -7,7 +7,7 @@ import klib.fp.types._
 
 import slyce.core._
 
-final case class Grammar[Tok, Nt, NtRoot <: Nt](state0: Grammar.State[Tok, Nt, NtRoot]) {
+final case class Grammar[Tok <: Token, Nt, NtRoot <: Nt](state0: Grammar.State[Tok, Nt, NtRoot]) {
 
   def buildTree(tokens: List[Tok]): Attempt[NtRoot] = {
 
@@ -46,9 +46,9 @@ final case class Grammar[Tok, Nt, NtRoot <: Nt](state0: Grammar.State[Tok, Nt, N
 }
 object Grammar {
 
-  type Stack[Tok, Nt, NtRoot <: Nt] = List[(Tok \/ Nt, State[Tok, Nt, NtRoot])]
+  type Stack[Tok <: Token, Nt, NtRoot <: Nt] = List[(Tok \/ Nt, State[Tok, Nt, NtRoot])]
 
-  final case class State[Tok, Nt, NtRoot <: Nt](
+  final case class State[Tok <: Token, Nt, NtRoot <: Nt](
       handleStack: (Stack[Tok, Nt, NtRoot], Maybe[NonEmptyList[Tok]]) => Attempt[
         (
             State[Tok, Nt, NtRoot],
