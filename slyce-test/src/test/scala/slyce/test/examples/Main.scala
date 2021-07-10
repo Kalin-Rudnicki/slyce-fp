@@ -46,7 +46,7 @@ object Main {
           ),
         "parse" ->
           Executable.fromSubCommands(
-            "calc" -> debugParse(calc.calc.parser),
+            "calc" -> calc.Parse.executable,
           ),
         "test" -> test,
       )(args)

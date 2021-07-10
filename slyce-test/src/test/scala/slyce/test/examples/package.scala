@@ -71,7 +71,7 @@ package object examples {
     }
   }
 
-  def debugParse(parser: Parser[_, _, _]): Executable = {
+  def debugParse[NtRoot](parser: Parser[_, _, NtRoot])(onTree: (Logger, NtRoot) => IO[Unit]): Executable = {
     val tokenize: Executable = {
       final class Conf(args: Seq[String]) extends Executable.Conf(args) {
         val file: ScallopOption[File] = opt(required = true)
@@ -89,6 +89,7 @@ package object examples {
               L.break(),
             ),
           )
+
           sourceText <- IO.readFile(conf.file())
           _ <- logger(
             L(
@@ -97,18 +98,53 @@ package object examples {
             ),
           )
           source = Source(sourceText)
-          toks <- parser.tokenize(source).mapErrors(e => Message(e.toString)).toIO
-          _ <- logger(L.log.info(1))
+
           markedSource = parser.markTokens(source)
-          _ <- logger(L.log.info(2))
           _ <- logger(L.log.info(markedSource))
-          _ <- logger(L.log.info(3))
+        } yield ()
+      }
+    }
+
+    val tree: Executable = {
+      final class Conf(args: Seq[String]) extends Executable.Conf(args) {
+        val file: ScallopOption[File] = opt(required = true)
+        verify()
+      }
+      object Conf extends Executable.ConfBuilder(new Conf(_))
+
+      Executable.fromConf(Conf) { (logger, conf) =>
+        for {
+          _ <- logger(
+            L(
+              L.ansi.cursorPos(1, 1),
+              L.ansi.clearScreen(),
+              L.log.info(s"Building tree: ${conf.file()}"),
+              L.break(),
+            ),
+          )
+
+          sourceText <- IO.readFile(conf.file())
+          _ <- logger(
+            L(
+              L.log.info(sourceText),
+              L.break(),
+            ),
+          )
+          source = Source(sourceText)
+
+          _ <- parser.parseAndMarkErrors(source) match {
+            case Right(root) =>
+              onTree(logger, root)
+            case Left(markedSource) =>
+              logger(L.log.info(markedSource))
+          }
         } yield ()
       }
     }
 
     Executable.fromSubCommands(
       "tokenize" -> tokenize,
+      "tree" -> tree,
     )
   }
 
