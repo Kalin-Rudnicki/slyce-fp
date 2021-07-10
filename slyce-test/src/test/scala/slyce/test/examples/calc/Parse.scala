@@ -1,11 +1,14 @@
 package slyce.test.examples.calc
 
+import scala.annotation.tailrec
+
 import klib.Implicits._
 import klib.fp.types._
 import klib.utils._
 import klib.utils.Logger.{helpers => L}
 
 import slyce.core._
+import slyce.parse._
 import slyce.test.examples._
 import slyce.test.examples.calc.calc._
 
@@ -13,8 +16,97 @@ object Parse {
 
   lazy val executable: Executable =
     debugParse(parser) { (logger, root) =>
+      @tailrec
+      def simplifyList(lines: NonTerminal.Lines, stack: List[NonTerminal.Line]): List[NonTerminal.Line] =
+        lines match {
+          case NonTerminal.LinesSimple._1(line, _, next) =>
+            simplifyList(next, line :: stack)
+          case NonTerminal.LinesSimple._2 =>
+            stack.reverse
+        }
+      def simplifyExpr(expr: NonTerminal.Expr): Expression[Tok.int \/ Tok.variable, String] = {
+        def expr1(expr: NonTerminal.Expr1): Expression[Tok.int \/ Tok.variable, String] =
+          expr match {
+            case NonTerminal.Expr1._1(left, op, right) => Expression.Node(expr2(left), op.text, expr1(right))
+            case NonTerminal.Expr1._2(expr)            => expr2(expr)
+          }
+        def expr2(expr: NonTerminal.Expr2): Expression[Tok.int \/ Tok.variable, String] =
+          expr match {
+            case NonTerminal.Expr2._1(left, op, right) => Expression.Node(expr2(left), op.text, expr3(right))
+            case NonTerminal.Expr2._2(expr)            => expr3(expr)
+          }
+        def expr3(expr: NonTerminal.Expr3): Expression[Tok.int \/ Tok.variable, String] =
+          expr match {
+            case NonTerminal.Expr3._1(left, op, right) => Expression.Node(expr3(left), op.text, expr4(right))
+            case NonTerminal.Expr3._2(expr)            => expr4(expr)
+          }
+        def expr4(expr: NonTerminal.Expr4): Expression[Tok.int \/ Tok.variable, String] =
+          expr match {
+            case NonTerminal.Expr4._1(variable)   => Expression.Leaf(variable.right)
+            case NonTerminal.Expr4._2(int)        => Expression.Leaf(int.left)
+            case NonTerminal.Expr4._3(_, expr, _) => expr1(expr)
+          }
+
+        expr1(expr)
+      }
+
+      @tailrec
+      def eval(lines: List[NonTerminal.Line], variables: Map[String, Int]): Unit = {
+        def evalExpr(expr: Expression[Tok.int \/ Tok.variable, String]): String \/ Int =
+          expr match {
+            case Expression.Node(left, op, right) =>
+              for {
+                leftV <- evalExpr(left)
+                rightV <- evalExpr(right)
+                opF <- op match {
+                  case "+" => { (a: Int, b: Int) => (a + b).right }.right
+                  case "-" => { (a: Int, b: Int) => (a - b).right }.right
+                  case "*" => { (a: Int, b: Int) => (a * b).right }.right
+                  case "/" => { (a: Int, b: Int) => (b == 0) ? "Div/0".left | (a / b).right }.right
+                  case "^" => { (a: Int, b: Int) => Math.pow(a, b).toInt.right }.right
+                  case _   => s"Unknown operator: ${op.unesc}".left
+                }
+                res <- opF(leftV, rightV)
+              } yield res
+            case Expression.Leaf(operand) =>
+              operand match {
+                case Right(variable) =>
+                  variables.get(variable.text).toMaybe match {
+                    case Some(value) => value.right
+                    case None        => s"Unknown variable: ${variable.text.unesc}".left
+                  }
+                case Left(int) =>
+                  int.text.toInt.right
+              }
+          }
+
+        lines match {
+          case head :: tail =>
+            head match {
+              case NonTerminal.Line._1(NonTerminal.Assign(variable, _, expr)) =>
+                evalExpr(simplifyExpr(expr)) match {
+                  case Left(error) =>
+                    println(s"[error] $error")
+                  case Right(value) =>
+                    eval(tail, variables.updated(variable.text, value))
+                }
+              case NonTerminal.Line._2(expr) =>
+                evalExpr(simplifyExpr(expr)) match {
+                  case Left(error) =>
+                    println(s"[error] $error")
+                  case Right(value) =>
+                    println(s"[value] $value")
+                    eval(tail, variables)
+                }
+            }
+          case Nil =>
+        }
+      }
+
       for {
         _ <- logger(L.log.info("SUCCESS!!!!!"))
+        lines = simplifyList(root, Nil)
+        _ = eval(lines, Map.empty)
       } yield ()
     }
 

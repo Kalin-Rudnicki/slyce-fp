@@ -3,9 +3,9 @@ package slyce.parse
 sealed trait Expression[+Operand, +Operator]
 object Expression {
   final case class Node[+Operand, +Operator](
-      left: Operand,
+      left: Expression[Operand, Operator],
       op: Operator,
-      right: Operand,
+      right: Expression[Operand, Operator],
   ) extends Expression[Operand, Operator]
   final case class Leaf[+Operand](operand: Operand) extends Expression[Operand, Nothing]
 }
