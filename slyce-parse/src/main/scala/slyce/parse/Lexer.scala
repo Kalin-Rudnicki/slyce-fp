@@ -29,8 +29,8 @@ final case class Lexer[Tok <: Token](state0: Lexer.State[Tok]) {
           yields.yields.map {
             case Lexer.Yields.Yield(ySpan, build) =>
               def getIdx(i: Int, label: String): Attempt[Int] = {
-                val i2 = (i > 0) ? i | (charAndPos.length + i)
-                (i2 < 0 || i2 >= charAndPos.length) ?
+                val i2 = (i >= 0) ? i | (charAndPos.length + i)
+                (i2 < 0 || i2 > charAndPos.length) ?
                   Dead(Marked(s"Substring $label out of bounds [$i2] (length = ${charAndPos.length})", wholeSpan.some) :: Nil) |
                   i2.pure[Attempt]
               }
@@ -41,7 +41,7 @@ final case class Lexer[Tok <: Token](state0: Lexer.State[Tok]) {
                 _ <-
                   (startIdx <= endIdx) ?
                     ().pure[Attempt] |
-                    Dead(Marked("Substring end before start", wholeSpan.some) :: Nil)
+                    Dead(Marked(s"Substring end before start ($endIdx < $startIdx)", wholeSpan.some) :: Nil)
                 spanStart = charAndPos(startIdx)._2
                 spanEnd = charAndPos(endIdx)._2
                 string = charAndPos.slice(startIdx, endIdx + 1).map(_._1).mkString
@@ -61,6 +61,18 @@ final case class Lexer[Tok <: Token](state0: Lexer.State[Tok]) {
               Dead(Marked("Unexpected EOF") :: Nil)
           }
       }
+
+    sealed trait Res
+    object Res {
+      final case class Loop(
+          newState: Lexer.State[Tok],
+          newPos: Span.Pos,
+          newSeen: List[(Char, Span.Pos)],
+          tail: List[Char],
+      ) extends Res
+      final case class Last(last: Maybe[(Char, Span.Pos)]) extends Res
+      final case class Result(tokens: List[Tok]) extends Res
+    }
 
     // TODO (KR) : It might eventually make sense to de-dup things in order to go faster,
     //           : but for now, I think cleaner is better
@@ -82,15 +94,19 @@ final case class Lexer[Tok <: Token](state0: Lexer.State[Tok]) {
               case Some(newState) =>
                 val newPos = pos.onChar(head)
                 val newSeen = (head, pos) :: seen
-                (newState, newPos, newSeen, tail).right
+                Res.Loop(newState, newPos, newSeen, tail)
               case None =>
-                (head, pos).some.left
+                Res.Last((head, pos).some)
             }
           case Nil =>
-            None.left // TODO (KR) : Make sure Nil with nothing seen returns success
+            // TODO (KR) :
+            if (seen.isEmpty)
+              Res.Result(toks.reverse)
+            else
+              Res.Last(None)
         }
       ) match {
-        case Right((newState, newPos, newSeen, tail)) =>
+        case Res.Loop(newState, newPos, newSeen, tail) =>
           loop(
             newState,
             mode,
@@ -101,7 +117,7 @@ final case class Lexer[Tok <: Token](state0: Lexer.State[Tok]) {
             newSeen,
             newState.yields.cata(tm => (tm, newPos, tail, newSeen).some, hit),
           )
-        case Left(last) =>
+        case Res.Last(last) =>
           calcHit(hit, last) match {
             case Alive((toMode, pos, chars, newToks)) =>
               toMode match {
@@ -158,6 +174,8 @@ final case class Lexer[Tok <: Token](state0: Lexer.State[Tok]) {
             case dead @ Dead(_) =>
               dead
           }
+        case Res.Result(tokens) =>
+          tokens.pure[Attempt]
       }
 
     loop(

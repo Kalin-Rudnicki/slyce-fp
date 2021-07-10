@@ -10,9 +10,12 @@ import klib.utils._
 import klib.utils.Logger.{helpers => L}
 import klib.utils.Logger.helpers.Implicits._
 
+import slyce.core._
 import slyce.generate.input._
 import slyce.generate.main._
 import slyce.parse._
+
+import klib.utils.IndentedString.Break
 
 package object examples {
 
@@ -69,21 +72,43 @@ package object examples {
   }
 
   def debugParse(parser: Parser[_, _, _]): Executable = {
-    val parse: Executable = {
+    val tokenize: Executable = {
       final class Conf(args: Seq[String]) extends Executable.Conf(args) {
+        val file: ScallopOption[File] = opt(required = true)
         verify()
       }
       object Conf extends Executable.ConfBuilder(new Conf(_))
 
       Executable.fromConf(Conf) { (logger, conf) =>
         for {
-          _ <- logger(L.log.info("[parse]"))
+          _ <- logger(
+            L(
+              L.ansi.cursorPos(1, 1),
+              L.ansi.clearScreen(),
+              L.log.info(s"Parsing: ${conf.file()}"),
+              L.break(),
+            ),
+          )
+          sourceText <- IO.readFile(conf.file())
+          _ <- logger(
+            L(
+              L.log.info(sourceText),
+              L.break(),
+            ),
+          )
+          source = Source(sourceText)
+          toks <- parser.tokenize(source).mapErrors(e => Message(e.toString)).toIO
+          _ <- logger(L.log.info(1))
+          markedSource = parser.markTokens(source)
+          _ <- logger(L.log.info(2))
+          _ <- logger(L.log.info(markedSource))
+          _ <- logger(L.log.info(3))
         } yield ()
       }
     }
 
     Executable.fromSubCommands(
-      "parse" -> parse,
+      "tokenize" -> tokenize,
     )
   }
 
