@@ -398,14 +398,6 @@ object Build {
                   }
                   val matchStr = (head :: tail).reverse.mkString(" :: ")
                   inline(
-                    // REMOVE : ...
-                    /*
-                    "// REMOVE : ...",
-                    s"""println("reducing ($ntRef)".toColorString.red)""",
-                    s"""println("    ${state.id}")""",
-                    """stack.foreach{s => println { s"    ${s._1 match { case Left(tok) => tok.tokName; case Right(nt) => nt.getClass }} @ ${s._2.id}" } }""",
-                     */
-                    //
                     "stack match {",
                     indented(
                       s"case $matchStr :: stack =>",
