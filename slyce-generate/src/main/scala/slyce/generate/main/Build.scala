@@ -446,7 +446,7 @@ object Build {
                         "(",
                         indented(
                           "to,",
-                          "stack,",
+                          s"(nt.right, s${state.id}) :: stack,",
                           s"$retToks,",
                         ),
                         ").left.pure[Attempt]",

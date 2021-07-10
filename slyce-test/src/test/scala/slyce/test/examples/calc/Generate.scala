@@ -30,7 +30,7 @@ object Generate {
                 Line(
                   priority = 1,
                   regex = Marked(
-                    inclusive('{', '}', '(', ')', '=', ';'),
+                    inclusive('(', ')', '=', ';'),
                   ),
                   yields = Yields(
                     yields = List(Marked(Text())),
@@ -101,21 +101,8 @@ object Generate {
           ),
         ),
         grammar = Grammar(
-          startNt = Marked("Prog"),
+          startNt = Marked("Lines"),
           nts = List(
-            Grammar.NT(
-              name = Grammar.Identifier.unsafeNonTerminal(Marked("Prog")),
-              nt = Grammar.StandardNonTerminal.`:`(
-                reductions = NonEmptyList.nel(
-                  List(
-                    Marked(Grammar.Identifier.raw("{")),
-                    Marked(Grammar.Identifier("Assign")),
-                    Marked(Grammar.Identifier.raw(";")),
-                    Marked(Grammar.Identifier.raw("}")),
-                  ),
-                ),
-              ),
-            ),
             Grammar.NT(
               name = Grammar.Identifier.unsafeNonTerminal(Marked("Lines")),
               nt = Grammar.ListNonTerminal(
