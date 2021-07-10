@@ -26,7 +26,7 @@ final case class Parser[Tok <: Token, Nt, NtRoot <: Nt](
     tokenize(source) match {
       case Alive(tokens) =>
         def tokLabel(tok: Tok): String =
-          tok.getClass.getSimpleName
+          tok.tokName
 
         source.mark(
           tokens.map { tok =>

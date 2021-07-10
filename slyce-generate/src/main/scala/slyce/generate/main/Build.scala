@@ -171,19 +171,21 @@ object Build {
       )
 
     val body: IndentedString = {
+      val quadQuote: String = '"'.toString * 4
+
       val tokens: IndentedString =
         inline(
-          "sealed trait Tok extends Token",
+          "sealed abstract class Tok(val tokName: String) extends Token",
           "object Tok {",
           indented(
             output.tokens.toList.map { tok =>
-              s"final case class ${terminalName(tok)}(text: String, span: Span) extends Tok"
+              s"final case class ${terminalName(tok)}(text: String, span: Span) extends Tok(${tok.unesc})"
             },
             output.raws.nonEmpty ?
               inline(
                 Break,
                 output.raws.toList.map { raw =>
-                  s"final case class ${rawName(raw)}(text: String, span: Span) extends Tok"
+                  s"final case class ${rawName(raw)}(text: String, span: Span) extends Tok(${raw.unesc("""""""""")})"
                 },
                 Break,
                 "def findRawTerminal(text: String, span: Span): Attempt[Tok] =",
