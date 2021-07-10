@@ -12,10 +12,7 @@ package object generate {
 
   implicit class CharSetOps(chars: Set[Char]) {
 
-    def prettyChars: String =
-      prettyChars("Set")
-
-    def prettyChars(name: String): String = {
+    def groupChars: List[Char \/ (Char, Char)] = {
       @tailrec
       def loop(
           queue: List[Char],
@@ -55,8 +52,15 @@ package object generate {
             stack.reverse
         }
 
+      loop(chars.toList.sorted, Nil)
+    }
+
+    def prettyChars: String =
+      prettyChars("Set")
+
+    def prettyChars(name: String): String = {
       val list =
-        loop(chars.toList.sorted, Nil).map {
+        chars.groupChars.map {
           case Left(c) =>
             c.unesc
           case Right((c1, c2)) =>

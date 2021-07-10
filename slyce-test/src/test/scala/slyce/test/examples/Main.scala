@@ -44,6 +44,10 @@ object Main {
             "grammar" -> grammar.Generate.executable,
             "tmp" -> tmp.Generate.executable,
           ),
+        "parse" ->
+          Executable.fromSubCommands(
+            "calc" -> debugParse(calc.calc.parser),
+          ),
         "test" -> test,
       )(args)
       .runSync

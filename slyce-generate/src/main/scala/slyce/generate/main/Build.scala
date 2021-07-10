@@ -8,6 +8,7 @@ import klib.Implicits._
 import klib.fp.types._
 import klib.fp.utils.ado
 import klib.utils._
+
 import slyce.generate._
 import slyce.generate.building._
 
@@ -164,6 +165,7 @@ object Build {
       inline(
         "import klib.Implicits._",
         "import klib.fp.types._",
+        "import klib.utils._",
         "import slyce.core._",
         "import slyce.parse._",
       )
@@ -256,32 +258,64 @@ object Build {
 
       val parser: IndentedString = {
         val lexer: IndentedString = {
+          def defineState(idx: Int): IndentedString =
+            s"var s$idx: Lexer.State[Tok] = null"
           def makeState(idx: Int, state: slyce.generate.building.Dfa.State): IndentedString = {
             inline(
-              s"lazy val s$idx: Lexer.State[Tok] =",
+              s"s$idx =",
               indented(
                 "Lexer.State[Tok](",
                 indented(
                   s"$idx,",
-                  inline(
-                    "Map(",
-                    indented(
-                      state.transitions.toList
-                        .flatMap {
-                          case (chars, to) =>
-                            val to2 = to.map(t => output.dfa.stateMap(t.value))
-                            chars.toList.map((_, to2))
-                        }
-                        .sortBy(_._1)
-                        .map {
-                          case (c, to) =>
-                            val charComment = s"// ${c.unesc}"
-                            s"${c.toInt}.toChar -> ${to.cata(to => s"s$to.some, $charComment", "None,")}"
+                  if (state.transitions.nonEmpty)
+                    inline(
+                      "char => {",
+                      indented(
+                        "val int = char.toInt",
+                        Break,
+                        state.transitions.toList.zipWithIndex.map {
+                          case ((chars, to), i1) =>
+                            chars.groupChars.zipWithIndex.map {
+                              case (charOrRange, i2) =>
+                                val ifStmt = (i1 == 0 && i2 == 0) ? "if" | "else if"
+
+                                inline(
+                                  charOrRange match {
+                                    case Left(char) =>
+                                      s"$ifStmt (int == ${char.toInt}) // ${char.unesc}"
+                                    case Right((charMin, charMax)) =>
+                                      s"$ifStmt (int >= ${charMin.toInt} && int <= ${charMax.toInt}) // ${charMin.unesc}-${charMax.unesc}"
+                                  },
+                                  indented(
+                                    to match {
+                                      case Some(to) =>
+                                        s"s${output.dfa.stateMap(to.value)}.some"
+                                      case None =>
+                                        "None"
+                                    },
+                                  ),
+                                )
+                            }
                         },
-                    ),
-                    "),",
-                  ),
-                  state.elseTransition.cata(to => s"s${output.dfa.stateMap(to.value)}.some,", "None,"),
+                        "else",
+                        indented(
+                          state.elseTransition match {
+                            case Some(to) =>
+                              s"s${output.dfa.stateMap(to.value)}.some"
+                            case None =>
+                              "None"
+                          },
+                        ),
+                      ),
+                      "},",
+                    )
+                  else
+                    state.elseTransition match {
+                      case Some(to) =>
+                        s"_ => s${output.dfa.stateMap(to.value)},"
+                      case None =>
+                        "_ => None,"
+                    },
                   state.end match {
                     case Some(yields) =>
                       inline(
@@ -328,9 +362,15 @@ object Build {
             "Lexer[Tok] {",
             indented(
               output.dfa.states.toList.map {
+                case (_, i) =>
+                  defineState(i)
+              },
+              Break,
+              output.dfa.states.toList.map {
                 case (state, i) =>
                   makeState(i, state)
               },
+              Break,
               "s0",
             ),
             "},",
@@ -338,6 +378,8 @@ object Build {
         }
 
         val grammar: IndentedString = {
+          def defineState(state: ParsingTable.ParseState): IndentedString =
+            s"var s${state.id}: Grammar.State[Tok, NonTerminal, NtRoot] = null"
           def makeState(state: ParsingTable.ParseState): IndentedString = {
             def makeReduce(reduce: ParsingTable.ParseState.Reduce): IndentedString = {
               val ParsingTable.ParseState.Reduce((pNt, pIdx), rIdentifiers) = reduce
@@ -407,8 +449,9 @@ object Build {
               }
             }
 
+            // TODO (KR) :
             inline(
-              s"lazy val s${state.id}: Grammar.State[Tok, NonTerminal, NtRoot] =",
+              s"s${state.id} =",
               indented(
                 "Grammar.State[Tok, NonTerminal, NtRoot](",
                 indented(
@@ -510,6 +553,8 @@ object Build {
           inline(
             "Grammar[Tok, NonTerminal, NtRoot] {",
             indented(
+              output.parsingTable.states.map(defineState),
+              Break,
               output.parsingTable.states.map(makeState),
               s"s${output.parsingTable.startState.id}",
             ),

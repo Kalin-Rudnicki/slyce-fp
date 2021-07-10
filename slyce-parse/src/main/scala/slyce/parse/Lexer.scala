@@ -78,7 +78,7 @@ final case class Lexer[Tok <: Token](state0: Lexer.State[Tok]) {
       (
         chars match {
           case head :: tail =>
-            state.on.get(head).toMaybe.flatten.orElse(state.elseOn) match {
+            state.on(head) match {
               case Some(newState) =>
                 val newPos = pos.onChar(head)
                 val newSeen = (head, pos) :: seen
@@ -198,8 +198,7 @@ object Lexer {
 
   final case class State[Tok](
       id: Int,
-      on: Map[Char, Maybe[State[Tok]]],
-      elseOn: Maybe[State[Tok]],
+      on: Char => Maybe[State[Tok]],
       yields: Maybe[Yields[Tok]],
   )
 
