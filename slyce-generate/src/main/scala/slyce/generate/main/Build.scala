@@ -383,7 +383,7 @@ object Build {
           def defineState(state: ParsingTable.ParseState): IndentedString =
             s"var s${state.id}: Grammar.State[Tok, NonTerminal, NtRoot] = null"
           def makeState(state: ParsingTable.ParseState): IndentedString = {
-            def makeReduce(reduce: ParsingTable.ParseState.Reduce): IndentedString = {
+            def makeReduce(reduce: ParsingTable.ParseState.Reduce, retToks: String): IndentedString = {
               val ParsingTable.ParseState.Reduce((pNt, pIdx), rIdentifiers) = reduce
               val ntName = s"${scopedIdentifierName(pNt)}${ntIsCollapsed(unaliasNt(pNt)) ? "" | s"._${pIdx + 1}"}"
 
@@ -396,10 +396,19 @@ object Build {
                     case (identifier, i) =>
                       s"(${leftRightScopedIdentifierName(i, identifier)}, _)"
                   }
+                  val matchStr = (head :: tail).reverse.mkString(" :: ")
                   inline(
+                    // REMOVE : ...
+                    /*
+                    "// REMOVE : ...",
+                    s"""println("reducing ($ntRef)".toColorString.red)""",
+                    s"""println("    ${state.id}")""",
+                    """stack.foreach{s => println { s"    ${s._1 match { case Left(tok) => tok.tokName; case Right(nt) => nt.getClass }} @ ${s._2.id}" } }""",
+                     */
+                    //
                     "stack match {",
                     indented(
-                      s"case ${(head :: tail).reverse.mkString(" :: ")} :: stack =>",
+                      s"case $matchStr :: stack =>",
                       indented(
                         s"val nt: NonTerminal = $ntRef",
                         "poppedState.onNt(nt) match {",
@@ -410,7 +419,7 @@ object Build {
                             indented(
                               "to,",
                               "(nt.right, poppedState) :: stack,",
-                              "None,",
+                              s"$retToks,",
                             ),
                             ").left.pure[Attempt]",
                           ),
@@ -422,11 +431,12 @@ object Build {
                         "}",
                       ),
                       "case _ =>",
-                      indented("""Dead(Marked("This should be impossible...") :: Nil)"""),
+                      indented(s"""Dead(Marked("This should be impossible (1)... $matchStr") :: Nil)"""),
                     ),
                     "}",
                   )
                 case None =>
+                  // TODO (KR) : Might need changes here as well...
                   inline(
                     s"val nt: NonTerminal = $ntName",
                     s"s${state.id}.onNt(nt) match {",
@@ -457,6 +467,7 @@ object Build {
               indented(
                 "Grammar.State[Tok, NonTerminal, NtRoot](",
                 indented(
+                  s"${state.id},",
                   "{ (stack, tokens) =>",
                   indented(
                     "tokens match {",
@@ -487,7 +498,7 @@ object Build {
                                           ").left.pure[Attempt]",
                                         )
                                       case reduce @ ParsingTable.ParseState.Reduce(_, _) =>
-                                        makeReduce(reduce)
+                                        makeReduce(reduce, "tokens.some")
                                     },
                                   ),
                                 )
@@ -506,9 +517,9 @@ object Build {
                             inline(
                               terminalAction match {
                                 case reduce @ ParsingTable.ParseState.Reduce(_, _) =>
-                                  makeReduce(reduce)
+                                  makeReduce(reduce, "None")
                                 case ParsingTable.ParseState.Shift(_) =>
-                                  "??? // NOTE : This should not be possible..."
+                                  "??? // NOTE : It should not be possible to generate this..."
                               },
                             )
                           case None =>
@@ -519,7 +530,7 @@ object Build {
                                   "case (Right(ntRoot: NtRoot), _) :: Nil =>",
                                   indented("ntRoot.right.pure[Attempt]"),
                                   "case _ =>",
-                                  indented("""Dead(Marked("This should be impossible...") :: Nil)"""),
+                                  indented("""Dead(Marked("This should be impossible (2)...") :: Nil)"""),
                                 ),
                                 "}",
                               )
@@ -542,7 +553,7 @@ object Build {
                         )
                     },
                     "case _ =>",
-                    indented("""Dead(Marked("This should be impossible...") :: Nil)"""),
+                    indented("""Dead(Marked("This should be impossible (3)...") :: Nil)"""),
                   ),
                   "},",
                 ),
@@ -565,7 +576,8 @@ object Build {
         }
 
         inline(
-          "val parser: Parser[Tok, NonTerminal, NtRoot] =",
+          // TODO (KR) : Remove `lazy` (?)
+          "lazy val parser: Parser[Tok, NonTerminal, NtRoot] =",
           indented(
             "Parser[Tok, NonTerminal, NtRoot](",
             indented(

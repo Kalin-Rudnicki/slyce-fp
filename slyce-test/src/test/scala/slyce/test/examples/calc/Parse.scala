@@ -11,7 +11,7 @@ import slyce.test.examples.calc.calc._
 
 object Parse {
 
-  val executable: Executable =
+  lazy val executable: Executable =
     debugParse(parser) { (logger, root) =>
       for {
         _ <- logger(L.log.info("SUCCESS!!!!!"))
