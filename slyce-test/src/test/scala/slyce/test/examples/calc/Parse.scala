@@ -27,7 +27,7 @@ object Parse {
       def simplifyExpr(expr: NonTerminal.Expr): Expression[Tok.int \/ Tok.variable, String] = {
         def expr1(expr: NonTerminal.Expr1): Expression[Tok.int \/ Tok.variable, String] =
           expr match {
-            case NonTerminal.Expr1._1(left, op, right) => Expression.Node(expr2(left), op.text, expr1(right))
+            case NonTerminal.Expr1._1(left, op, right) => Expression.Node(expr1(left), op.text, expr2(right))
             case NonTerminal.Expr1._2(expr)            => expr2(expr)
           }
         def expr2(expr: NonTerminal.Expr2): Expression[Tok.int \/ Tok.variable, String] =
@@ -37,7 +37,7 @@ object Parse {
           }
         def expr3(expr: NonTerminal.Expr3): Expression[Tok.int \/ Tok.variable, String] =
           expr match {
-            case NonTerminal.Expr3._1(left, op, right) => Expression.Node(expr3(left), op.text, expr4(right))
+            case NonTerminal.Expr3._1(left, op, right) => Expression.Node(expr4(left), op.text, expr3(right))
             case NonTerminal.Expr3._2(expr)            => expr4(expr)
           }
         def expr4(expr: NonTerminal.Expr4): Expression[Tok.int \/ Tok.variable, String] =

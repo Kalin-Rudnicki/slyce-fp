@@ -146,9 +146,9 @@ object Generate {
               name = Grammar.Identifier.unsafeNonTerminal(Marked("Expr")),
               nt = Grammar.AssocNonTerminal(
                 assocs = NonEmptyList.nel(
-                  (Marked(Grammar.AssocNonTerminal.Type.Right), Marked(Grammar.Identifier("powOp"))),
-                  (Marked(Grammar.AssocNonTerminal.Type.Left), Marked(Grammar.Identifier("multOp"))),
                   (Marked(Grammar.AssocNonTerminal.Type.Left), Marked(Grammar.Identifier("addOp"))),
+                  (Marked(Grammar.AssocNonTerminal.Type.Left), Marked(Grammar.Identifier("multOp"))),
+                  (Marked(Grammar.AssocNonTerminal.Type.Right), Marked(Grammar.Identifier("powOp"))),
                 ),
                 base = Grammar.StandardNonTerminal.^(
                   reductions = NonEmptyList.nel(
