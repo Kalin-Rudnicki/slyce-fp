@@ -523,11 +523,32 @@ object ExpandedGrammar {
       }
 
     val duplicateMap = findDuplicates(Map.empty)
+    val filteredNts = filterRedundantAnonListNts(expandedGrammar.nts, duplicateMap.values.toSet).map(dereferenceNt(_, duplicateMap))
+    val filteredAliases = expandedGrammar.aliases.map(t => (dereferenceNtId(t._1, duplicateMap), dereferenceNtId(t._2, duplicateMap)))
+
+    def unaliasNt(nt: ExpandedGrammar.Identifier.NonTerminal): ExpandedGrammar.Identifier.NonTerminal =
+      filteredAliases.find(_._1 == nt).toMaybe.cata(_._2, nt)
+
+    val deReferenceAliases =
+      filteredNts.map { nt =>
+        ExpandedGrammar.NT(
+          nt.name,
+          nt.reductions.map { reduction =>
+            ExpandedGrammar.NT.Reduction(
+              reduction.elements.map {
+                case nt: Identifier.NonTerminal => unaliasNt(nt)
+                case i                          => i
+              },
+              reduction.liftIdx,
+            )
+          },
+        )
+      }
 
     ExpandedGrammar(
       startNt = expandedGrammar.startNt,
-      nts = filterRedundantAnonListNts(expandedGrammar.nts, duplicateMap.values.toSet).map(dereferenceNt(_, duplicateMap)),
-      aliases = expandedGrammar.aliases.map(t => (dereferenceNtId(t._1, duplicateMap), dereferenceNtId(t._2, duplicateMap))),
+      nts = deReferenceAliases,
+      aliases = filteredAliases,
     )
   }
 

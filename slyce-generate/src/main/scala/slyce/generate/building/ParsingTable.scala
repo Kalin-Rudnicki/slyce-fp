@@ -58,7 +58,8 @@ object ParsingTable {
   // =====|  |=====
 
   def fromExpandedGrammar(expandedGrammar: ExpandedGrammar): Attempt[ParsingTable] = {
-    // TODO (KR) : Possibly improve (?)
+    // TODO (KR) : No clue why this is still needed after unaliasing in ExpandedGrammar
+    //           : but it fails none-the-less, and works when its here
     def unaliasNt(nt: ExpandedGrammar.Identifier.NonTerminal): ExpandedGrammar.Identifier.NonTerminal =
       expandedGrammar.aliases.find(_._1 == nt).toMaybe.cata(_._2, nt)
 

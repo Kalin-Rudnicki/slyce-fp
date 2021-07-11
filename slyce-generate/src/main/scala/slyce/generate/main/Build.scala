@@ -103,10 +103,6 @@ object Build {
         )
       }.toMap
 
-    // TODO (KR) : Possibly improve (?)
-    def unaliasNt(nt: ExpandedGrammar.Identifier.NonTerminal): ExpandedGrammar.Identifier.NonTerminal =
-      output.deDuplicatedExpandedGrammar.aliases.find(_._1 == nt).toMaybe.cata(_._2, nt)
-
     def rawName(raw: String): String =
       raw.unesc("`")
 
@@ -382,7 +378,7 @@ object Build {
           def makeState(state: ParsingTable.ParseState): IndentedString = {
             def makeReduce(reduce: ParsingTable.ParseState.Reduce, retToks: String): IndentedString = {
               val ParsingTable.ParseState.Reduce((pNt, pIdx), rIdentifiers) = reduce
-              val ntName = s"${scopedIdentifierName(pNt)}${ntIsCollapsed(unaliasNt(pNt)) ? "" | s"._${pIdx + 1}"}"
+              val ntName = s"${scopedIdentifierName(pNt)}${ntIsCollapsed(pNt) ? "" | s"._${pIdx + 1}"}"
 
               rIdentifiers.toNel match {
                 case Some(rIdentifiers) =>

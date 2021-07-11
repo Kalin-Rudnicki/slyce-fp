@@ -528,6 +528,50 @@ object OutputDebug {
           ),
         )
 
+      def parsingTableToHtml(parsingTable: ParsingTable): Frag = {
+
+        val finishTerms =
+          parsingTable.states.flatMap { state => state.finishesOn.map(_.cata(_.toString, "$")) }
+
+        val otherTerms =
+          parsingTable.states.flatMap { state => state.terminalActions.toList.map(_._1.cata(_.toString, "$")) }
+
+        val allTerminals =
+          (finishTerms ::: otherTerms).distinct.sorted
+
+        val allNonTerminals =
+          parsingTable.states.flatMap { state => state.nonTerminalActions.toList.map(_._1.toString) }.distinct.sorted
+
+        def terminalIdx(term: Maybe[ExpandedGrammar.Identifier.Term]): Int =
+          allTerminals.indexOf(term.cata(_.toString, "$"))
+        def nonTerminalIdx(nonTerm: ExpandedGrammar.Identifier.NonTerminal): Int =
+          allTerminals.size + allNonTerminals.indexOf(nonTerm.toString)
+
+        subSection("Parsing Table")(
+          setting("Start State")(
+            p(parsingTable.startState.id),
+          ),
+          setting("Table")(
+            table(
+              tr(
+                th(colspan := allTerminals.size)("Terminals"),
+                th(colspan := allNonTerminals.size)("NonTerminals"),
+              ),
+              tr(
+                allTerminals.map(t => th(padding := "0 25px", minWidth := "70px")(t)),
+                allNonTerminals.map(t => th(padding := "0 25px", minWidth := "70px")(t)),
+              ),
+              parsingTable.states.map { state =>
+                tr(
+                  td(s"State #${state.id}"),
+                  td(TODO),
+                )
+              },
+            ),
+          ),
+        )
+      }
+
       section(
         "BuildOutput",
       )(
@@ -536,6 +580,8 @@ object OutputDebug {
         expandedGrammarToHtml("ExpandedGrammar", buildOutput.expandedGrammar),
         br,
         expandedGrammarToHtml("DeDuplicated ExpandedGrammar", buildOutput.deDuplicatedExpandedGrammar),
+        br,
+        parsingTableToHtml(buildOutput.parsingTable),
       )
     }
 
