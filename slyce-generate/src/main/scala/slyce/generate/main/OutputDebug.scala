@@ -544,6 +544,12 @@ object OutputDebug {
               },
             ),
           ),
+          br,
+          setting("Extras")(
+            ul(
+              expandedGrammar.extras.map(e => li(e.toString)),
+            ),
+          ),
         )
 
       def parsingTableToHtml(parsingTable: ParsingTable): Frag = {

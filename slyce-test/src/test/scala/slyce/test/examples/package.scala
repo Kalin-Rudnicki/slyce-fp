@@ -125,14 +125,6 @@ package object examples {
 
           sourceText <- IO.readFile(conf.file())
           source = Source(sourceText)
-          /*
-          _ <- logger(
-            L(
-              L.log.info(sourceText),
-              L.break(),
-            ),
-          )
-           */
 
           _ <- parser.parseAndMarkErrors(source) match {
             case Right(root) =>

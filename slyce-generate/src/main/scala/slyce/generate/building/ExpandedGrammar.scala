@@ -15,6 +15,7 @@ final case class ExpandedGrammar private (
     startNt: Marked[String], // TODO (KR) : Remove?
     nts: List[ExpandedGrammar.NT[ExpandedGrammar.Identifier.NonTerminal]],
     aliases: List[ExpandedGrammar.Alias],
+    extras: List[ExpandedGrammar.ExtraFor],
     withs: List[ExpandedGrammar.With],
 )
 
@@ -36,6 +37,20 @@ object ExpandedGrammar {
   )
 
   sealed trait Extra
+  object Extra {
+    final case class SimpleToList(
+        liftIdx: Int,
+        tailIdx: Int,
+    ) extends Extra
+    final case class HeadTailToList(
+        isNel: Boolean,
+        headLiftIdx: Int,
+        headTailIdx: Int,
+        tailNt: Identifier.NonTerminal,
+        tailLiftIdx: Int,
+        tailTailIdx: Int,
+    ) extends Extra
+  }
 
   /*
     NOTE (KR) : Types of identifiers
@@ -296,7 +311,11 @@ object ExpandedGrammar {
             sNt :: eStart.generatedNts,
             ma.toList ::: eStart.aliases,
             eStart.withs,
-            eStart.extras, // TODO (KR) : extras
+            ExtraFor(
+              nt = myId,
+              extra = Extra.SimpleToList(lnt.start.unIgnoredIdx, lnt.start.size),
+            ) ::
+              eStart.extras,
           )
         case (Grammar.ListNonTerminal.Type.*, Some(repeat)) =>
           val (ma, myHeadId, myTailId) = createMyIds
@@ -313,7 +332,17 @@ object ExpandedGrammar {
             sNt :: rNt :: eStart.generatedNts ::: eRepeat.generatedNts,
             ma.toList ::: eStart.aliases ::: eRepeat.aliases,
             eStart.withs ::: eRepeat.withs,
-            eStart.extras ::: eRepeat.extras, // TODO (KR) : extras
+            ExtraFor(
+              myHeadId,
+              Extra.HeadTailToList(
+                isNel = false,
+                headLiftIdx = lnt.start.unIgnoredIdx,
+                headTailIdx = lnt.start.size,
+                tailNt = myTailId,
+                tailLiftIdx = repeat.unIgnoredIdx,
+                tailTailIdx = repeat.size,
+              ),
+            ) :: eStart.extras ::: eRepeat.extras,
           )
         case (Grammar.ListNonTerminal.Type.+, None) =>
           val (ma, myHeadId, myTailId) = createMyIds
@@ -328,7 +357,17 @@ object ExpandedGrammar {
             sNt :: rNt :: eStart.generatedNts,
             ma.toList ::: eStart.aliases,
             eStart.withs,
-            eStart.extras, // TODO (KR) : extras
+            ExtraFor(
+              myHeadId,
+              Extra.HeadTailToList(
+                isNel = true,
+                headLiftIdx = lnt.start.unIgnoredIdx,
+                headTailIdx = lnt.start.size,
+                tailNt = myTailId,
+                tailLiftIdx = lnt.start.unIgnoredIdx,
+                tailTailIdx = lnt.start.size,
+              ),
+            ) :: eStart.extras,
           )
         case (Grammar.ListNonTerminal.Type.+, Some(repeat)) =>
           val (ma, myHeadId, myTailId) = createMyIds
@@ -345,7 +384,17 @@ object ExpandedGrammar {
             sNt :: rNt :: eStart.generatedNts ::: eRepeat.generatedNts,
             ma.toList ::: eStart.aliases ::: eRepeat.aliases,
             eStart.withs ::: eRepeat.withs,
-            eStart.extras ::: eRepeat.extras, // TODO (KR) : extras
+            ExtraFor(
+              myHeadId,
+              Extra.HeadTailToList(
+                isNel = true,
+                headLiftIdx = lnt.start.unIgnoredIdx,
+                headTailIdx = lnt.start.size,
+                tailNt = myTailId,
+                tailLiftIdx = repeat.unIgnoredIdx,
+                tailTailIdx = repeat.size,
+              ),
+            ) :: eStart.extras ::: eRepeat.extras,
           )
       }
     }
@@ -467,7 +516,7 @@ object ExpandedGrammar {
         case identifier: Grammar.Identifier =>
           Expansion(
             Identifier.fromGrammarIdentifier(identifier),
-            Nil, // TODO (KR) : This cant be right...
+            Nil,
             Nil,
             Nil, // TODO (KR) : sumTypes
             Nil, // TODO (KR) : extras
@@ -483,6 +532,7 @@ object ExpandedGrammar {
       startNt = grammar.startNt,
       nts = combined.generatedNts,
       aliases = combined.aliases,
+      extras = combined.extras,
       withs = combined.withs.distinct,
     )
   }
@@ -620,6 +670,7 @@ object ExpandedGrammar {
       startNt = expandedGrammar.startNt,
       nts = deReferenceAliases,
       aliases = filteredAliases,
+      extras = expandedGrammar.extras, // TODO (KR) : unalias as well?
       withs = expandedGrammar.withs, // TODO (KR) : unalias as well?
     )
   }

@@ -18,6 +18,9 @@ final case class IgnoredList[+T](
   def toList: List[T] =
     before ::: unIgnored :: after
 
+  def size: Int =
+    before.size + after.size + 1
+
 }
 
 object IgnoredList {
