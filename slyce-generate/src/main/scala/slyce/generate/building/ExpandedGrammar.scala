@@ -358,7 +358,7 @@ object ExpandedGrammar {
       for {
         expansion <- rec(
           1,
-          ant.assocs.toList,
+          ant.assocs.toList.reverse,
         )
       } yield expansion
         .copy(aliases = (Identifier.NonTerminal.NamedNt(name.name), Identifier.NonTerminal.AssocNt(name.name, 1)) :: expansion.aliases)
