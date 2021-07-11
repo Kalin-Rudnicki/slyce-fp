@@ -19,7 +19,22 @@ final case class ExpandedGrammar private (
 
 object ExpandedGrammar {
 
-  type Alias = (Identifier.NonTerminal, Identifier.NonTerminal)
+  final case class Alias(
+      named: Identifier.NonTerminal,
+      actual: Identifier.NonTerminal,
+  )
+  final case class SumType(
+      identifier: Identifier,
+      nt: Identifier.NonTerminal,
+      name: String,
+  )
+
+  final case class ExtraFor(
+      nt: Identifier.NonTerminal,
+      extra: Extra,
+  )
+
+  sealed trait Extra
 
   /*
     NOTE (KR) : Types of identifiers
@@ -77,7 +92,6 @@ object ExpandedGrammar {
   final case class NT[+N <: Identifier.NonTerminal](
       name: N,
       reductions: NonEmptyList[NT.Reduction],
-      extras: List[NT.Extra],
   )
   object NT {
 
@@ -85,13 +99,10 @@ object ExpandedGrammar {
         name: N,
         reduction0: Reduction,
         reductionN: Reduction*,
-    )(
-        extras: Extra*,
     ): NT[N] =
       NT(
         name,
         NonEmptyList(reduction0, reductionN.toList),
-        extras.toList,
       )
 
     final case class Reduction(elements: List[Identifier], liftIdx: Maybe[Int] = None)
@@ -102,8 +113,6 @@ object ExpandedGrammar {
 
     }
 
-    sealed trait Extra
-
   }
 
   // =====|  |=====
@@ -113,6 +122,8 @@ object ExpandedGrammar {
         data: T,
         generatedNts: List[NT[Identifier.NonTerminal]],
         aliases: List[Alias],
+        sumTypes: List[SumType],
+        extras: List[ExtraFor],
     )
     object Expansion {
 
@@ -126,6 +137,8 @@ object ExpandedGrammar {
           data = main.data,
           generatedNts = all.flatMap(_.generatedNts),
           aliases = all.flatMap(_.aliases),
+          sumTypes = all.flatMap(_.sumTypes),
+          extras = all.flatMap(_.extras),
         )
       }
 
@@ -136,6 +149,8 @@ object ExpandedGrammar {
           cf(expansions.map(_.data)),
           expansionList.flatMap(_.generatedNts),
           expansionList.flatMap(_.aliases),
+          expansionList.flatMap(_.sumTypes),
+          expansionList.flatMap(_.extras),
         )
       }
 
@@ -154,6 +169,8 @@ object ExpandedGrammar {
               f(t.data),
               t.generatedNts,
               t.aliases,
+              t.sumTypes,
+              t.extras,
             )
         }
 
@@ -195,7 +212,7 @@ object ExpandedGrammar {
         case Grammar.StandardNonTerminal.`:`(reductions) =>
           for {
             eReductions <- reductions.map(expandList).traverse
-            tmpENt = Expansion.combine(eReductions)(ers => NT(name, ers, Nil))
+            tmpENt = Expansion.combine(eReductions)(ers => NT(name, ers))
           } yield tmpENt
             .copy(generatedNts = tmpENt.data :: tmpENt.generatedNts)
             .map(_ => name)
@@ -203,8 +220,7 @@ object ExpandedGrammar {
           // TODO (KR) : Need extra information for lifting
           for {
             eReductions <- reductions.map(expandIgnoredList).traverse
-            extras = Nil // TODO (KR) :
-            tmpENt = Expansion.combine(eReductions)(ers => NT(name, ers, extras))
+            tmpENt = Expansion.combine(eReductions)(ers => NT(name, ers))
           } yield tmpENt
             .copy(generatedNts = tmpENt.data :: tmpENt.generatedNts)
             .map(_ => name)
@@ -221,7 +237,7 @@ object ExpandedGrammar {
             val id = Identifier.NonTerminal.ListNt(name.name, Identifier.NonTerminal.ListType.Simple)
 
             (
-              (Identifier.NonTerminal.NamedNt(name.name), id).some,
+              Alias(Identifier.NonTerminal.NamedNt(name.name), id).some,
               id,
             )
           case None =>
@@ -236,7 +252,7 @@ object ExpandedGrammar {
             val headId = Identifier.NonTerminal.ListNt(name.name, Identifier.NonTerminal.ListType.Head)
 
             (
-              (Identifier.NonTerminal.NamedNt(name.name), headId).some,
+              Alias(Identifier.NonTerminal.NamedNt(name.name), headId).some,
               headId,
               Identifier.NonTerminal.ListNt(name.name, Identifier.NonTerminal.ListType.Tail),
             )
@@ -255,11 +271,13 @@ object ExpandedGrammar {
           for {
             eStart <- expandIgnoredList(lnt.start)
             sR1 = NT.Reduction(eStart.data.elements.appended(myId), eStart.data.liftIdx)
-            sNt = NT(myId, sR1, NT.Reduction())() // TODO (KR) : extras
+            sNt = NT(myId, sR1, NT.Reduction())
           } yield Expansion(
             myId,
             sNt :: eStart.generatedNts,
             ma.toList ::: eStart.aliases,
+            Nil, // TODO (KR) : sumTypes
+            Nil, // TODO (KR) : extras
           )
         case (Grammar.ListNonTerminal.Type.*, Some(repeat)) =>
           val (ma, myHeadId, myTailId) = createMyIds
@@ -269,12 +287,14 @@ object ExpandedGrammar {
             eRepeat <- expandIgnoredList(repeat)
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
             rR1 = NT.Reduction(eRepeat.data.elements.appended(myTailId), eRepeat.data.liftIdx)
-            sNt = NT(myHeadId, sR1, NT.Reduction())() // TODO (KR) : extras
-            rNt = NT(myTailId, rR1, NT.Reduction())() // TODO (KR) : extras
+            sNt = NT(myHeadId, sR1, NT.Reduction())
+            rNt = NT(myTailId, rR1, NT.Reduction())
           } yield Expansion(
             myHeadId,
             sNt :: rNt :: eStart.generatedNts ::: eRepeat.generatedNts,
             ma.toList ::: eStart.aliases ::: eRepeat.aliases,
+            Nil, // TODO (KR) : sumTypes
+            Nil, // TODO (KR) : extras
           )
         case (Grammar.ListNonTerminal.Type.+, None) =>
           val (ma, myHeadId, myTailId) = createMyIds
@@ -282,12 +302,14 @@ object ExpandedGrammar {
           for {
             eStart <- expandIgnoredList(lnt.start)
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
-            sNt = NT(myHeadId, sR1)() // TODO (KR) : extras
-            rNt = NT(myTailId, sR1, NT.Reduction())() // TODO (KR) : extras
+            sNt = NT(myHeadId, sR1)
+            rNt = NT(myTailId, sR1, NT.Reduction())
           } yield Expansion(
             myHeadId,
             sNt :: rNt :: eStart.generatedNts,
             ma.toList ::: eStart.aliases,
+            Nil, // TODO (KR) : sumTypes
+            Nil, // TODO (KR) : extras
           )
         case (Grammar.ListNonTerminal.Type.+, Some(repeat)) =>
           val (ma, myHeadId, myTailId) = createMyIds
@@ -297,12 +319,14 @@ object ExpandedGrammar {
             eRepeat <- expandIgnoredList(repeat)
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
             rR1 = NT.Reduction(eRepeat.data.elements.appended(myTailId), eRepeat.data.liftIdx)
-            sNt = NT(myHeadId, sR1)() // TODO (KR) : extras
-            rNt = NT(myTailId, rR1, NT.Reduction())() // TODO (KR) : extras
+            sNt = NT(myHeadId, sR1)
+            rNt = NT(myTailId, rR1, NT.Reduction())
           } yield Expansion(
             myHeadId,
             sNt :: rNt :: eStart.generatedNts ::: eRepeat.generatedNts,
             ma.toList ::: eStart.aliases ::: eRepeat.aliases,
+            Nil, // TODO (KR) : sumTypes
+            Nil, // TODO (KR) : extras
           )
       }
     }
@@ -342,9 +366,10 @@ object ExpandedGrammar {
                   NT.Reduction(
                     childExpansion.data,
                   ),
-                )() // TODO (KR) : extras
-                  :: Nil,
+                ) :: Nil,
                 Nil,
+                Nil, // TODO (KR) : sumTypes
+                Nil, // TODO (KR) : extras
               )
             } yield Expansion.join(
               myExpansion,
@@ -361,7 +386,7 @@ object ExpandedGrammar {
           ant.assocs.toList.reverse,
         )
       } yield expansion
-        .copy(aliases = (Identifier.NonTerminal.NamedNt(name.name), Identifier.NonTerminal.AssocNt(name.name, 1)) :: expansion.aliases)
+        .copy(aliases = Alias(Identifier.NonTerminal.NamedNt(name.name), Identifier.NonTerminal.AssocNt(name.name, 1)) :: expansion.aliases)
     }
 
     def expandList(l: List[Marked[Grammar.Element]]): Attempt[Expansion[NT.Reduction]] =
@@ -392,9 +417,10 @@ object ExpandedGrammar {
               optId,
               NT.Reduction(expandedElement.data),
               NT.Reduction(),
-            )() // TODO (KR) : extras
-              :: Nil,
+            ) :: Nil,
             Nil,
+            Nil, // TODO (KR) : sumTypes
+            Nil, // TODO (KR) : extras
           )
         } yield Expansion.join(optElem, expandedElement)
       else
@@ -408,8 +434,10 @@ object ExpandedGrammar {
         case identifier: Grammar.Identifier =>
           Expansion(
             Identifier.fromGrammarIdentifier(identifier),
+            Nil, // TODO (KR) : This cant be right...
             Nil,
-            Nil,
+            Nil, // TODO (KR) : sumTypes
+            Nil, // TODO (KR) : extras
           ).pure[Attempt]
       }
 
@@ -496,7 +524,6 @@ object ExpandedGrammar {
       NT(
         dereferenceNtId(nt.name, found),
         nt.reductions.map(r => NT.Reduction(r.elements.map(dereferenceId(_, found)), r.liftIdx)),
-        nt.extras,
       )
 
     @tailrec
@@ -534,10 +561,10 @@ object ExpandedGrammar {
 
     val duplicateMap = findDuplicates(Map.empty)
     val filteredNts = filterRedundantAnonListNts(expandedGrammar.nts, duplicateMap.values.toSet).map(dereferenceNt(_, duplicateMap))
-    val filteredAliases = expandedGrammar.aliases.map(t => (dereferenceNtId(t._1, duplicateMap), dereferenceNtId(t._2, duplicateMap)))
+    val filteredAliases = expandedGrammar.aliases.map(t => Alias(dereferenceNtId(t.named, duplicateMap), dereferenceNtId(t.actual, duplicateMap)))
 
     def unaliasNt(nt: ExpandedGrammar.Identifier.NonTerminal): ExpandedGrammar.Identifier.NonTerminal =
-      filteredAliases.find(_._1 == nt).toMaybe.cata(_._2, nt)
+      filteredAliases.find(_.named == nt).toMaybe.cata(_.actual, nt)
 
     val deReferenceAliases =
       filteredNts.map { nt =>
@@ -552,7 +579,6 @@ object ExpandedGrammar {
               reduction.liftIdx,
             )
           },
-          nt.extras,
         )
       }
 

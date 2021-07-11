@@ -223,8 +223,8 @@ object Build {
           "object NonTerminal {",
           indented(
             output.deDuplicatedExpandedGrammar.aliases.map {
-              case (from, to) =>
-                s"type ${nonTerminalName(from)} = ${nonTerminalName(to)}"
+              case ExpandedGrammar.Alias(named, actual) =>
+                s"type ${nonTerminalName(named)} = ${nonTerminalName(actual)}"
             },
             Break,
             output.deDuplicatedExpandedGrammar.nts.map { nt =>

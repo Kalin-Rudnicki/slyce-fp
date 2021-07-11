@@ -518,10 +518,10 @@ object OutputDebug {
                 ),
               ),
               expandedGrammar.aliases.map {
-                case (identifier, references) =>
+                case ExpandedGrammar.Alias(named, actual) =>
                   tr(
-                    td(identifier.toString),
-                    td(references.toString),
+                    td(named.toString),
+                    td(actual.toString),
                   )
               },
             ),

@@ -61,7 +61,7 @@ object ParsingTable {
     // TODO (KR) : No clue why this is still needed after unaliasing in ExpandedGrammar
     //           : but it fails none-the-less, and works when its here
     def unaliasNt(nt: ExpandedGrammar.Identifier.NonTerminal): ExpandedGrammar.Identifier.NonTerminal =
-      expandedGrammar.aliases.find(_._1 == nt).toMaybe.cata(_._2, nt)
+      expandedGrammar.aliases.find(_.named == nt).toMaybe.cata(_.actual, nt)
 
     val firstMap: Map[ExpandedGrammar.Identifier.NonTerminal, First] = {
       final case class Waiting(
