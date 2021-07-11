@@ -1,33 +1,46 @@
 
 @start: Grammar
 
-Grammar : "@start" nonTerminal NonTerminal+
+Grammar : "@start" nonTerminal (^NonTerminal ";")+
+        ;
 
-ElementList + Element
+ElementList          + Element
+                     ;
 UnIgnoredElementList : Element
-                     | ElementList "^" Element ElementList
+                     | Element* "^" Element Element*
+                     ;
 
 NonTerminal : nonTerminal NTBody
-NTBody ^ StandardNT
-       | ListNT
-       | AssocNT
+NTBody      ^ StandardNT
+            | ListNT
+            | AssocNT
+            ;
 
 StandardNT ^ BasicNT
            | LiftNT
-BasicNT : ":" (ElementList . "|" ^ElementList)+
-LiftNT : "^" (UnIgnoredElementList . "|" ^UnIgnoredElementList)+
+           ;
+BasicNT    : ":" (ElementList . "|" ^ElementList)+
+           ;
+LiftNT     : "^" (UnIgnoredElementList . "|" ^UnIgnoredElementList)+
+           ;
 
 ListNT : listType UnIgnoredElementList
        | listType UnIgnoredElementList "." UnIgnoredElementList
+       ;
 
-AssocNT : "~" (AssocPair . "|" ^AssocPair)+ StandardNT
+AssocNT   : "~" (AssocPair . "|" ^AssocPair)+ StandardNT
+          ;
 AssocPair : assocType Element
+          ;
 
-Element : NonOptElement "?"?
-AnonList : Element listType
-         | "(" UnIgnoredElementList ")" listType
-         | "(" UnIgnoredElementList "." UnIgnoredElementList ")" listType
+Element       : NonOptElement "?"?
+              ;
+AnonList      : Element listType
+              | "(" UnIgnoredElementList ")" listType
+              | "(" UnIgnoredElementList "." UnIgnoredElementList ")" listType
+              ;
 NonOptElement : nonTerminal
               | terminal
               | raw
               | AnonList
+              ;

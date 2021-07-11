@@ -83,8 +83,8 @@ package object examples {
         for {
           _ <- logger(
             L(
-              // L.ansi.cursorPos(1, 1),
-              // L.ansi.clearScreen(),
+              L.ansi.cursorPos(1, 1),
+              L.ansi.clearScreen(),
               L.log.info(s"Parsing: ${conf.file()}"),
               L.break(),
             ),
@@ -108,6 +108,7 @@ package object examples {
     val tree: Executable = {
       final class Conf(args: Seq[String]) extends Executable.Conf(args) {
         val file: ScallopOption[File] = opt(required = true)
+        val exec: ScallopOption[Boolean] = opt()
         verify()
       }
       object Conf extends Executable.ConfBuilder(new Conf(_))
@@ -123,18 +124,24 @@ package object examples {
             ),
           )
 
-          sourceText <- IO.readFile(conf.file())
+          sourceText <- IO.readFile(conf.file()).timed(time => logger(L.log.info(s"File read: ${Timer.formatFlex(time)}")))
+          source = Source(sourceText)
+          /*
           _ <- logger(
             L(
               L.log.info(sourceText),
               L.break(),
             ),
           )
-          source = Source(sourceText)
+           */
 
-          _ <- parser.parseAndMarkErrors(source) match {
+          res <- IO(parser.parseAndMarkErrors(source)).timed(time => logger(L.log.info(s"Parsing: ${Timer.formatFlex(time)}")))
+          _ <- res match {
             case Right(root) =>
-              onTree(logger, root)
+              if (conf.exec())
+                onTree(logger, root)
+              else
+                logger(L.log.info("Success!"))
             case Left(markedSource) =>
               logger(L.log.info(markedSource))
           }
