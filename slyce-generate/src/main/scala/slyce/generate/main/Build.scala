@@ -38,25 +38,18 @@ object Build {
       deDuplicatedExpandedGrammar = ExpandedGrammar.simplifyAnonLists(expandedGrammar)
       parsingTable <- ParsingTable.fromExpandedGrammar(deDuplicatedExpandedGrammar)
 
-      tokens = dfa.states.toList.flatMap { state =>
-        state.end.toList.flatMap { yields =>
-          yields.yields.flatMap {
-            _.value match {
-              case Yields.Yield.Terminal(name, _) =>
-                name.some
-              case _ =>
-                None
-            }
-          }
-        }
-      }.toSet
-
       egElements = deDuplicatedExpandedGrammar.nts.flatMap { nt =>
         nt.reductions.toList.flatMap(_.elements)
       }
+      tokens = egElements.flatMap {
+        case term: ExpandedGrammar.Identifier.Terminal =>
+          term.some
+        case _ =>
+          None
+      }.toSet
       raws = egElements.flatMap {
-        case ExpandedGrammar.Identifier.Raw(name) =>
-          name.some
+        case raw: ExpandedGrammar.Identifier.Raw =>
+          raw.some
         case _ =>
           None
       }.toSet
@@ -95,19 +88,66 @@ object Build {
         .map { case (uuid, i) => (uuid, i + 1) }
         .toMap
 
-    lazy val ntIsCollapsed: Map[ExpandedGrammar.Identifier.NonTerminal, Boolean] =
-      output.deDuplicatedExpandedGrammar.nts.map { nt =>
-        (
-          nt.name,
-          nt.reductions.size == 1,
-        )
-      }.toMap
+    val ntIsCollapsed: ExpandedGrammar.Identifier.NonTerminal => Boolean = {
+      val map: Map[ExpandedGrammar.Identifier.NonTerminal, Boolean] =
+        output.deDuplicatedExpandedGrammar.nts.map { nt =>
+          (
+            nt.name,
+            nt.reductions.size == 1,
+          )
+        }.toMap
 
-    def rawName(raw: String): String =
-      raw.unesc("`")
+      map.getOrElse(_, false)
+    }
 
-    def terminalName(terminal: String): String =
-      terminal
+    val ntIsCaseObject: ExpandedGrammar.Identifier.NonTerminal => Boolean = {
+      val map: Map[ExpandedGrammar.Identifier.NonTerminal, Boolean] =
+        output.deDuplicatedExpandedGrammar.nts.map { nt =>
+          (
+            nt.name,
+            nt.reductions.size == 1 && nt.reductions.head.elements.isEmpty,
+          )
+        }.toMap
+
+      map.getOrElse(_, false)
+    }
+
+    val withsByIdentifier: ExpandedGrammar.Identifier => List[ExpandedGrammar.With] = {
+      val map: Map[ExpandedGrammar.Identifier, List[ExpandedGrammar.With]] =
+        output.deDuplicatedExpandedGrammar.withs.groupBy(_.identifier)
+
+      map.getOrElse(_, Nil)
+    }
+
+    val withsByNonTerminal: ExpandedGrammar.Identifier.NonTerminal => Map[String, List[ExpandedGrammar.With]] = {
+      val map: Map[String, Map[String, List[ExpandedGrammar.With]]] =
+        output.deDuplicatedExpandedGrammar.withs
+          .groupBy(_.nt.toString)
+          .map {
+            case (k, v) =>
+              (
+                k,
+                v.groupBy(_.name),
+              )
+          }
+
+      // TODO (KR) : possible unaliasing issues
+      nt => map.getOrElse(nt.toString, Map.empty)
+    }
+
+    def withName(`with`: ExpandedGrammar.With): String =
+      s"${scopedIdentifierName(`with`.nt, false)}.${`with`.name}"
+
+    def identifierWithString(identifier: ExpandedGrammar.Identifier): String =
+      withsByIdentifier(identifier).flatMap { w =>
+        (withsByNonTerminal(w.nt)(w.name).size > 1).maybe(s" with ${withName(w)}")
+      }.mkString
+
+    def rawName(raw: ExpandedGrammar.Identifier.Raw): String =
+      raw.name.unesc("`")
+
+    def terminalName(terminal: ExpandedGrammar.Identifier.Terminal): String =
+      terminal.name
 
     @tailrec
     def nonTerminalName(nonTerminal: ExpandedGrammar.Identifier.NonTerminal, prefix: String = ""): String =
@@ -125,17 +165,18 @@ object Build {
           }
       }
 
-    def scopedIdentifierName(identifier: ExpandedGrammar.Identifier): String =
+    def scopedIdentifierName(identifier: ExpandedGrammar.Identifier, includeType: Boolean): String =
       identifier match {
-        case ExpandedGrammar.Identifier.Terminal(name)           => s"Tok.${terminalName(name)}"
-        case ExpandedGrammar.Identifier.Raw(name)                => s"Tok.${rawName(name)}"
-        case nonTerminal: ExpandedGrammar.Identifier.NonTerminal => s"NonTerminal.${nonTerminalName(nonTerminal)}"
+        case terminal: ExpandedGrammar.Identifier.Terminal => s"Tok.${terminalName(terminal)}"
+        case raw: ExpandedGrammar.Identifier.Raw           => s"Tok.${rawName(raw)}"
+        case nonTerminal: ExpandedGrammar.Identifier.NonTerminal =>
+          s"NonTerminal.${nonTerminalName(nonTerminal)}${(includeType && ntIsCaseObject(nonTerminal)) ? ".type" | ""}"
       }
 
     def leftRightScopedIdentifierName(idx: Int, identifier: ExpandedGrammar.Identifier): String =
       identifier match {
-        case nonTerminal: ExpandedGrammar.Identifier.NonTerminal => s"Right(_${idx + 1}: ${scopedIdentifierName(nonTerminal)})"
-        case terminal: ExpandedGrammar.Identifier.Term           => s"Left(_${idx + 1}: ${scopedIdentifierName(terminal)})"
+        case nonTerminal: ExpandedGrammar.Identifier.NonTerminal => s"Right(_${idx + 1}: ${scopedIdentifierName(nonTerminal, true)})"
+        case terminal: ExpandedGrammar.Identifier.Term           => s"Left(_${idx + 1}: ${scopedIdentifierName(terminal, true)})"
       }
 
     // =====|  |=====
@@ -174,13 +215,13 @@ object Build {
           "object Tok {",
           indented(
             output.tokens.toList.map { tok =>
-              s"final case class ${terminalName(tok)}(text: String, span: Span) extends Tok(${tok.unesc})"
+              s"final case class ${terminalName(tok)}(text: String, span: Span) extends Tok(${tok.name.unesc})${identifierWithString(tok)}"
             },
             output.raws.nonEmpty ?
               inline(
                 Break,
                 output.raws.toList.map { raw =>
-                  s"final case class ${rawName(raw)}(text: String, span: Span) extends Tok(${raw.unesc("""""""""")})"
+                  s"final case class ${rawName(raw)}(text: String, span: Span) extends Tok(${raw.name.unesc("""""""""")})${identifierWithString(raw)}"
                 },
                 Break,
                 "def findRawTerminal(text: String, span: Span): Attempt[Tok] =",
@@ -188,7 +229,7 @@ object Build {
                   "text match {",
                   indented(
                     output.raws.toList.map { raw =>
-                      s"case ${raw.unesc} => ${rawName(raw)}(text, span).pure[Attempt]"
+                      s"case ${raw.name.unesc} => ${rawName(raw)}(text, span).pure[Attempt]"
                     },
                     """case _ => Dead(Marked(s"Invalid raw-terminal : ${text.unesc}", span.some) :: Nil)""",
                   ),
@@ -208,7 +249,7 @@ object Build {
               indented(
                 reduction.elements.zipWithIndex.map {
                   case (element, i) =>
-                    s"_$i: ${scopedIdentifierName(element)},"
+                    s"_$i: ${scopedIdentifierName(element, true)},"
                 },
               ),
               s") extends ${`extends`}",
@@ -223,21 +264,52 @@ object Build {
           "object NonTerminal {",
           indented(
             output.deDuplicatedExpandedGrammar.aliases.map {
-              case ExpandedGrammar.Alias(named, actual) =>
-                s"type ${nonTerminalName(named)} = ${nonTerminalName(actual)}"
+              case ExpandedGrammar.Alias(from, actual) =>
+                s"type ${nonTerminalName(from)} = ${nonTerminalName(actual)}"
             },
             Break,
             output.deDuplicatedExpandedGrammar.nts.map { nt =>
               val ntName = nonTerminalName(nt.name)
+              val withs = withsByNonTerminal(nt.name)
+
+              val withIdtStr =
+                inline(
+                  withs.toList.map {
+                    case (name, withs) =>
+                      withs match {
+                        case head :: Nil =>
+                          s"type $name = ${scopedIdentifierName(head.identifier, true)}"
+                        case _ =>
+                          s"sealed trait $name"
+                      }
+                  },
+                )
+
               inline(
-                (nt.reductions.size == 1) ?
+                if (nt.reductions.size == 1)
                   inline(
-                    typeSignature(ntName, nt.reductions.head, "NonTerminal"),
-                  ) |
+                    typeSignature(ntName, nt.reductions.head, s"NonTerminal${identifierWithString(nt.name)}"),
+                    withs.nonEmpty.maybe {
+                      inline(
+                        s"object $ntName {",
+                        indented(
+                          withIdtStr,
+                        ),
+                        "}",
+                      )
+                    },
+                  )
+                else
                   inline(
-                    s"sealed trait $ntName extends NonTerminal",
+                    s"sealed trait $ntName extends NonTerminal${identifierWithString(nt.name)}",
                     s"object $ntName {",
                     indented(
+                      withs.nonEmpty.maybe {
+                        inline(
+                          withIdtStr,
+                          Break,
+                        )
+                      },
                       nt.reductions.toList.zipWithIndex.map {
                         case (reduction, i) =>
                           typeSignature(s"_${i + 1}", reduction, ntName)
@@ -378,7 +450,7 @@ object Build {
           def makeState(state: ParsingTable.ParseState): IndentedString = {
             def makeReduce(reduce: ParsingTable.ParseState.Reduce, retToks: String): IndentedString = {
               val ParsingTable.ParseState.Reduce((pNt, pIdx), rIdentifiers) = reduce
-              val ntName = s"${scopedIdentifierName(pNt)}${ntIsCollapsed(pNt) ? "" | s"._${pIdx + 1}"}"
+              val ntName = s"${scopedIdentifierName(pNt, false)}${ntIsCollapsed(pNt) ? "" | s"._${pIdx + 1}"}"
 
               rIdentifiers.toNel match {
                 case Some(rIdentifiers) =>
@@ -469,7 +541,7 @@ object Build {
                             .map {
                               case (term, action) =>
                                 inline(
-                                  s"case tok: ${scopedIdentifierName(term)} =>",
+                                  s"case tok: ${scopedIdentifierName(term, true)} =>",
                                   indented(
                                     action match {
                                       case ParsingTable.ParseState.Shift(to) =>
@@ -533,7 +605,7 @@ object Build {
                     state.nonTerminalActions.toList.map {
                       case (nonTerminal, shift) =>
                         inline(
-                          s"case _: ${scopedIdentifierName(nonTerminal)} =>",
+                          s"case _: ${scopedIdentifierName(nonTerminal, true)} =>",
                           indented(s"s${shift.to.value.id}.pure[Attempt]"),
                         )
                     },

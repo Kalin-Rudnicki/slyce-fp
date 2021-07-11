@@ -526,6 +526,24 @@ object OutputDebug {
               },
             ),
           ),
+          br,
+          setting("Withs")(
+            table(
+              tr(
+                th("Identifier", width := "200px"),
+                th("NT", width := "200px"),
+                th("Name", width := "200px"),
+              ),
+              expandedGrammar.withs.map {
+                case ExpandedGrammar.With(identifier, nt, name) =>
+                  tr(
+                    td(identifier.toString),
+                    td(nt.toString),
+                    td(name),
+                  )
+              },
+            ),
+          ),
         )
 
       def parsingTableToHtml(parsingTable: ParsingTable): Frag = {

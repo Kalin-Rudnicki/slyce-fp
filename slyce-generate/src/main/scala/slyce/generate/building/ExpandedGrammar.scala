@@ -15,6 +15,7 @@ final case class ExpandedGrammar private (
     startNt: Marked[String], // TODO (KR) : Remove?
     nts: List[ExpandedGrammar.NT[ExpandedGrammar.Identifier.NonTerminal]],
     aliases: List[ExpandedGrammar.Alias],
+    withs: List[ExpandedGrammar.With],
 )
 
 object ExpandedGrammar {
@@ -23,7 +24,7 @@ object ExpandedGrammar {
       named: Identifier.NonTerminal,
       actual: Identifier.NonTerminal,
   )
-  final case class SumType(
+  final case class With(
       identifier: Identifier,
       nt: Identifier.NonTerminal,
       name: String,
@@ -122,9 +123,25 @@ object ExpandedGrammar {
         data: T,
         generatedNts: List[NT[Identifier.NonTerminal]],
         aliases: List[Alias],
-        sumTypes: List[SumType],
+        withs: List[With],
         extras: List[ExtraFor],
-    )
+    ) {
+
+      def add(
+          generatedNts: List[NT[Identifier.NonTerminal]] = Nil,
+          aliases: List[Alias] = Nil,
+          withs: List[With] = Nil,
+          extras: List[ExtraFor] = Nil,
+      ): Expansion[T] =
+        Expansion(
+          data = this.data,
+          generatedNts = generatedNts ::: this.generatedNts,
+          aliases = aliases ::: this.aliases,
+          withs = withs ::: this.withs,
+          extras = extras ::: this.extras,
+        )
+
+    }
     object Expansion {
 
       def join(
@@ -137,7 +154,7 @@ object ExpandedGrammar {
           data = main.data,
           generatedNts = all.flatMap(_.generatedNts),
           aliases = all.flatMap(_.aliases),
-          sumTypes = all.flatMap(_.sumTypes),
+          withs = all.flatMap(_.withs),
           extras = all.flatMap(_.extras),
         )
       }
@@ -149,7 +166,7 @@ object ExpandedGrammar {
           cf(expansions.map(_.data)),
           expansionList.flatMap(_.generatedNts),
           expansionList.flatMap(_.aliases),
-          expansionList.flatMap(_.sumTypes),
+          expansionList.flatMap(_.withs),
           expansionList.flatMap(_.extras),
         )
       }
@@ -169,7 +186,7 @@ object ExpandedGrammar {
               f(t.data),
               t.generatedNts,
               t.aliases,
-              t.sumTypes,
+              t.withs,
               t.extras,
             )
         }
@@ -219,7 +236,7 @@ object ExpandedGrammar {
         case Grammar.StandardNonTerminal.^(reductions) =>
           // TODO (KR) : Need extra information for lifting
           for {
-            eReductions <- reductions.map(expandIgnoredList).traverse
+            eReductions <- reductions.map(expandIgnoredList(_)).traverse
             tmpENt = Expansion.combine(eReductions)(ers => NT(name, ers))
           } yield tmpENt
             .copy(generatedNts = tmpENt.data :: tmpENt.generatedNts)
@@ -257,6 +274,8 @@ object ExpandedGrammar {
               Identifier.NonTerminal.ListNt(name.name, Identifier.NonTerminal.ListType.Tail),
             )
           case None =>
+            // TODO (KR) : It would be nice to associate the 2 with each other...
+            //           : This should be possible by changing all of the de-dupe stuff from using UUID to (UUID, ListType)
             (
               None,
               Identifier.NonTerminal.AnonListNt(UUID.randomUUID, Identifier.NonTerminal.ListType.Head),
@@ -269,22 +288,22 @@ object ExpandedGrammar {
           val (ma, myId) = createMyId
 
           for {
-            eStart <- expandIgnoredList(lnt.start)
+            eStart <- expandIgnoredList(lnt.start, Some(With(_, myId, "LiftType")))
             sR1 = NT.Reduction(eStart.data.elements.appended(myId), eStart.data.liftIdx)
             sNt = NT(myId, sR1, NT.Reduction())
           } yield Expansion(
             myId,
             sNt :: eStart.generatedNts,
             ma.toList ::: eStart.aliases,
-            Nil, // TODO (KR) : sumTypes
-            Nil, // TODO (KR) : extras
+            eStart.withs,
+            eStart.extras, // TODO (KR) : extras
           )
         case (Grammar.ListNonTerminal.Type.*, Some(repeat)) =>
           val (ma, myHeadId, myTailId) = createMyIds
 
           for {
-            eStart <- expandIgnoredList(lnt.start)
-            eRepeat <- expandIgnoredList(repeat)
+            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, "LiftType")))
+            eRepeat <- expandIgnoredList(repeat, Some(With(_, myHeadId, "LiftType")))
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
             rR1 = NT.Reduction(eRepeat.data.elements.appended(myTailId), eRepeat.data.liftIdx)
             sNt = NT(myHeadId, sR1, NT.Reduction())
@@ -293,14 +312,14 @@ object ExpandedGrammar {
             myHeadId,
             sNt :: rNt :: eStart.generatedNts ::: eRepeat.generatedNts,
             ma.toList ::: eStart.aliases ::: eRepeat.aliases,
-            Nil, // TODO (KR) : sumTypes
-            Nil, // TODO (KR) : extras
+            eStart.withs ::: eRepeat.withs,
+            eStart.extras ::: eRepeat.extras, // TODO (KR) : extras
           )
         case (Grammar.ListNonTerminal.Type.+, None) =>
           val (ma, myHeadId, myTailId) = createMyIds
 
           for {
-            eStart <- expandIgnoredList(lnt.start)
+            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, "LiftType")))
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
             sNt = NT(myHeadId, sR1)
             rNt = NT(myTailId, sR1, NT.Reduction())
@@ -308,15 +327,15 @@ object ExpandedGrammar {
             myHeadId,
             sNt :: rNt :: eStart.generatedNts,
             ma.toList ::: eStart.aliases,
-            Nil, // TODO (KR) : sumTypes
-            Nil, // TODO (KR) : extras
+            eStart.withs,
+            eStart.extras, // TODO (KR) : extras
           )
         case (Grammar.ListNonTerminal.Type.+, Some(repeat)) =>
           val (ma, myHeadId, myTailId) = createMyIds
 
           for {
-            eStart <- expandIgnoredList(lnt.start)
-            eRepeat <- expandIgnoredList(repeat)
+            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, "LiftType")))
+            eRepeat <- expandIgnoredList(repeat, Some(With(_, myHeadId, "LiftType")))
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
             rR1 = NT.Reduction(eRepeat.data.elements.appended(myTailId), eRepeat.data.liftIdx)
             sNt = NT(myHeadId, sR1)
@@ -325,8 +344,8 @@ object ExpandedGrammar {
             myHeadId,
             sNt :: rNt :: eStart.generatedNts ::: eRepeat.generatedNts,
             ma.toList ::: eStart.aliases ::: eRepeat.aliases,
-            Nil, // TODO (KR) : sumTypes
-            Nil, // TODO (KR) : extras
+            eStart.withs ::: eRepeat.withs,
+            eStart.extras ::: eRepeat.extras, // TODO (KR) : extras
           )
       }
     }
@@ -391,21 +410,33 @@ object ExpandedGrammar {
 
     def expandList(l: List[Marked[Grammar.Element]]): Attempt[Expansion[NT.Reduction]] =
       for {
-        expansions <- l.map(expandElement).traverse
+        expansions <- l.map(expandElement(_)).traverse
       } yield Expansion.combine(expansions)(rs => NT.Reduction(rs))
 
-    def expandIgnoredList(il: IgnoredList[Marked[Grammar.Element]]): Attempt[Expansion[NT.Reduction]] =
+    def expandIgnoredList(
+        il: IgnoredList[Marked[Grammar.Element]],
+        mWith: Maybe[Identifier => With] = None,
+    ): Attempt[Expansion[NT.Reduction]] =
       for {
-        beforeExpansions <- il.before.map(expandElement).traverse
-        unIgnoredExpansion <- expandElement(il.unIgnored)
-        afterExpansions <- il.after.map(expandElement).traverse
+        beforeExpansions <- il.before.map(expandElement(_)).traverse
+        unIgnoredExpansion <- expandElement(il.unIgnored, mWith)
+        afterExpansions <- il.after.map(expandElement(_)).traverse
         expansions = beforeExpansions ::: unIgnoredExpansion :: afterExpansions
       } yield Expansion.combine(expansions)(rs => NT.Reduction(rs, il.before.size.some))
 
-    def expandElement(element: Marked[Grammar.Element]): Attempt[Expansion[Identifier]] = {
+    def expandElement(
+        element: Marked[Grammar.Element],
+        mWith: Maybe[Identifier => With] = None,
+    ): Attempt[Expansion[Identifier]] = {
 
       val (isOpt, elem) = element.value.toNonOpt
       val expandedElem = expandNonOptElement(elem)
+
+      def addWithIfExists(expansion: Expansion[Identifier]): Expansion[Identifier] =
+        mWith match {
+          case Some(withF) => expansion.copy(withs = withF(expansion.data) :: expansion.withs)
+          case None        => expansion
+        }
 
       if (isOpt)
         for {
@@ -422,9 +453,11 @@ object ExpandedGrammar {
             Nil, // TODO (KR) : sumTypes
             Nil, // TODO (KR) : extras
           )
-        } yield Expansion.join(optElem, expandedElement)
+        } yield Expansion.join(addWithIfExists(optElem), expandedElement)
       else
-        expandedElem
+        for {
+          expandedElement <- expandedElem
+        } yield addWithIfExists(expandedElement)
     }
 
     def expandNonOptElement(element: Grammar.NonOptElement): Attempt[Expansion[Identifier]] =
@@ -450,6 +483,7 @@ object ExpandedGrammar {
       startNt = grammar.startNt,
       nts = combined.generatedNts,
       aliases = combined.aliases,
+      withs = combined.withs.distinct,
     )
   }
 
@@ -586,6 +620,7 @@ object ExpandedGrammar {
       startNt = expandedGrammar.startNt,
       nts = deReferenceAliases,
       aliases = filteredAliases,
+      withs = expandedGrammar.withs, // TODO (KR) : unalias as well?
     )
   }
 

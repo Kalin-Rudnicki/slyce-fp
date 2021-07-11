@@ -10,18 +10,19 @@ import klib.utils.Logger.{helpers => L}
 import slyce.core._
 import slyce.parse._
 import slyce.test.examples._
-import slyce.test.examples.calc.calc._
+// import slyce.test.examples.calc.calc._
 
 object Parse {
 
+  /*
   lazy val executable: Executable =
     debugParse(parser) { (logger, root) =>
       @tailrec
-      def simplifyList(lines: NonTerminal.Lines, stack: List[NonTerminal.Line]): List[NonTerminal.Line] =
+      def simplifyList(lines: NonTerminal.LinesTail, stack: List[NonTerminal.Line]): List[NonTerminal.Line] =
         lines match {
-          case NonTerminal.LinesSimple._1(line, _, next) =>
+          case NonTerminal.LinesTail._1(line, _, next) =>
             simplifyList(next, line :: stack)
-          case NonTerminal.LinesSimple._2 =>
+          case NonTerminal.LinesTail._2 =>
             stack.reverse
         }
       def simplifyExpr(expr: NonTerminal.Expr): Expression[Tok.int \/ Tok.variable, String] = {
@@ -105,9 +106,10 @@ object Parse {
 
       for {
         _ <- logger(L.log.info("SUCCESS!!!!!"))
-        lines = simplifyList(root, Nil)
+        lines = root._0 :: simplifyList(root._2, Nil)
         _ = eval(lines, Map.empty)
       } yield ()
     }
+   */
 
 }
