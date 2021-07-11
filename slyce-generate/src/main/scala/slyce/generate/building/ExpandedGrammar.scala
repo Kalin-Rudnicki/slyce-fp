@@ -77,6 +77,7 @@ object ExpandedGrammar {
   final case class NT[+N <: Identifier.NonTerminal](
       name: N,
       reductions: NonEmptyList[NT.Reduction],
+      extras: List[NT.Extra],
   )
   object NT {
 
@@ -84,10 +85,13 @@ object ExpandedGrammar {
         name: N,
         reduction0: Reduction,
         reductionN: Reduction*,
+    )(
+        extras: Extra*,
     ): NT[N] =
       NT(
         name,
         NonEmptyList(reduction0, reductionN.toList),
+        extras.toList,
       )
 
     final case class Reduction(elements: List[Identifier], liftIdx: Maybe[Int] = None)
@@ -97,6 +101,8 @@ object ExpandedGrammar {
         Reduction(elementN.toList)
 
     }
+
+    sealed trait Extra
 
   }
 
@@ -189,7 +195,7 @@ object ExpandedGrammar {
         case Grammar.StandardNonTerminal.`:`(reductions) =>
           for {
             eReductions <- reductions.map(expandList).traverse
-            tmpENt = Expansion.combine(eReductions)(ers => NT(name, ers))
+            tmpENt = Expansion.combine(eReductions)(ers => NT(name, ers, Nil))
           } yield tmpENt
             .copy(generatedNts = tmpENt.data :: tmpENt.generatedNts)
             .map(_ => name)
@@ -197,7 +203,8 @@ object ExpandedGrammar {
           // TODO (KR) : Need extra information for lifting
           for {
             eReductions <- reductions.map(expandIgnoredList).traverse
-            tmpENt = Expansion.combine(eReductions)(ers => NT(name, ers))
+            extras = Nil // TODO (KR) :
+            tmpENt = Expansion.combine(eReductions)(ers => NT(name, ers, extras))
           } yield tmpENt
             .copy(generatedNts = tmpENt.data :: tmpENt.generatedNts)
             .map(_ => name)
@@ -248,7 +255,7 @@ object ExpandedGrammar {
           for {
             eStart <- expandIgnoredList(lnt.start)
             sR1 = NT.Reduction(eStart.data.elements.appended(myId), eStart.data.liftIdx)
-            sNt = NT(myId, sR1, NT.Reduction())
+            sNt = NT(myId, sR1, NT.Reduction())() // TODO (KR) : extras
           } yield Expansion(
             myId,
             sNt :: eStart.generatedNts,
@@ -262,8 +269,8 @@ object ExpandedGrammar {
             eRepeat <- expandIgnoredList(repeat)
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
             rR1 = NT.Reduction(eRepeat.data.elements.appended(myTailId), eRepeat.data.liftIdx)
-            sNt = NT(myHeadId, sR1, NT.Reduction())
-            rNt = NT(myTailId, rR1, NT.Reduction())
+            sNt = NT(myHeadId, sR1, NT.Reduction())() // TODO (KR) : extras
+            rNt = NT(myTailId, rR1, NT.Reduction())() // TODO (KR) : extras
           } yield Expansion(
             myHeadId,
             sNt :: rNt :: eStart.generatedNts ::: eRepeat.generatedNts,
@@ -275,8 +282,8 @@ object ExpandedGrammar {
           for {
             eStart <- expandIgnoredList(lnt.start)
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
-            sNt = NT(myHeadId, sR1)
-            rNt = NT(myTailId, sR1, NT.Reduction())
+            sNt = NT(myHeadId, sR1)() // TODO (KR) : extras
+            rNt = NT(myTailId, sR1, NT.Reduction())() // TODO (KR) : extras
           } yield Expansion(
             myHeadId,
             sNt :: rNt :: eStart.generatedNts,
@@ -290,8 +297,8 @@ object ExpandedGrammar {
             eRepeat <- expandIgnoredList(repeat)
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
             rR1 = NT.Reduction(eRepeat.data.elements.appended(myTailId), eRepeat.data.liftIdx)
-            sNt = NT(myHeadId, sR1)
-            rNt = NT(myTailId, rR1, NT.Reduction())
+            sNt = NT(myHeadId, sR1)() // TODO (KR) : extras
+            rNt = NT(myTailId, rR1, NT.Reduction())() // TODO (KR) : extras
           } yield Expansion(
             myHeadId,
             sNt :: rNt :: eStart.generatedNts ::: eRepeat.generatedNts,
@@ -335,7 +342,8 @@ object ExpandedGrammar {
                   NT.Reduction(
                     childExpansion.data,
                   ),
-                ) :: Nil,
+                )() // TODO (KR) : extras
+                  :: Nil,
                 Nil,
               )
             } yield Expansion.join(
@@ -384,7 +392,8 @@ object ExpandedGrammar {
               optId,
               NT.Reduction(expandedElement.data),
               NT.Reduction(),
-            ) :: Nil,
+            )() // TODO (KR) : extras
+              :: Nil,
             Nil,
           )
         } yield Expansion.join(optElem, expandedElement)
@@ -487,6 +496,7 @@ object ExpandedGrammar {
       NT(
         dereferenceNtId(nt.name, found),
         nt.reductions.map(r => NT.Reduction(r.elements.map(dereferenceId(_, found)), r.liftIdx)),
+        nt.extras,
       )
 
     @tailrec
@@ -542,6 +552,7 @@ object ExpandedGrammar {
               reduction.liftIdx,
             )
           },
+          nt.extras,
         )
       }
 

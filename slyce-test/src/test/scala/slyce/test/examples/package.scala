@@ -108,7 +108,6 @@ package object examples {
     val tree: Executable = {
       final class Conf(args: Seq[String]) extends Executable.Conf(args) {
         val file: ScallopOption[File] = opt(required = true)
-        val exec: ScallopOption[Boolean] = opt()
         verify()
       }
       object Conf extends Executable.ConfBuilder(new Conf(_))
@@ -124,7 +123,7 @@ package object examples {
             ),
           )
 
-          sourceText <- IO.readFile(conf.file()).timed(time => logger(L.log.info(s"File read: ${Timer.formatFlex(time)}")))
+          sourceText <- IO.readFile(conf.file())
           source = Source(sourceText)
           /*
           _ <- logger(
@@ -135,13 +134,9 @@ package object examples {
           )
            */
 
-          res <- IO(parser.parseAndMarkErrors(source)).timed(time => logger(L.log.info(s"Parsing: ${Timer.formatFlex(time)}")))
-          _ <- res match {
+          _ <- parser.parseAndMarkErrors(source) match {
             case Right(root) =>
-              if (conf.exec())
-                onTree(logger, root)
-              else
-                logger(L.log.info("Success!"))
+              onTree(logger, root)
             case Left(markedSource) =>
               logger(L.log.info(markedSource))
           }
@@ -149,9 +144,33 @@ package object examples {
       }
     }
 
+    val time: Executable = {
+      final class Conf(args: Seq[String]) extends Executable.Conf(args) {
+        val file: ScallopOption[File] = opt(required = true)
+        verify()
+      }
+      object Conf extends Executable.ConfBuilder(new Conf(_))
+
+      Executable.fromConf(Conf) { (logger, conf) =>
+        for {
+          _ <- logger(
+            L(
+              L.ansi.cursorPos(1, 1),
+              L.ansi.clearScreen(),
+              L.log.info(s"Showing time: ${conf.file()}"),
+              L.break(),
+            ),
+          )
+
+          _ <- parser.runTimedParse(logger, conf.file())
+        } yield ()
+      }
+    }
+
     Executable.fromSubCommands(
       "tokenize" -> tokenize,
       "tree" -> tree,
+      "time" -> time,
     )
   }
 
