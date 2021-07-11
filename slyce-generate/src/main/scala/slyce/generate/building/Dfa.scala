@@ -11,16 +11,8 @@ import slyce.generate.input.Lexer
 
 final case class Dfa private (
     modeStarts: Map[String, Dfa.State], // Not actually used, just for reference
-    states: NonEmptyList[(Dfa.State, Int)],
-) {
-
-  val stateMap: Map[Dfa.State, Int] =
-    states.toList.toMap
-
-  def stateId(state: Dfa.State): String =
-    stateMap.get(state).toMaybe.cata(id => s"State#$id", "(?)")
-
-}
+    states: NonEmptyList[Dfa.State],
+)
 
 object Dfa {
 
@@ -113,23 +105,20 @@ object Dfa {
         )
       }
 
-      val stateMap: Map[Set[Nfa.State], State] = {
-        lazy val lazyMap: Map[Set[Nfa.State], State] =
-          iStateMap.map {
-            case (k, v) =>
-              k ->
-                State(
-                  transitions = v.transitions.map {
-                    case (k, v) =>
-                      k -> v.nonEmpty.maybe(Lazy(lazyMap(v)))
-                  },
-                  elseTransition = v.elseTransition.map(ss => Lazy(lazyMap(ss))),
-                  end = v.end.map(_.map(modeName => Lazy(lazyMap(modeMap(modeName)._1)))),
-                )
-          }
-
-        lazyMap
-      }
+      val stateMap: Map[Set[Nfa.State], State] =
+        Lazy.selfMap[((Set[Nfa.State], IState), Int), Set[Nfa.State], State](iStateMap.toList.zipWithIndex) {
+          case (((k, v), i), ef) =>
+            k ->
+              State(
+                id = i,
+                transitions = v.transitions.map {
+                  case (k, v) =>
+                    k -> v.nonEmpty.maybe(ef(v))
+                },
+                elseTransition = v.elseTransition.map(ef),
+                end = v.end.map(_.map(modeName => ef(modeMap(modeName)._1))),
+              )
+        }
 
       val modeStarts: Map[String, State] =
         nfa.modes.map {
@@ -148,7 +137,7 @@ object Dfa {
 
       Dfa(
         modeStarts,
-        NonEmptyList(initialState, otherStates).zipWithIndex,
+        NonEmptyList(initialState, otherStates),
       )
     }
   }
@@ -200,6 +189,7 @@ object Dfa {
   }
 
   final case class State private[Dfa] (
+      id: Int,
       transitions: Map[Set[Char], Maybe[Lazy[State]]],
       elseTransition: Maybe[Lazy[State]],
       end: Maybe[Yields[Lazy[State]]],

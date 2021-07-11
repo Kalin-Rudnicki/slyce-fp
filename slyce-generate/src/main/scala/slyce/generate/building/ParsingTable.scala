@@ -469,52 +469,48 @@ object ParsingTable {
         .map(_.toMap)
 
     stateMap.map { stateMap =>
-      val preParseStateMap: Map[PreParseState, ParseState] = {
-        lazy val lazyMap: Map[PreParseState, ParseState] =
-          stateMap.toList.zipWithIndex.map {
-            case ((_, preParseState), i) =>
-              def convertShift(shift: PreParseState.Shift): ParseState.Shift =
-                ParseState.Shift(Lazy(lazyMap(stateMap(shift.to))))
+      val preParseStateMap: Map[PreParseState, ParseState] =
+        Lazy.selfMap[((State, PreParseState), Int), PreParseState, ParseState](stateMap.toList.zipWithIndex) {
+          case (((_, preParseState), i), ef) =>
+            def convertShift(shift: PreParseState.Shift): ParseState.Shift =
+              ParseState.Shift(ef(stateMap(shift.to)))
 
-              val (terminalActions, finishesOn) =
-                preParseState.terminalActions.toList
-                  .partitionMap {
-                    case (mTerm, action) =>
-                      action match {
-                        case shift @ PreParseState.Shift(_) =>
-                          scala.Left((mTerm, convertShift(shift)))
-                        case PreParseState.Reduce(produces, rIdentifiers) =>
-                          produces match {
-                            case Some(produces) =>
-                              scala.Left((mTerm, ParseState.Reduce(produces, rIdentifiers)))
-                            case None =>
-                              scala.Right(mTerm)
-                          }
-                      }
-                  }
-
-              val nonTerminalActions =
-                preParseState.nonTerminalActions.map {
-                  case (nonTerminal, shift) =>
-                    (
-                      nonTerminal,
-                      convertShift(shift),
-                    )
+            val (terminalActions, finishesOn) =
+              preParseState.terminalActions.toList
+                .partitionMap {
+                  case (mTerm, action) =>
+                    action match {
+                      case shift @ PreParseState.Shift(_) =>
+                        scala.Left((mTerm, convertShift(shift)))
+                      case PreParseState.Reduce(produces, rIdentifiers) =>
+                        produces match {
+                          case Some(produces) =>
+                            scala.Left((mTerm, ParseState.Reduce(produces, rIdentifiers)))
+                          case None =>
+                            scala.Right(mTerm)
+                        }
+                    }
                 }
 
-              (
-                preParseState,
-                ParseState(
-                  id = i,
-                  terminalActions.toMap,
-                  nonTerminalActions,
-                  finishesOn.toSet,
-                ),
-              )
-          }.toMap
+            val nonTerminalActions =
+              preParseState.nonTerminalActions.map {
+                case (nonTerminal, shift) =>
+                  (
+                    nonTerminal,
+                    convertShift(shift),
+                  )
+              }
 
-        lazyMap
-      }
+            (
+              preParseState,
+              ParseState(
+                id = i,
+                terminalActions.toMap,
+                nonTerminalActions,
+                finishesOn.toSet,
+              ),
+            )
+        }
 
       // TODO (KR) : Possibly force state0 to be id = 0
       ParsingTable(

@@ -83,8 +83,8 @@ package object examples {
         for {
           _ <- logger(
             L(
-              L.ansi.cursorPos(1, 1),
-              L.ansi.clearScreen(),
+              // L.ansi.cursorPos(1, 1),
+              // L.ansi.clearScreen(),
               L.log.info(s"Parsing: ${conf.file()}"),
               L.break(),
             ),

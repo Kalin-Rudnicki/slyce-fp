@@ -38,18 +38,17 @@ object Build {
       deDuplicatedExpandedGrammar = ExpandedGrammar.simplifyAnonLists(expandedGrammar)
       parsingTable <- ParsingTable.fromExpandedGrammar(deDuplicatedExpandedGrammar)
 
-      tokens = dfa.states.toList.flatMap {
-        case (state, _) =>
-          state.end.toList.flatMap { yields =>
-            yields.yields.flatMap {
-              _.value match {
-                case Yields.Yield.Terminal(name, _) =>
-                  name.some
-                case _ =>
-                  None
-              }
+      tokens = dfa.states.toList.flatMap { state =>
+        state.end.toList.flatMap { yields =>
+          yields.yields.flatMap {
+            _.value match {
+              case Yields.Yield.Terminal(name, _) =>
+                name.some
+              case _ =>
+                None
             }
           }
+        }
       }.toSet
 
       egElements = deDuplicatedExpandedGrammar.nts.flatMap { nt =>
@@ -260,15 +259,15 @@ object Build {
 
       val parser: IndentedString = {
         val lexer: IndentedString = {
-          def defineState(idx: Int): IndentedString =
-            s"var s$idx: Lexer.State[Tok] = null"
-          def makeState(idx: Int, state: slyce.generate.building.Dfa.State): IndentedString = {
+          def defineState(state: Dfa.State): IndentedString =
+            s"var s${state.id}: Lexer.State[Tok] = null"
+          def makeState(state: Dfa.State): IndentedString = {
             inline(
-              s"s$idx =",
+              s"s${state.id} =",
               indented(
                 "Lexer.State[Tok](",
                 indented(
-                  s"$idx,",
+                  s"${state.id},",
                   if (state.transitions.nonEmpty)
                     inline(
                       "char => {",
@@ -291,7 +290,7 @@ object Build {
                                   indented(
                                     to match {
                                       case Some(to) =>
-                                        s"s${output.dfa.stateMap(to.value)}.some"
+                                        s"s${to.value.id}.some"
                                       case None =>
                                         "None"
                                     },
@@ -303,7 +302,7 @@ object Build {
                         indented(
                           state.elseTransition match {
                             case Some(to) =>
-                              s"s${output.dfa.stateMap(to.value)}.some"
+                              s"s${to.value.id}.some"
                             case None =>
                               "None"
                           },
@@ -314,7 +313,7 @@ object Build {
                   else
                     state.elseTransition match {
                       case Some(to) =>
-                        s"_ => s${output.dfa.stateMap(to.value)},"
+                        s"_ => s${to.value.id},"
                       case None =>
                         "_ => None,"
                     },
@@ -343,8 +342,8 @@ object Build {
                           "),",
                           yields.toMode.value match {
                             case Yields.ToMode.Same       => "Lexer.Yields.ToMode.Same,"
-                            case Yields.ToMode.To(mode)   => s"Lexer.Yields.ToMode.To[Tok](s${output.dfa.stateMap(mode.value)}),"
-                            case Yields.ToMode.Push(mode) => s"Lexer.Yields.ToMode.Push[Tok](s${output.dfa.stateMap(mode.value)}),"
+                            case Yields.ToMode.To(mode)   => s"Lexer.Yields.ToMode.To[Tok](s${mode.value.id}),"
+                            case Yields.ToMode.Push(mode) => s"Lexer.Yields.ToMode.Push[Tok](s${mode.value.id}),"
                             case Yields.ToMode.Pop        => "Lexer.Yields.ToMode.Pop,"
                           },
                         ),
@@ -363,17 +362,15 @@ object Build {
           inline(
             "Lexer[Tok] {",
             indented(
-              output.dfa.states.toList.map {
-                case (_, i) =>
-                  defineState(i)
+              output.dfa.states.toList.map { state =>
+                defineState(state)
               },
               Break,
-              output.dfa.states.toList.map {
-                case (state, i) =>
-                  makeState(i, state)
+              output.dfa.states.toList.map { state =>
+                makeState(state)
               },
               Break,
-              "s0",
+              s"s${output.dfa.states.head.id}",
             ),
             "},",
           )

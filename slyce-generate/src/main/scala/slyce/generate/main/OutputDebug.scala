@@ -380,7 +380,7 @@ object OutputDebug {
                 case (name, dfaState) =>
                   tr(
                     td(name),
-                    td(dfa.stateId(dfaState)),
+                    td(dfaState.id),
                   )
               },
             ),
@@ -405,55 +405,54 @@ object OutputDebug {
                   width := "150px",
                 ),
               ),
-              dfa.states.toList.map {
-                case (state, _) =>
-                  tr(
-                    td(dfa.stateId(state)),
-                    td(
-                      table(
-                        tr(
-                          th("On")(
-                            width := "250px",
-                          ),
-                          th("ToState")(
-                            width := "150px",
-                          ),
+              dfa.states.toList.map { state =>
+                tr(
+                  td(state.id),
+                  td(
+                    table(
+                      tr(
+                        th("On")(
+                          width := "250px",
                         ),
-                        state.transitions.toList.map {
-                          case (on, toState) =>
-                            tr(
-                              td(on.prettyChars),
-                              td(
-                                toState.map { ts =>
-                                  dfa.stateId(ts.value)
-                                }.toList,
-                              ),
-                            )
-                        },
-                      )(
-                        border := "none",
+                        th("ToState")(
+                          width := "150px",
+                        ),
                       ),
+                      state.transitions.toList.map {
+                        case (on, toState) =>
+                          tr(
+                            td(on.prettyChars),
+                            td(
+                              toState.map { ts =>
+                                ts.value.id
+                              }.toList,
+                            ),
+                          )
+                      },
+                    )(
+                      border := "none",
                     ),
-                    td(
-                      state.elseTransition.map { e =>
-                        dfa.stateId(e.value)
-                      }.toList,
-                    ),
-                    td(
-                      ul(
-                        state.end.toList.flatMap { e =>
-                          e.yields.map { y =>
-                            li(y.value.toString)
-                          }
-                        },
-                      ),
-                    ),
-                    td(
-                      state.end.toList.map { e =>
-                        e.toMode.value.map(ls => dfa.stateId(ls.value)).toString
+                  ),
+                  td(
+                    state.elseTransition.map { e =>
+                      e.value.id
+                    }.toList,
+                  ),
+                  td(
+                    ul(
+                      state.end.toList.flatMap { e =>
+                        e.yields.map { y =>
+                          li(y.value.toString)
+                        }
                       },
                     ),
-                  )
+                  ),
+                  td(
+                    state.end.toList.map { e =>
+                      e.toMode.value.map(ls => ls.value.id).toString
+                    },
+                  ),
+                )
               },
             ),
           ),
