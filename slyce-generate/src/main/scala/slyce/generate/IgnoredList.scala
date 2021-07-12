@@ -25,6 +25,59 @@ final case class IgnoredList[+T](
 
 object IgnoredList {
 
+  object builder {
+
+    def before[T](ts: T*): Builder1[T] =
+      new Builder1(_before = ts.toList)
+
+    def unIgnored[T](t: T): Builder2[T] =
+      new Builder2(_before = Nil, _unIgnored = t)
+
+  }
+
+  final class Builder1[+T] private[IgnoredList] (
+      _before: List[T],
+  ) {
+
+    def unIgnored[T2 >: T](t: T2): Builder2[T2] =
+      new Builder2(_before = _before, _unIgnored = t)
+
+  }
+
+  final class Builder2[+T] private[IgnoredList] (
+      _before: List[T],
+      _unIgnored: T,
+  ) {
+
+    def after[T2 >: T](ts: T2*): Builder3[T2] =
+      new Builder3(_before = _before, _unIgnored = _unIgnored, _after = ts.toList)
+
+    def build: IgnoredList[T] =
+      IgnoredList(
+        before = _before,
+        unIgnored = _unIgnored,
+        after = Nil,
+      )
+
+  }
+
+  final class Builder3[+T] private[IgnoredList] (
+      _before: List[T],
+      _unIgnored: T,
+      _after: List[T],
+  ) {
+
+    def build: IgnoredList[T] =
+      IgnoredList(
+        before = _before,
+        unIgnored = _unIgnored,
+        after = _after,
+      )
+
+  }
+
+  // =====|  |=====
+
   def fromList[T](list: List[(Boolean, T)]): Maybe[IgnoredList[T]] = {
     @tailrec
     def ensure(

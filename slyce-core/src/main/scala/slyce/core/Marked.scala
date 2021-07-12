@@ -1,5 +1,6 @@
 package slyce.core
 
+import klib.Implicits._
 import klib.fp.typeclass._
 import klib.fp.types._
 
@@ -17,6 +18,20 @@ final case class Marked[+T](
 }
 
 object Marked {
+
+  object Implicits {
+
+    implicit class MarkedIdOps[I](i: I) {
+
+      def marked: Marked[I] =
+        Marked(i)
+
+      def marked(span: Span): Marked[I] =
+        Marked(i, span.some)
+
+    }
+
+  }
 
   implicit val markedMonad: Monad[Marked] =
     new Monad[Marked] {

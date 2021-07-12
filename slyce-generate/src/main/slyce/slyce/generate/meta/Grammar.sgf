@@ -28,7 +28,7 @@ ListNT : listType UnIgnoredElementList
        | listType UnIgnoredElementList "." UnIgnoredElementList
        ;
 
-AssocNT   : "~" (AssocPair . "|" ^AssocPair)+ StandardNT
+AssocNT   : tilde (AssocPair . "|" ^AssocPair)+ StandardNT
           ;
 AssocPair : assocType Element
           ;
@@ -39,13 +39,13 @@ AnonList      : Element listType
               | "(" UnIgnoredElementList ")" listType
               | "(" UnIgnoredElementList "." UnIgnoredElementList ")" listType
               ;
-NonOptElement : nonTerminal
+NonOptElement ^ nonTerminal
               | terminal
               | Raw
               | AnonList
               ;
 
-Raw  ^ "\"" ^Char+ "\""
+Raw  : "\"" Char+ "\""
      ;
 Char ^ chars
      | escChar

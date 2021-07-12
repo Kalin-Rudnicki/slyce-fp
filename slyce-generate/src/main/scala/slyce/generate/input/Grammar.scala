@@ -43,10 +43,35 @@ object Grammar {
     final case class `:`(
         reductions: NonEmptyList[List[Marked[Element]]],
     ) extends StandardNonTerminal
+    object `:` {
+
+      def apply(r0: List[Marked[Element]], rN: List[Marked[Element]]*): `:` =
+        `:`(reductions = NonEmptyList(r0, rN.toList))
+
+      def simple(elements: Marked[Element]*): `:` =
+        `:`(
+          reductions = NonEmptyList.nel(
+            elements.toList,
+          ),
+        )
+
+    }
 
     final case class ^(
         reductions: NonEmptyList[IgnoredList[Marked[Element]]],
     ) extends StandardNonTerminal
+    object ^ {
+
+      def apply(r0: IgnoredList[Marked[Element]], rN: IgnoredList[Marked[Element]]*): ^ =
+        ^(reductions = NonEmptyList(r0, rN.toList))
+
+      def simple(ui0: Marked[Element], uiN: Marked[Element]*): ^ =
+        ^(
+          reductions = NonEmptyList(ui0, uiN.toList)
+            .map(IgnoredList.builder.unIgnored(_).build),
+        )
+
+    }
 
   }
 
@@ -58,11 +83,40 @@ object Grammar {
       with NonOptElement
 
   object ListNonTerminal {
-    sealed trait Type
+
+    sealed trait Type {
+
+      def simple(unIgnored: Marked[Element]): ListNonTerminal =
+        repeat(
+          IgnoredList.builder.unIgnored(unIgnored).build,
+        )
+
+      def simpleBetween(unIgnored: Marked[Element], between: Marked[Element]*): ListNonTerminal =
+        startRepeat(
+          IgnoredList.builder.unIgnored(unIgnored).build,
+          IgnoredList.builder.before(between: _*).unIgnored(unIgnored).build,
+        )
+
+      def repeat(repeat: IgnoredList[Marked[Element]]): ListNonTerminal =
+        ListNonTerminal(
+          `type` = this,
+          start = repeat,
+          repeat = None,
+        )
+
+      def startRepeat(start: IgnoredList[Marked[Element]], repeat: IgnoredList[Marked[Element]]): ListNonTerminal =
+        ListNonTerminal(
+          `type` = this,
+          start = start,
+          repeat = repeat.some,
+        )
+
+    }
     object Type {
       case object + extends Type
       case object * extends Type
     }
+
   }
 
   final case class AssocNonTerminal(

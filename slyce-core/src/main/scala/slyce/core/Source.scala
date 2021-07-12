@@ -1,5 +1,7 @@
 package slyce.core
 
+import java.io.File
+
 import scala.annotation.tailrec
 import scala.math.Ordering.Implicits.infixOrderingOps
 
@@ -7,7 +9,7 @@ import klib.Implicits._
 import klib.fp.types._
 import klib.utils._
 
-final case class Source(input: String) {
+final case class Source(input: String, name: Maybe[String] = None) {
   val chars: List[Char] = input.toList
 
   def mark(
@@ -211,7 +213,7 @@ final case class Source(input: String) {
                   // TODO (KR) : Might need to start something here
                   stringBuilder.append('\n')
                   writeMessageList(
-                    doneForLine.reverse.map(dfl => (dfl.messages, dfl.colorizeAndDeColorize)),
+                    doneForLine.reverseMap(dfl => (dfl.messages, dfl.colorizeAndDeColorize)),
                     config.markerString,
                     config.markerIndentString,
                   )
@@ -227,7 +229,7 @@ final case class Source(input: String) {
                   stringBuilder.append('\n')
                   current.colorizeAndDeColorize.foreach(cdc => stringBuilder.append(cdc._2))
                   writeMessageList(
-                    doneForLine.reverse.map(dfl => (dfl.messages, dfl.colorizeAndDeColorize)),
+                    doneForLine.reverseMap(dfl => (dfl.messages, dfl.colorizeAndDeColorize)),
                     config.markerString,
                     config.markerIndentString,
                   )
@@ -330,7 +332,7 @@ final case class Source(input: String) {
             case State.ShowingLine(doneForLine) =>
               stringBuilder.append('\n')
               writeMessageList(
-                doneForLine.reverse.map(dfl => (dfl.messages, dfl.colorizeAndDeColorize)),
+                doneForLine.reverseMap(dfl => (dfl.messages, dfl.colorizeAndDeColorize)),
                 config.markerString,
                 config.markerIndentString,
               )
@@ -362,7 +364,6 @@ final case class Source(input: String) {
             stack.reverse
         }
 
-      // TODO (KR) : '\n' (?)
       writeMessageList(
         loop(waiting, colors, Nil),
         config.eofMarkerString,
@@ -396,6 +397,10 @@ final case class Source(input: String) {
 
 }
 object Source {
+
+  def fromFile(file: File): IO[Source] =
+    IO.readFile(file)
+      .map(Source(_, file.toString.some))
 
   final case class Config(
       markerString: String,
