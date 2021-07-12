@@ -217,8 +217,6 @@ object Build {
       )
 
     val body: IndentedString = {
-      val quadQuote: String = '"'.toString * 4
-
       val tokens: IndentedString =
         inline(
           "sealed abstract class Tok(val tokName: String) extends Token",
@@ -310,7 +308,7 @@ object Build {
                             def makeLoop(ntName2: String, liftIdx: Int, tailIdx: Int): IndentedString =
                               inline(
                                 "@tailrec",
-                                s"def loop(queue: $ntName2, stack: List[$ntName.LiftType]): List[$ntName.LiftType] =",
+                                s"def loop(queue: $ntName2, stack: List[$ntName.${ExpandedGrammar.LiftType}]): List[$ntName.${ExpandedGrammar.LiftType}] =",
                                 indented(
                                   "queue match {",
                                   indented(
@@ -325,7 +323,7 @@ object Build {
                               extra match {
                                 case ExpandedGrammar.Extra.SimpleToList(liftIdx, tailIdx) =>
                                   inline(
-                                    s"def toList: List[$ntName.LiftType] = {",
+                                    s"def toList: List[$ntName.${ExpandedGrammar.LiftType}] = {",
                                     indented(
                                       makeLoop(ntName, liftIdx, tailIdx),
                                       Break,
@@ -336,17 +334,17 @@ object Build {
                                 case ExpandedGrammar.Extra.HeadTailToList(isNel, headLiftIdx, headTailIdx, tailNt, tailLiftIdx, tailTailIdx) =>
                                   if (isNel)
                                     inline(
-                                      s"def toNonEmptyList: NonEmptyList[$ntName.LiftType] = {",
+                                      s"def toNonEmptyList: NonEmptyList[$ntName.${ExpandedGrammar.LiftType}] = {",
                                       indented(
                                         makeLoop(nonTerminalName(tailNt), tailLiftIdx, tailTailIdx),
                                         Break,
-                                        s"NonEmptyList[$ntName.LiftType](this._$headLiftIdx, loop(this._$headTailIdx, Nil))",
+                                        s"NonEmptyList[$ntName.${ExpandedGrammar.LiftType}](this._$headLiftIdx, loop(this._$headTailIdx, Nil))",
                                       ),
                                       "}",
                                     )
                                   else
                                     inline(
-                                      s"def toList: List[$ntName.LiftType] = {",
+                                      s"def toList: List[$ntName.${ExpandedGrammar.LiftType}] = {",
                                       indented(
                                         makeLoop(nonTerminalName(tailNt), tailLiftIdx, tailTailIdx),
                                         Break,
@@ -359,6 +357,18 @@ object Build {
                                       ),
                                       "}",
                                     )
+                                case ExpandedGrammar.Extra.Optional =>
+                                  inline(
+                                    s"def toMaybe: Maybe[$ntName.${ExpandedGrammar.LiftType}] =",
+                                    indented(
+                                      "this match {",
+                                      indented(
+                                        s"case $ntName._1(some) => some.some",
+                                        s"case $ntName._2 => None",
+                                      ),
+                                      "}",
+                                    ),
+                                  )
                               },
                               Break,
                             )

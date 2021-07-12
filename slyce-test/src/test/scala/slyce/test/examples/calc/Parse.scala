@@ -82,12 +82,13 @@ object Parse {
                   case Right(value) =>
                     eval(tail, variables.updated(variable.text, value))
                 }
-              case NonTerminal.Line._2(expr) =>
+              case NonTerminal.Line._2(expr, show) =>
                 evalExpr(simplifyExpr(expr)) match {
                   case Left(error) =>
                     println(s"[error] $error")
                   case Right(value) =>
-                    println(s"[value] $value")
+                    if (show.toMaybe.nonEmpty)
+                      println(s"[value] $value")
                     eval(tail, variables)
                 }
             }

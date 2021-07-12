@@ -21,6 +21,8 @@ final case class ExpandedGrammar private (
 
 object ExpandedGrammar {
 
+  val LiftType = "LiftType"
+
   final case class Alias(
       named: Identifier.NonTerminal,
       actual: Identifier.NonTerminal,
@@ -38,10 +40,12 @@ object ExpandedGrammar {
 
   sealed trait Extra
   object Extra {
+
     final case class SimpleToList(
         liftIdx: Int,
         tailIdx: Int,
     ) extends Extra
+
     final case class HeadTailToList(
         isNel: Boolean,
         headLiftIdx: Int,
@@ -50,6 +54,9 @@ object ExpandedGrammar {
         tailLiftIdx: Int,
         tailTailIdx: Int,
     ) extends Extra
+
+    case object Optional extends Extra
+
   }
 
   /*
@@ -303,7 +310,7 @@ object ExpandedGrammar {
           val (ma, myId) = createMyId
 
           for {
-            eStart <- expandIgnoredList(lnt.start, Some(With(_, myId, "LiftType")))
+            eStart <- expandIgnoredList(lnt.start, Some(With(_, myId, LiftType)))
             sR1 = NT.Reduction(eStart.data.elements.appended(myId), eStart.data.liftIdx)
             sNt = NT(myId, sR1, NT.Reduction())
           } yield Expansion(
@@ -321,8 +328,8 @@ object ExpandedGrammar {
           val (ma, myHeadId, myTailId) = createMyIds
 
           for {
-            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, "LiftType")))
-            eRepeat <- expandIgnoredList(repeat, Some(With(_, myHeadId, "LiftType")))
+            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, LiftType)))
+            eRepeat <- expandIgnoredList(repeat, Some(With(_, myHeadId, LiftType)))
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
             rR1 = NT.Reduction(eRepeat.data.elements.appended(myTailId), eRepeat.data.liftIdx)
             sNt = NT(myHeadId, sR1, NT.Reduction())
@@ -348,7 +355,7 @@ object ExpandedGrammar {
           val (ma, myHeadId, myTailId) = createMyIds
 
           for {
-            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, "LiftType")))
+            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, LiftType)))
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
             sNt = NT(myHeadId, sR1)
             rNt = NT(myTailId, sR1, NT.Reduction())
@@ -373,8 +380,8 @@ object ExpandedGrammar {
           val (ma, myHeadId, myTailId) = createMyIds
 
           for {
-            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, "LiftType")))
-            eRepeat <- expandIgnoredList(repeat, Some(With(_, myHeadId, "LiftType")))
+            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, LiftType)))
+            eRepeat <- expandIgnoredList(repeat, Some(With(_, myHeadId, LiftType)))
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
             rR1 = NT.Reduction(eRepeat.data.elements.appended(myTailId), eRepeat.data.liftIdx)
             sNt = NT(myHeadId, sR1)
@@ -499,8 +506,8 @@ object ExpandedGrammar {
               NT.Reduction(),
             ) :: Nil,
             Nil,
-            Nil, // TODO (KR) : sumTypes
-            Nil, // TODO (KR) : extras
+            With(expandedElement.data, optId, LiftType) :: Nil,
+            ExtraFor(optId, Extra.Optional) :: Nil,
           )
         } yield Expansion.join(addWithIfExists(optElem), expandedElement)
       else
@@ -518,8 +525,8 @@ object ExpandedGrammar {
             Identifier.fromGrammarIdentifier(identifier),
             Nil,
             Nil,
-            Nil, // TODO (KR) : sumTypes
-            Nil, // TODO (KR) : extras
+            Nil,
+            Nil,
           ).pure[Attempt]
       }
 
