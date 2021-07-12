@@ -6,6 +6,7 @@ import org.rogach.scallop._
 
 import klib.Implicits._
 import klib.fp.types._
+import klib.fp.utils.ado
 import klib.utils._
 import klib.utils.Logger.{helpers => L}
 import klib.utils.Logger.helpers.Implicits._
@@ -38,22 +39,21 @@ package object examples {
           ),
         )
         aBuildResult = Build.buildOutput(buildInput)
-        _ <-
+        _ <- ado[IO].join(
           if (conf.debugOutput())
             for {
               _ <- logger(L.log.info("Writing DebugOutput..."))
               _ <- OutputDebug.outputDebug(buildInput, aBuildResult)
             } yield ()
           else
-            ().pure[IO]
-        _ <-
+            ().pure[IO],
           if (conf.fileOutput())
             aBuildResult match {
               case Alive(buildResult) =>
                 for {
                   _ <- logger(L.log.info("Writing FileOutput..."))
                   pkg = List("slyce", "test", "examples", buildInput.name)
-                  outputIdtStr = Build.outputToString(pkg, buildResult)
+                  outputIdtStr <- IO(Build.outputToString(pkg, buildResult))
                   outputStr = outputIdtStr.toString("  ")
                   outputFile =
                     new File(List(List("slyce-test", "src", "test", "scala"), pkg, List(s"${buildInput.name}.scala")).flatten.mkString("/"))
@@ -63,7 +63,8 @@ package object examples {
                 logger(L(errors.map(e => L.log.fatal(e.value.toString))))
             }
           else
-            ().pure[IO]
+            ().pure[IO],
+        )
         _ <- logger(L.log.info("Done."))
       } yield ()
     }
