@@ -61,8 +61,8 @@ package object examples {
                     new File(List(List("slyce-test", "src", "test", "scala"), pkg, List(s"${buildInput.name}.scala")).flatten.mkString("/"))
                   _ <- IO.writeFile(outputFile, outputStr)
                 } yield ()
-              case Dead(_) =>
-                ().pure[IO]
+              case Dead(errors) =>
+                logger(L(errors.map(e => L.log.fatal(e.value.toString))))
             }
           else
             ().pure[IO]

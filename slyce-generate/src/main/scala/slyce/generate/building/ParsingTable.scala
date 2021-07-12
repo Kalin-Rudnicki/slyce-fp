@@ -437,7 +437,63 @@ object ParsingTable {
       val combinedTerminals: List[(Maybe[ExpandedGrammar.Identifier.Term], PreParseState.TerminalAction)] =
         onT ::: finished
 
-      def ensureSingleEntry[A, B](list: List[(A, B)])(onNot1: List[B] => String): Attempt[Map[A, B]] =
+      def conflictLabel(base: String, _1: String, _2s: List[PreParseState.TerminalAction]): String = {
+        import IndentedString._
+        val conflictType =
+          _2s
+            .map {
+              case PreParseState.Shift(_)     => "Shift"
+              case PreParseState.Reduce(_, _) => "Reduce"
+            }
+            .distinct
+            .sorted
+            .reverse
+            .mkString("/")
+        val listMsgs =
+          inline(
+            _2s
+              .map {
+                case PreParseState.Shift(State(entries, on)) =>
+                  indented(
+                    "Shift",
+                    indented(
+                      entries.toList.map { entry =>
+                        inline(
+                          entry.produces.cata(p => s"${p._1}[${p._2}]", "[TreeRoot]"),
+                          indented(
+                            "seen:",
+                            indented(entry.rSeen.reverseMap(_.toString)),
+                            "unseen:",
+                            indented(entry.unseen.map(_.toString)),
+                          ),
+                        )
+                      },
+                    ),
+                  )
+                case PreParseState.Reduce(produces, rIdentifiers) =>
+                  indented(
+                    "Reduce",
+                    indented(
+                      produces match {
+                        case Some((nt, idx)) =>
+                          inline(
+                            s"$nt[$idx]",
+                            indented(
+                              rIdentifiers.reverseMap(_.toString),
+                            ),
+                          )
+                        case None =>
+                          "[TreeRoot]"
+                      },
+                    ),
+                  )
+              },
+          ).toString("    ")
+
+        s"$conflictType Conflict [$base] (${_1}) :\n$listMsgs"
+      }
+
+      def ensureSingleEntry[A, B](list: List[(A, B)])(onNot1: (A, List[B]) => String): Attempt[Map[A, B]] =
         list
           .groupMap(_._1)(_._2)
           .toList
@@ -447,7 +503,7 @@ object ParsingTable {
                 case head :: Nil =>
                   (_1, head).pure[Attempt]
                 case _ =>
-                  Dead(Marked(Msg(onNot1(_2s))) :: Nil)
+                  Dead(Marked(Msg(onNot1(_1, _2s))) :: Nil)
               }
           }
           .traverse
@@ -455,8 +511,12 @@ object ParsingTable {
 
       ado[Attempt]
         .join(
-          ensureSingleEntry(combinedTerminals)(_ => "combinedTerminals"), // TODO (KR) : improve message
-          ensureSingleEntry(onNt)(_ => "onNt"), // TODO (KR) : improve message
+          ensureSingleEntry(combinedTerminals) { (_1, _2) =>
+            conflictLabel("Terminal", _1.cata(_.toString, "$"), _2)
+          },
+          ensureSingleEntry(onNt) { (_1, _2) =>
+            s"Conflict with NonTerminals (${_1}) [${_2.map(s => s"\n    $s").mkString}]"
+          },
         )
         .map {
           case (terminalActions, nonTerminalActions) =>

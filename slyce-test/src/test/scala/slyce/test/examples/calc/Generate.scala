@@ -30,7 +30,7 @@ object Generate {
                 Line(
                   priority = 1,
                   regex = Marked(
-                    inclusive('(', ')', '=', ';'),
+                    inclusive('(', ')', '=', ';', '~'),
                   ),
                   yields = Yields(
                     yields = List(Marked(Text())),
@@ -125,6 +125,7 @@ object Generate {
                     Marked(Grammar.Identifier("Assign")),
                   ),
                   List(
+                    Marked(Grammar.Optional(Grammar.Identifier.raw("~"))),
                     Marked(Grammar.Identifier("Expr")),
                   ),
                 ),
