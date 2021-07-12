@@ -9,6 +9,7 @@ import klib.fp.types._
 import klib.fp.utils.ado
 import klib.utils._
 
+import slyce.core._
 import slyce.generate._
 import slyce.generate.building._
 
@@ -36,32 +37,85 @@ object Build {
       )
       ((nfa, dfa), expandedGrammar) = joinedItems
       deDuplicatedExpandedGrammar = ExpandedGrammar.simplifyAnonLists(expandedGrammar)
-      parsingTable <- ParsingTable.fromExpandedGrammar(deDuplicatedExpandedGrammar)
 
-      egElements = deDuplicatedExpandedGrammar.nts.flatMap { nt =>
+      lexerDefines = dfa.states.toList.flatMap { state =>
+        state.end.toList.flatMap { end =>
+          end.yields.flatMap { yields =>
+            yields.value match {
+              case Yields.Yield.Terminal(name, _) => name.some
+              case _                              => None
+            }
+          }
+        }
+      }.toSet
+
+      grammarDefines = deDuplicatedExpandedGrammar.nts.map(_.name).toSet
+      ntReferences = deDuplicatedExpandedGrammar.nts.flatMap { nt =>
         nt.reductions.toList.flatMap(_.elements)
       }
-      tokens = egElements.flatMap {
+      grammarNTReferences = ntReferences.flatMap {
+        case nt: ExpandedGrammar.Identifier.NonTerminal =>
+          nt.some
+        case _ =>
+          None
+      }.toSet
+      grammarTReferences = ntReferences.flatMap {
         case term: ExpandedGrammar.Identifier.Terminal =>
           term.some
         case _ =>
           None
       }.toSet
-      raws = egElements.flatMap {
+      grammarRawReferences = ntReferences.flatMap {
         case raw: ExpandedGrammar.Identifier.Raw =>
           raw.some
         case _ =>
           None
       }.toSet
 
-      // TODO (KR) : Extra checks
-      //           : - Unused,
+      // TODO (KR) : Checks
+      //           : [ERROR] Lexer toMode to DNE mode (possibly already checked)
+      //           : [WARN ] Lexer defines unreferenced terminal
+
+      // TODO (KR) : Possibly get marked data as well?
+      grammarReferencesDneTerminal: Attempt[Unit] = {
+        def checkReference(t: ExpandedGrammar.Identifier.Terminal): Attempt[Unit] =
+          if (lexerDefines.contains(t.name))
+            ().pure[Attempt]
+          else
+            Dead(Marked(Msg(s"Grammar references non-existent terminal: $t")) :: Nil)
+
+        grammarTReferences.toList
+          .map(checkReference)
+          .traverse
+          .map(_ => ())
+      }
+
+      // TODO (KR) : Possibly get marked data as well?
+      grammarReferencesDneNonTerminal: Attempt[Unit] = {
+        def checkReference(nt: ExpandedGrammar.Identifier.NonTerminal): Attempt[Unit] =
+          if (grammarDefines.contains(nt))
+            ().pure[Attempt]
+          else
+            Dead(Marked(Msg(s"Grammar references non-existent non-terminal: $nt")) :: Nil)
+
+        grammarNTReferences.toList
+          .map(checkReference)
+          .traverse
+          .map(_ => ())
+      }
+
+      _ <- ado[Attempt].join(
+        grammarReferencesDneTerminal,
+        grammarReferencesDneNonTerminal,
+      )
+
+      parsingTable <- ParsingTable.fromExpandedGrammar(deDuplicatedExpandedGrammar)
     } yield BuildOutput(
       name = buildInput.name,
       nfa = nfa,
       dfa = dfa,
-      tokens = tokens,
-      raws = raws,
+      tokens = grammarTReferences,
+      raws = grammarRawReferences,
       expandedGrammar = expandedGrammar,
       deDuplicatedExpandedGrammar = deDuplicatedExpandedGrammar,
       parsingTable = parsingTable,
