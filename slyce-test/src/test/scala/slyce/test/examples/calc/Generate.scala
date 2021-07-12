@@ -54,6 +54,20 @@ object Generate {
                     Sequence(
                       inclusive('-').maybe,
                       CharClass.`\\d`.atLeastOnce,
+                      inclusive('.'),
+                      CharClass.`\\d`.atLeastOnce,
+                    ),
+                  ),
+                  yields = Yields(
+                    yields = List(Marked(Terminal("float"))),
+                  ),
+                ),
+                Line(
+                  priority = 4,
+                  regex = Marked(
+                    Sequence(
+                      inclusive('-').maybe,
+                      CharClass.`\\d`.atLeastOnce,
                     ),
                   ),
                   yields = Yields(
@@ -61,7 +75,7 @@ object Generate {
                   ),
                 ),
                 Line(
-                  priority = 4,
+                  priority = 5,
                   regex = Marked(
                     inclusive('+', '-'),
                   ),
@@ -70,7 +84,7 @@ object Generate {
                   ),
                 ),
                 Line(
-                  priority = 5,
+                  priority = 6,
                   regex = Marked(
                     inclusive('*', '/'),
                   ),
@@ -79,7 +93,7 @@ object Generate {
                   ),
                 ),
                 Line(
-                  priority = 6,
+                  priority = 7,
                   regex = Marked(
                     inclusive('^'),
                   ),
@@ -88,7 +102,7 @@ object Generate {
                   ),
                 ),
                 Line(
-                  priority = 7,
+                  priority = 8,
                   regex = Marked(
                     inclusive(' ', '\t', '\n').atLeastOnce,
                   ),
@@ -97,7 +111,7 @@ object Generate {
                   ),
                 ),
                 Line(
-                  priority = 8,
+                  priority = 9,
                   regex = Marked(
                     Sequence("~~"),
                   ),
@@ -169,7 +183,7 @@ object Generate {
                     ),
                     IgnoredList(
                       before = Nil,
-                      unIgnored = Marked(Grammar.Identifier("int")),
+                      unIgnored = Marked(Grammar.Identifier("Constant")),
                       after = Nil,
                     ),
                     IgnoredList(
@@ -177,6 +191,23 @@ object Generate {
                       unIgnored = Marked(Grammar.Identifier("Expr")),
                       after = List(Marked(Grammar.Identifier(")"))),
                     ),
+                  ),
+                ),
+              ),
+            ),
+            Grammar.NT(
+              name = Grammar.Identifier.unsafeNonTerminal(Marked("Constant")),
+              nt = Grammar.StandardNonTerminal.`^`(
+                reductions = NonEmptyList.nel(
+                  IgnoredList(
+                    before = Nil,
+                    unIgnored = Marked(Grammar.Identifier("int")),
+                    after = Nil,
+                  ),
+                  IgnoredList(
+                    before = Nil,
+                    unIgnored = Marked(Grammar.Identifier("float")),
+                    after = Nil,
                   ),
                 ),
               ),

@@ -7,6 +7,7 @@ import scala.annotation.tailrec
 import klib.Implicits._
 import klib.fp.typeclass.Functor
 import klib.fp.types._
+
 import slyce.core._
 import slyce.generate._
 import slyce.generate.input.Grammar
@@ -56,6 +57,10 @@ object ExpandedGrammar {
     ) extends Extra
 
     case object Optional extends Extra
+
+    final case class Lift(
+        idxs: NonEmptyList[Int],
+    ) extends Extra
 
   }
 
@@ -236,7 +241,7 @@ object ExpandedGrammar {
     ): Attempt[Expansion[Identifier]] = {
 
       nonTerminal match {
-        case snt: Grammar.StandardNonTerminal => expandStandardNonTerminal(Identifier.NonTerminal.NamedNt(name.name), snt)
+        case snt: Grammar.StandardNonTerminal => expandStandardNonTerminal(Identifier.NonTerminal.NamedNt(name.name), snt, None)
         case lnt: Grammar.ListNonTerminal     => expandListNonTerminal(name.some, lnt)
         case ant: Grammar.AssocNonTerminal    => expandAssocNonTerminal(name, ant)
       }
@@ -245,6 +250,7 @@ object ExpandedGrammar {
     def expandStandardNonTerminal(
         name: Identifier.NonTerminal,
         snt: Grammar.StandardNonTerminal,
+        exprBaseId: Maybe[Identifier.NonTerminal],
     ): Attempt[Expansion[Identifier]] = {
 
       snt match {
@@ -256,12 +262,27 @@ object ExpandedGrammar {
             .copy(generatedNts = tmpENt.data :: tmpENt.generatedNts)
             .map(_ => name)
         case Grammar.StandardNonTerminal.^(reductions) =>
+          val mAddWiths: Maybe[Identifier => With] =
+            exprBaseId match {
+              case Some(exprBaseId) =>
+                None
+              case None =>
+                Some(With(_, name, LiftType))
+            }
+          val lift: Maybe[ExtraFor] =
+            exprBaseId match {
+              case Some(exprBaseId) =>
+                None
+              case None =>
+                ExtraFor(name, Extra.Lift(reductions.map(_.unIgnoredIdx))).some
+            }
+
           // TODO (KR) : Need extra information for lifting
           for {
-            eReductions <- reductions.map(expandIgnoredList(_)).traverse
+            eReductions <- reductions.map(expandIgnoredList(_, mAddWiths)).traverse
             tmpENt = Expansion.combine(eReductions)(ers => NT(name, ers))
           } yield tmpENt
-            .copy(generatedNts = tmpENt.data :: tmpENt.generatedNts)
+            .add(generatedNts = tmpENt.data :: Nil, extras = lift.toList)
             .map(_ => name)
       }
     }
@@ -452,7 +473,11 @@ object ExpandedGrammar {
               opExpansion,
             )
           case Nil =>
-            expandStandardNonTerminal(Identifier.NonTerminal.AssocNt(name.name, idx), ant.base)
+            expandStandardNonTerminal(
+              Identifier.NonTerminal.AssocNt(name.name, idx),
+              ant.base,
+              Identifier.NonTerminal.AssocNt(name.name, 1).some,
+            )
         }
 
       for {
@@ -461,7 +486,13 @@ object ExpandedGrammar {
           ant.assocs.toList.reverse,
         )
       } yield expansion
-        .copy(aliases = Alias(Identifier.NonTerminal.NamedNt(name.name), Identifier.NonTerminal.AssocNt(name.name, 1)) :: expansion.aliases)
+        .add(
+          aliases = Alias(
+            Identifier.NonTerminal.NamedNt(name.name),
+            Identifier.NonTerminal.AssocNt(name.name, 1),
+          ) :: Nil,
+        )
+
     }
 
     def expandList(l: List[Marked[Grammar.Element]]): Attempt[Expansion[NT.Reduction]] =

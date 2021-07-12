@@ -222,23 +222,35 @@ object Build {
           "sealed abstract class Tok(val tokName: String) extends Token",
           "object Tok {",
           indented(
-            output.tokens.toList.map { tok =>
-              s"final case class ${terminalName(tok)}(text: String, span: Span) extends Tok(${tok.name.unesc})${identifierWithString(tok)}"
-            },
+            output.tokens.toList
+              .map(t => (t, terminalName(t)))
+              .sortBy(_._2)
+              .map {
+                case (tok, tokName) =>
+                  s"final case class $tokName(text: String, span: Span) extends Tok(${tok.name.unesc})${identifierWithString(tok)}"
+              },
             output.raws.nonEmpty ?
               inline(
                 Break,
-                output.raws.toList.map { raw =>
-                  s"final case class ${rawName(raw)}(text: String, span: Span) extends Tok(${raw.name.unesc("""""""""")})${identifierWithString(raw)}"
-                },
+                output.raws.toList
+                  .map(r => (r, rawName(r)))
+                  .sortBy(_._2)
+                  .map {
+                    case (raw, rawName) =>
+                      s"final case class $rawName(text: String, span: Span) extends Tok(${raw.name.unesc("""""""""")})${identifierWithString(raw)}"
+                  },
                 Break,
                 "def findRawTerminal(text: String, span: Span): Attempt[Tok] =",
                 indented(
                   "text match {",
                   indented(
-                    output.raws.toList.map { raw =>
-                      s"case ${raw.name.unesc} => ${rawName(raw)}(text, span).pure[Attempt]"
-                    },
+                    output.raws.toList
+                      .map(r => (r, rawName(r)))
+                      .sortBy(_._2)
+                      .map {
+                        case (raw, rawName) =>
+                          s"case ${raw.name.unesc} => $rawName(text, span).pure[Attempt]"
+                      },
                     """case _ => Dead(Marked(s"Invalid raw-terminal : ${text.unesc}", span.some) :: Nil)""",
                   ),
                   "}",
@@ -276,145 +288,164 @@ object Build {
                 s"type ${nonTerminalName(from)} = ${nonTerminalName(actual)}"
             },
             Break,
-            output.deDuplicatedExpandedGrammar.nts.map { nt =>
-              val ntName = nonTerminalName(nt.name)
-              val withs = withsByNonTerminal(nt.name)
+            output.deDuplicatedExpandedGrammar.nts
+              .map(nt => (nt, nonTerminalName(nt.name)))
+              .sortBy(_._2)
+              .map {
+                case (nt, ntName) =>
+                  val withs = withsByNonTerminal(nt.name)
 
-              val withIdtStr =
-                inline(
-                  withs.toList.map {
-                    case (name, withs) =>
-                      withs match {
-                        case head :: Nil =>
-                          s"type $name = ${scopedIdentifierName(head.identifier, true)}"
-                        case _ =>
-                          s"sealed trait $name"
-                      }
-                  },
-                )
-
-              val extras = extrasByNonTerminal(nt.name)
-              val (extrasBracket, extrasBody) =
-                if (extras.isEmpty)
-                  ("", inline())
-                else
-                  (
-                    " {",
+                  val withIdtStr =
                     inline(
-                      indented(
-                        Break,
-                        extras.map {
-                          extra =>
-                            def makeLoop(ntName2: String, liftIdx: Int, tailIdx: Int): IndentedString =
-                              inline(
-                                "@tailrec",
-                                s"def loop(queue: $ntName2, stack: List[$ntName.${ExpandedGrammar.LiftType}]): List[$ntName.${ExpandedGrammar.LiftType}] =",
-                                indented(
-                                  "queue match {",
-                                  indented(
-                                    s"case head: $ntName2._1 => loop(head._$tailIdx, head._$liftIdx :: stack)",
-                                    s"case _: $ntName2._2.type => stack.reverse",
-                                  ),
-                                  "}",
-                                ),
-                              )
+                      withs.toList.map {
+                        case (name, withs) =>
+                          withs match {
+                            case head :: Nil =>
+                              s"type $name = ${scopedIdentifierName(head.identifier, true)}"
+                            case _ =>
+                              s"sealed trait $name"
+                          }
+                      },
+                    )
 
-                            inline(
-                              extra match {
-                                case ExpandedGrammar.Extra.SimpleToList(liftIdx, tailIdx) =>
+                  val extras = extrasByNonTerminal(nt.name)
+                  val (extrasBracket, extrasBody) =
+                    if (extras.isEmpty)
+                      ("", inline())
+                    else
+                      (
+                        " {",
+                        inline(
+                          indented(
+                            Break,
+                            extras.map {
+                              extra =>
+                                def makeLoop(ntName2: String, liftIdx: Int, tailIdx: Int): IndentedString =
                                   inline(
-                                    s"def toList: List[$ntName.${ExpandedGrammar.LiftType}] = {",
+                                    "@tailrec",
+                                    s"def loop(queue: $ntName2, stack: List[$ntName.${ExpandedGrammar.LiftType}]): List[$ntName.${ExpandedGrammar.LiftType}] =",
                                     indented(
-                                      makeLoop(ntName, liftIdx, tailIdx),
-                                      Break,
-                                      "loop(this, Nil)",
-                                    ),
-                                    "}",
-                                  )
-                                case ExpandedGrammar.Extra.HeadTailToList(isNel, headLiftIdx, headTailIdx, tailNt, tailLiftIdx, tailTailIdx) =>
-                                  if (isNel)
-                                    inline(
-                                      s"def toNonEmptyList: NonEmptyList[$ntName.${ExpandedGrammar.LiftType}] = {",
+                                      "queue match {",
                                       indented(
-                                        makeLoop(nonTerminalName(tailNt), tailLiftIdx, tailTailIdx),
-                                        Break,
-                                        s"NonEmptyList[$ntName.${ExpandedGrammar.LiftType}](this._$headLiftIdx, loop(this._$headTailIdx, Nil))",
+                                        s"case head: $ntName2._1 => loop(head._$tailIdx, head._$liftIdx :: stack)",
+                                        s"case _: $ntName2._2.type => stack.reverse",
                                       ),
                                       "}",
-                                    )
-                                  else
-                                    inline(
-                                      s"def toList: List[$ntName.${ExpandedGrammar.LiftType}] = {",
-                                      indented(
-                                        makeLoop(nonTerminalName(tailNt), tailLiftIdx, tailTailIdx),
-                                        Break,
-                                        "this match {",
+                                    ),
+                                  )
+
+                                inline(
+                                  extra match {
+                                    case ExpandedGrammar.Extra.SimpleToList(liftIdx, tailIdx) =>
+                                      inline(
+                                        s"def toList: List[$ntName.${ExpandedGrammar.LiftType}] = {",
                                         indented(
-                                          s"case head: $ntName._1 => head._$headLiftIdx :: loop(head._$headTailIdx, Nil)",
-                                          s"case _: $ntName._2.type => Nil",
+                                          makeLoop(ntName, liftIdx, tailIdx),
+                                          Break,
+                                          "loop(this, Nil)",
                                         ),
                                         "}",
-                                      ),
-                                      "}",
-                                    )
-                                case ExpandedGrammar.Extra.Optional =>
-                                  inline(
-                                    s"def toMaybe: Maybe[$ntName.${ExpandedGrammar.LiftType}] =",
-                                    indented(
-                                      "this match {",
-                                      indented(
-                                        s"case $ntName._1(some) => some.some",
-                                        s"case $ntName._2 => None",
-                                      ),
-                                      "}",
-                                    ),
-                                  )
-                              },
-                              Break,
-                            )
-                        },
-                      ),
-                      "}",
-                    ),
-                  )
+                                      )
+                                    case ExpandedGrammar.Extra.HeadTailToList(isNel, headLiftIdx, headTailIdx, tailNt, tailLiftIdx, tailTailIdx) =>
+                                      if (isNel)
+                                        inline(
+                                          s"def toNonEmptyList: NonEmptyList[$ntName.${ExpandedGrammar.LiftType}] = {",
+                                          indented(
+                                            makeLoop(nonTerminalName(tailNt), tailLiftIdx, tailTailIdx),
+                                            Break,
+                                            s"NonEmptyList[$ntName.${ExpandedGrammar.LiftType}](this._$headLiftIdx, loop(this._$headTailIdx, Nil))",
+                                          ),
+                                          "}",
+                                        )
+                                      else
+                                        inline(
+                                          s"def toList: List[$ntName.${ExpandedGrammar.LiftType}] = {",
+                                          indented(
+                                            makeLoop(nonTerminalName(tailNt), tailLiftIdx, tailTailIdx),
+                                            Break,
+                                            "this match {",
+                                            indented(
+                                              s"case head: $ntName._1 => head._$headLiftIdx :: loop(head._$headTailIdx, Nil)",
+                                              s"case _: $ntName._2.type => Nil",
+                                            ),
+                                            "}",
+                                          ),
+                                          "}",
+                                        )
+                                    case ExpandedGrammar.Extra.Optional =>
+                                      inline(
+                                        s"def toMaybe: Maybe[$ntName.${ExpandedGrammar.LiftType}] =",
+                                        indented(
+                                          "this match {",
+                                          indented(
+                                            s"case $ntName._1(some) => some.some",
+                                            s"case $ntName._2 => None",
+                                          ),
+                                          "}",
+                                        ),
+                                      )
+                                    case ExpandedGrammar.Extra.Lift(idxs) =>
+                                      inline(
+                                        s"def lift: $ntName.${ExpandedGrammar.LiftType} =",
+                                        indented(
+                                          "this match {",
+                                          indented(
+                                            idxs.toList.zipWithIndex.map {
+                                              case (liftIdx, rIdx) =>
+                                                inline(
+                                                  s"case nt: $ntName._${rIdx + 1} => nt._$liftIdx",
+                                                )
+                                            },
+                                          ),
+                                          "}",
+                                        ),
+                                      )
+                                  },
+                                  Break,
+                                )
+                            },
+                          ),
+                          "}",
+                        ),
+                      )
 
-              inline(
-                if (nt.reductions.size == 1)
                   inline(
-                    typeSignature(ntName, nt.reductions.head, s"NonTerminal${identifierWithString(nt.name)}$extrasBracket"),
-                    extrasBody,
-                    withs.nonEmpty.maybe {
+                    if (nt.reductions.size == 1)
                       inline(
+                        typeSignature(ntName, nt.reductions.head, s"NonTerminal${identifierWithString(nt.name)}$extrasBracket"),
+                        extrasBody,
+                        withs.nonEmpty.maybe {
+                          inline(
+                            s"object $ntName {",
+                            indented(
+                              withIdtStr,
+                            ),
+                            "}",
+                          )
+                        },
+                      )
+                    else
+                      inline(
+                        s"sealed trait $ntName extends NonTerminal${identifierWithString(nt.name)}$extrasBracket",
+                        extrasBody,
                         s"object $ntName {",
                         indented(
-                          withIdtStr,
+                          withs.nonEmpty.maybe {
+                            inline(
+                              withIdtStr,
+                              Break,
+                            )
+                          },
+                          nt.reductions.toList.zipWithIndex.map {
+                            case (reduction, i) =>
+                              typeSignature(s"_${i + 1}", reduction, ntName)
+                          },
                         ),
                         "}",
-                      )
-                    },
+                      ),
+                    Break,
                   )
-                else
-                  inline(
-                    s"sealed trait $ntName extends NonTerminal${identifierWithString(nt.name)}$extrasBracket",
-                    extrasBody,
-                    s"object $ntName {",
-                    indented(
-                      withs.nonEmpty.maybe {
-                        inline(
-                          withIdtStr,
-                          Break,
-                        )
-                      },
-                      nt.reductions.toList.zipWithIndex.map {
-                        case (reduction, i) =>
-                          typeSignature(s"_${i + 1}", reduction, ntName)
-                      },
-                    ),
-                    "}",
-                  ),
-                Break,
-              )
-            },
+              },
           ),
           "}",
         )

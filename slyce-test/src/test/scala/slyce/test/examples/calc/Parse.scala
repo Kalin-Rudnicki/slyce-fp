@@ -6,7 +6,6 @@ import klib.Implicits._
 import klib.fp.types._
 import klib.utils._
 import klib.utils.Logger.{helpers => L}
-
 import slyce.core._
 import slyce.parse._
 import slyce.test.examples._
@@ -16,26 +15,26 @@ object Parse {
 
   lazy val executable: Executable =
     debugParse(parser) { (logger, root) =>
-      def simplifyExpr(expr: NonTerminal.Expr): Expression[Tok.int \/ Tok.variable, String] = {
-        def expr1(expr: NonTerminal.Expr1): Expression[Tok.int \/ Tok.variable, String] =
+      def simplifyExpr(expr: NonTerminal.Expr): Expression[NonTerminal.Constant \/ Tok.variable, String] = {
+        def expr1(expr: NonTerminal.Expr1): Expression[NonTerminal.Constant \/ Tok.variable, String] =
           expr match {
             case NonTerminal.Expr1._1(left, op, right) => Expression.Node(expr1(left), op.text, expr2(right))
             case NonTerminal.Expr1._2(expr)            => expr2(expr)
           }
-        def expr2(expr: NonTerminal.Expr2): Expression[Tok.int \/ Tok.variable, String] =
+        def expr2(expr: NonTerminal.Expr2): Expression[NonTerminal.Constant \/ Tok.variable, String] =
           expr match {
             case NonTerminal.Expr2._1(left, op, right) => Expression.Node(expr2(left), op.text, expr3(right))
             case NonTerminal.Expr2._2(expr)            => expr3(expr)
           }
-        def expr3(expr: NonTerminal.Expr3): Expression[Tok.int \/ Tok.variable, String] =
+        def expr3(expr: NonTerminal.Expr3): Expression[NonTerminal.Constant \/ Tok.variable, String] =
           expr match {
             case NonTerminal.Expr3._1(left, op, right) => Expression.Node(expr4(left), op.text, expr3(right))
             case NonTerminal.Expr3._2(expr)            => expr4(expr)
           }
-        def expr4(expr: NonTerminal.Expr4): Expression[Tok.int \/ Tok.variable, String] =
+        def expr4(expr: NonTerminal.Expr4): Expression[NonTerminal.Constant \/ Tok.variable, String] =
           expr match {
             case NonTerminal.Expr4._1(variable)   => Expression.Leaf(variable.right)
-            case NonTerminal.Expr4._2(int)        => Expression.Leaf(int.left)
+            case NonTerminal.Expr4._2(constant)   => Expression.Leaf(constant.left)
             case NonTerminal.Expr4._3(_, expr, _) => expr1(expr)
           }
 
@@ -44,7 +43,7 @@ object Parse {
 
       @tailrec
       def eval(lines: List[NonTerminal.Line], variables: Map[String, Int]): Unit = {
-        def evalExpr(expr: Expression[Tok.int \/ Tok.variable, String]): String \/ Int =
+        def evalExpr(expr: Expression[NonTerminal.Constant \/ Tok.variable, String]): String \/ Int =
           expr match {
             case Expression.Node(left, op, right) =>
               for {
@@ -67,8 +66,11 @@ object Parse {
                     case Some(value) => value.right
                     case None        => s"Unknown variable: ${variable.text.unesc}".left
                   }
-                case Left(int) =>
-                  int.text.toInt.right
+                case Left(constant) =>
+                  constant.lift match {
+                    case Tok.float(text, _) => ??? // TODO (KR) :
+                    case Tok.int(text, _)   => text.toInt.right
+                  }
               }
           }
 
