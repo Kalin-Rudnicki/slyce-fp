@@ -13,7 +13,7 @@ lazy val `slyce-core` =
       version := SlyceVersion,
       scalaVersion := MyScalaVersion,
       resolvers += Resolver.mavenLocal,
-      libraryDependencies += MyOrg %% "klib-core" % "0.5.4",
+      libraryDependencies += MyOrg %% "klib-core" % "0.5.5",
     )
 
 lazy val `slyce-generate` =

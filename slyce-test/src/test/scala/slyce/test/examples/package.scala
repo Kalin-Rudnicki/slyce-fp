@@ -53,7 +53,7 @@ package object examples {
                 for {
                   _ <- logger(L.log.info("Writing FileOutput..."))
                   pkg = List("slyce", "test", "examples", buildInput.name)
-                  outputIdtStr <- IO(Build.outputToString(pkg, buildResult))
+                  outputIdtStr = Build.outputToString(pkg, buildResult)
                   outputStr = outputIdtStr.toString("  ")
                   outputFile =
                     new File(List(List("slyce-test", "src", "test", "scala"), pkg, List(s"${buildInput.name}.scala")).flatten.mkString("/"))

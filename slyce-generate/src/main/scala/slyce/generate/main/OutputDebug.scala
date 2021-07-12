@@ -639,7 +639,7 @@ object OutputDebug {
     for {
       _ <- DebugOutputDir.mkdirs.pure[IO]
       outputFile = new File(DebugOutputDir, s"${buildInput.name}.html")
-      htmlText <- IO(htmlFrag.render)
+      htmlText = htmlFrag.render
       _ <- IO.writeFile(outputFile, htmlText)
     } yield ()
   }
