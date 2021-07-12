@@ -1,0 +1,48 @@
+
+@start: General
+
+@mode: General
+\@(start|mode):                                      ; @ -> Mode
+\/\/[^\n]*\n                                         ;
+/\*([^*]|\*[^/])*\*/                                 ;
+\\[/@;n\\[\](){}+*?]                                 ; escChar[1]
+\n                                                   ;
+\;                                                   ; @ -> LineEnd
+[()+*?]                                              ; @
+\[                                                   ; @ -> CharClass
+\{                                                   ; @ -> Quant
+\\d                                                  ; escChars[1]
+[^\\]                                                ; char
+
+@mode: Mode
+[ \t]+                                               ;
+[A-Z][A-Za-z_\d]*                                    ; mode
+\n                                                   ; <-
+
+@mode: String
+"                                                    ; @ <-
+[^\\]+                                               ; chars
+\\[\\\n\t"]                                          ; escChar[1]
+
+@mode: LineEnd
+[ \t]+                                               ;
+\/\/[^\n]*\n                                         ; <-
+/\*([^*]|\*[^/])*\*/                                 ;
+[\[\],@]|>>|->|<-                                    ; @
+-?\d+                                                ; int
+"                                                    ; @ -> String
+[A-Z][A-Za-z_\d]*                                    ; mode
+\n                                                   ; <-
+
+@mode: CharClass
+]                                                    ; @ <-
+[\^\]\-]                                             ; @
+\\[\\\]\^nt]                                         ; escChar[1]
+\\d                                                  ; escChars[1]
+[^\\]                                                ; char
+
+@mode: Quant
+-?\d+                                                ; int
+[ \t]+                                               ;
+,                                                    ; @
+}                                                    ; @ <-

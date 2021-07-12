@@ -1,13 +1,13 @@
 
 @start: Grammar
 
-Grammar : "@start" nonTerminal (^NonTerminal ";")+
+Grammar : "@start:" mode (^NonTerminal ";")+
         ;
 
-ElementList          + Element
+ElementList          * Element
                      ;
 UnIgnoredElementList : Element
-                     | Element* "^" Element Element*
+                     | ElementList "^" Element ElementList
                      ;
 
 NonTerminal : nonTerminal NTBody
@@ -41,6 +41,12 @@ AnonList      : Element listType
               ;
 NonOptElement : nonTerminal
               | terminal
-              | raw
+              | Raw
               | AnonList
               ;
+
+Raw  ^ "\"" ^Char+ "\""
+     ;
+Char ^ chars
+     | escChar
+     ;

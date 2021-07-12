@@ -32,8 +32,6 @@ package object examples {
       for {
         _ <- logger(
           L(
-            L.ansi.cursorPos(1, 1),
-            L.ansi.clearScreen(),
             L.log.important(s"=====| ${buildInput.name} |====="),
             L.break(),
             L.log.info("Building..."),
@@ -83,8 +81,6 @@ package object examples {
         for {
           _ <- logger(
             L(
-              L.ansi.cursorPos(1, 1),
-              L.ansi.clearScreen(),
               L.log.info(s"Parsing: ${conf.file()}"),
               L.break(),
             ),
@@ -116,8 +112,6 @@ package object examples {
         for {
           _ <- logger(
             L(
-              L.ansi.cursorPos(1, 1),
-              L.ansi.clearScreen(),
               L.log.info(s"Building tree: ${conf.file()}"),
               L.break(),
             ),
@@ -147,8 +141,6 @@ package object examples {
         for {
           _ <- logger(
             L(
-              L.ansi.cursorPos(1, 1),
-              L.ansi.clearScreen(),
               L.log.info(s"Showing time: ${conf.file()}"),
               L.break(),
             ),
