@@ -212,7 +212,7 @@ object Generate {
                   ),
                   Line(
                     priority = 23,
-                    regex = exclusive('\\').atLeastOnce.marked,
+                    regex = exclusive('\\', '"').atLeastOnce.marked,
                     yields = Yields(
                       yields = List(
                         T.chars.map(t => Yields.Yield.Terminal(t.name)),
