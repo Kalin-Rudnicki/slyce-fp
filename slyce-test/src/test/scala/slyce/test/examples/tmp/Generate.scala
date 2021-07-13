@@ -37,6 +37,17 @@ object Generate {
                     ),
                   ),
                 ),
+                Line(
+                  priority = 2,
+                  regex = Marked(exclusive('\n', '\t', ' ')),
+                  yields = Yields(
+                    yields = List(
+                      Marked(
+                        Yields.Yield.Terminal("stuff"),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),

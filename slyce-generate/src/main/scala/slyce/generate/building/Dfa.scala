@@ -32,6 +32,7 @@ object Dfa {
       val allYields = all.flatMap(_.end.toList.flatMap(_.yields.yieldsTerminals)).toList.sorted
       val filteredYields = all.flatMap(_.end.toList.flatMap(_.yields.yieldsTerminals)).toList.sorted
 
+      /*
       if (statesYields.nonEmpty || allYields.nonEmpty)
         println {
           inline(
@@ -46,6 +47,7 @@ object Dfa {
             ),
           )
         }
+       */
     }
 
     filtered
@@ -53,8 +55,9 @@ object Dfa {
 
   def fromNfa(nfa: Nfa): Attempt[Dfa] = {
 
+    // TODO : Is this the issue... (?)
     def children(iState: IState): Set[Set[Nfa.State]] =
-      iState.transitions.toList.map(_._2).toSet
+      (iState.elseTransition.toList ::: iState.transitions.toList.map(_._2)).toSet
 
     val allNfaStates: Set[Nfa.State] =
       findAll(nfa.modes.toList.map(_._2.value.value).toSet) { state =>
@@ -69,6 +72,7 @@ object Dfa {
     {
       import IndentedString._
 
+      /*
       println {
         inline(
           "nfa:",
@@ -86,6 +90,7 @@ object Dfa {
           ),
         )
       }
+       */
     }
 
     val modeMap: Attempt[(Map[String, (Set[Nfa.State], IState)], List[(Yields[String], Maybe[NonEmptyList[Lexer.Mode.Line]])])] = {
@@ -175,12 +180,12 @@ object Dfa {
 
         val stateMap: Map[Set[Nfa.State], State] =
           Lazy.selfMap[((Set[Nfa.State], IState), Int), Set[Nfa.State], State](iStateMap.toList.zipWithIndex) {
-            case (((k, v), i), ef) =>
+            case (((nfaStates, iState), i), ef) =>
               // REMOVE : ...
               {
                 import IndentedString._
 
-                v.elseTransition.foreach { et =>
+                iState.elseTransition.foreach { et =>
                   println {
                     inline(
                       "else:",
@@ -195,15 +200,15 @@ object Dfa {
                 }
               }
 
-              k ->
+              nfaStates ->
                 State(
                   id = i,
-                  transitions = v.transitions.map {
+                  transitions = iState.transitions.map {
                     case (k, v) =>
                       k -> v.nonEmpty.maybe(ef(v))
                   },
-                  elseTransition = v.elseTransition.map(ef),
-                  end = v.end.map(_.map(modeName => ef(modeMap(modeName)._1))),
+                  elseTransition = iState.elseTransition.map(ef),
+                  end = iState.end.map(_.map(modeName => ef(modeMap(modeName)._1))),
                 )
           }
 
@@ -302,6 +307,8 @@ object Dfa {
             state
         }.toSet
 
+      val mElse = fromExclusive.nonEmpty.maybe(fromExclusive)
+
       val end: Maybe[(Yields[String], Maybe[NonEmptyList[Lexer.Mode.Line]])] = {
         val ends: List[Lexer.Mode.Line] = initialStates.toList.flatMap(_.end)
         val endsSorted = ends.sortBy(_.priority)
@@ -316,25 +323,30 @@ object Dfa {
       // REMOVE : ...
       {
         import IndentedString._
+
+        /*
         println(
           inline(
             ">",
             indented(
-              "nfa-states:",
+              "else:",
               indented(
-                rawStates.toList.flatMap { state =>
-                  state.end.toList.flatMap(_.yields.yieldsTerminals)
-                },
+                mElse.toList.flatMap(_.flatMap(_.end.toList.flatMap(_.yields.yieldsTerminals))).sorted,
+              ),
+              "end:",
+              indented(
+                initialStates.toList.flatMap(_.end.toList.flatMap(_.yields.yieldsTerminals)),
               ),
             ),
           ),
         )
+         */
       }
 
       (
         initialStates,
         end,
-        IState(charMap, fromExclusive.nonEmpty.maybe(fromExclusive), end.map(_._1)),
+        IState(charMap, mElse, end.map(_._1)),
       )
     }
 
