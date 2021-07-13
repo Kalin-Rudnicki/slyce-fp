@@ -18,194 +18,96 @@ final case class Dfa private (
 
 object Dfa {
 
-  private def canFreelyTransitionTo(states: Set[Nfa.State]): Set[Nfa.State] = {
+  private def expandEpsilons(states: Set[Nfa.State]): Set[Nfa.State] = {
     val all = findAll(states)(_.epsilonTransitions.map(_.value))
     val filtered = all.filter { state =>
       state.transition.nonEmpty || state.end.nonEmpty
-    }
-
-    // REMOVE : ...
-    {
-      import IndentedString._
-
-      val statesYields = all.flatMap(_.end.toList.flatMap(_.yields.yieldsTerminals)).toList.sorted
-      val allYields = all.flatMap(_.end.toList.flatMap(_.yields.yieldsTerminals)).toList.sorted
-      val filteredYields = all.flatMap(_.end.toList.flatMap(_.yields.yieldsTerminals)).toList.sorted
-
-      /*
-      if (statesYields.nonEmpty || allYields.nonEmpty)
-        println {
-          inline(
-            ">>>",
-            indented(
-              "states:",
-              indented(statesYields),
-              "all:",
-              indented(allYields),
-              "filtered:",
-              indented(filteredYields),
-            ),
-          )
-        }
-       */
     }
 
     filtered
   }
 
   def fromNfa(nfa: Nfa): Attempt[Dfa] = {
-
-    // TODO : Is this the issue... (?)
-    def children(iState: IState): Set[Set[Nfa.State]] =
-      (iState.elseTransition.toList ::: iState.transitions.toList.map(_._2)).toSet
-
     val allNfaStates: Set[Nfa.State] =
       findAll(nfa.modes.toList.map(_._2.value.value).toSet) { state =>
         state.transition.map(_._2.value).toSet |
           state.epsilonTransitions.map(_.value)
       }
 
-    val allYields: Set[Yields[String]] =
-      allNfaStates.flatMap(_.end.map(_.yields).toOption)
-
-    // REMOVE : ...
-    {
-      import IndentedString._
-
-      /*
-      println {
-        inline(
-          "nfa:",
-          indented(
-            allNfaStates.toList.flatMap {
-              _.end.toList.flatMap(_.yields.yieldsTerminals)
-            }.sorted,
-          ),
-          "allYields:",
-          indented(
-            allYields
-              .flatMap(_.yieldsTerminals)
-              .toList
-              .sorted,
-          ),
-        )
+    allNfaStates
+      .flatMap(_.end.map(_.yields.toMode))
+      .toList
+      .flatMap { toMode =>
+        toMode.value match {
+          case Yields.ToMode.To(name)   => toMode.map(_ => name).some
+          case Yields.ToMode.Push(name) => toMode.map(_ => name).some
+          case _                        => None
+        }
       }
-       */
-    }
-
-    val modeMap: Attempt[(Map[String, (Set[Nfa.State], IState)], List[(Yields[String], Maybe[NonEmptyList[Lexer.Mode.Line]])])] = {
-      val nfaStatesJoined =
-        nfa.modes.map {
-          case (k, v) =>
-            val tmp = IState.fromNfaStates(Set(v.value.value))
-
-            k -> tmp
-        }
-
-      val blocked1 = nfaStatesJoined.toList.flatMap(_._2._2)
-
-      val map =
-        nfaStatesJoined.map {
-          case (k, (v1, _, v2)) =>
-            k -> (v1, v2)
-        }
-
-      val modeTransitions: Map[String, Set[Maybe[Span]]] =
-        allYields.toList
-          .flatMap { y =>
-            val name =
-              y.toMode.value match {
-                case ToMode.Same =>
-                  None
-                case ToMode.To(mode) =>
-                  mode.some
-                case ToMode.Push(mode) =>
-                  mode.some
-                case ToMode.Pop =>
-                  None
-              }
-            name.map(_ -> y.toMode.span).toOption
-          }
-          .groupBy(_._1)
-          .map {
+      .map { name =>
+        if (nfa.modes.contains(name.value))
+          ().pure[Attempt]
+        else
+          Dead(name.map(name => Msg(s"Invalid mode name: $name")) :: Nil)
+      }
+      .traverse
+      .map { _ =>
+        val nfaStatesJoined =
+          nfa.modes.toList.map {
             case (k, v) =>
-              k -> v.map(_._2).toSet
+              val expanded = expandEpsilons(Set(v.value.value))
+              k -> (expanded, IState.fromNfaStates(expanded))
           }
 
-      val missingTransitions: Map[String, Set[Maybe[Span]]] =
-        modeTransitions.filterNot(t => nfa.modes.contains(t._1))
+        val blocked1 = nfaStatesJoined.flatMap(_._2._2._2)
 
-      val msgs: List[Marked[Msg]] =
-        missingTransitions.toList.flatMap {
-          case (mode, spans) =>
-            spans.map { span =>
-              Marked(Msg.userError(s"Invalid mode: $mode"), span)
-            }
-        }
+        val modeMap =
+          nfaStatesJoined.map {
+            case (k, (nfaStates, (iState, _))) =>
+              k -> (nfaStates, iState)
+          }.toMap
 
-      msgs.isEmpty.maybe((map, blocked1)).toEA(msgs: _*)
-    }
-
-    modeMap.map {
-      case (modeMap, blocked1) =>
-        val (iStateMap: Map[Set[Nfa.State], IState], blocked: List[(Yields[String], Maybe[NonEmptyList[Lexer.Mode.Line]])]) = {
+        val (iStateMap: Map[Set[Nfa.State], IState], blocked2: List[IState.Blocked]) = {
           @tailrec
           def loop(
               seen: Map[Set[Nfa.State], IState],
               unseen: Map[Set[Nfa.State], IState],
-              blocked: List[(Yields[String], Maybe[NonEmptyList[Lexer.Mode.Line]])],
-          ): (Map[Set[Nfa.State], IState], List[(Yields[String], Maybe[NonEmptyList[Lexer.Mode.Line]])]) =
+              blocked: List[IState.Blocked],
+          ): (Map[Set[Nfa.State], IState], List[IState.Blocked]) =
             if (unseen.isEmpty)
               (seen, blocked)
             else {
               val newSeen = seen ++ unseen
-              val newUnseen = unseen.toList.flatMap {
-                case (_, t) =>
-                  children(t)
-              }.toSet &~ newSeen.toList.map(_._1).toSet
-              val merged = newUnseen.toList.map(IState.fromNfaStates)
+              val newUnseen = unseen.flatMap(_._2.children).toSet &~ newSeen.keySet
+              val converted = newUnseen.toList.map(s => (s, IState.fromNfaStates(s)))
+
               loop(
                 newSeen,
-                merged.map { case (v1, _, v2) => (v1, v2) }.toMap,
-                merged.flatMap(_._2) ::: blocked,
+                converted.map { case (nfaStates, (iState, _)) => (nfaStates, iState) }.toMap,
+                converted.flatMap(_._2._2) ::: blocked,
               )
             }
 
           loop(
             Map.empty,
-            modeMap.toList.map(_._2).toMap,
+            modeMap.map(_._2),
             Nil,
           )
         }
 
+        // TODO (KR) :
+        val allBlocked = blocked1 ::: blocked2
+        println(s"#allBlocked: ${allBlocked.size}")
+
         val stateMap: Map[Set[Nfa.State], State] =
           Lazy.selfMap[((Set[Nfa.State], IState), Int), Set[Nfa.State], State](iStateMap.toList.zipWithIndex) {
             case (((nfaStates, iState), i), ef) =>
-              // REMOVE : ...
-              {
-                import IndentedString._
-
-                iState.elseTransition.foreach { et =>
-                  println {
-                    inline(
-                      "else:",
-                      indented(
-                        et.toList.flatMap {
-                          _.end.toList.flatMap(_.yields.yieldsTerminals)
-                        }.sorted,
-                      ),
-                    )
-                  }
-
-                }
-              }
-
               nfaStates ->
                 State(
                   id = i,
                   transitions = iState.transitions.map {
                     case (k, v) =>
-                      k -> v.nonEmpty.maybe(ef(v))
+                      k -> v.map(ef)
                   },
                   elseTransition = iState.elseTransition.map(ef),
                   end = iState.end.map(_.map(modeName => ef(modeMap(modeName)._1))),
@@ -215,7 +117,7 @@ object Dfa {
         val modeStarts: Map[String, State] =
           nfa.modes.map {
             case (k, v) =>
-              k -> stateMap(canFreelyTransitionTo(Set(v.value.value)))
+              k -> stateMap(expandEpsilons(Set(v.value.value)))
           }
 
         val (initialState: State, otherStates: List[State]) = {
@@ -227,126 +129,86 @@ object Dfa {
           )
         }
 
-        // TODO (KR) :
-        val allBlocked = blocked1 ::: blocked
-
-        // REMOVE : ...
-        {
-          import IndentedString._
-
-          println {
-            inline(
-              "states:",
-              indented(
-                (initialState :: otherStates).flatMap { state =>
-                  state.end.toList.flatMap(_.yieldsTerminals)
-                },
-              ),
-              "picked:",
-              indented(
-                allBlocked.flatMap(_._1.yieldsTerminals),
-              ),
-              "blocked:",
-              indented(
-                allBlocked.map {
-                  case (picked, notPicked) =>
-                    notPicked.nonEmpty.maybe {
-                      inline(
-                        picked.toString,
-                        indented(
-                          notPicked.map(_.toList.map(_.toString)),
-                        ),
-                      )
-                    }
-                },
-              ),
-            )
-          }
-        }
-
         Dfa(
           modeStarts,
           NonEmptyList(initialState, otherStates),
         )
-    }
+      }
   }
 
   private final case class IState private (
-      transitions: Map[Set[Char], Set[Nfa.State]],
+      transitions: Map[Set[Char], Maybe[Set[Nfa.State]]],
       elseTransition: Maybe[Set[Nfa.State]],
       end: Maybe[Yields[String]],
-  )
+  ) {
 
+    def children: Set[Set[Nfa.State]] =
+      (elseTransition.toList ::: transitions.toList.flatMap(_._2)).toSet
+
+  }
   private object IState {
 
-    def fromNfaStates(rawStates: Set[Nfa.State]): (Set[Nfa.State], Maybe[(Yields[String], Maybe[NonEmptyList[Lexer.Mode.Line]])], IState) = {
+    final case class Blocked(
+        yields: Yields[String],
+        blocked: NonEmptyList[Lexer.Mode.Line],
+    )
 
-      val initialStates: Set[Nfa.State] = canFreelyTransitionTo(rawStates)
-
+    def fromNfaStates(expandedStates: Set[Nfa.State]): (IState, Maybe[Blocked]) = {
       val transitionPairs: List[(InfiniteSet[Char], Nfa.State)] =
-        initialStates.toList.flatMap(_.transition.map(t => (t._1.chars, t._2.value)).toOption)
+        expandedStates.toList.flatMap(_.transition.map(t => (t._1.chars, t._2.value)).toOption)
 
       val explicitChars: Set[Char] =
         InfiniteSet.explicit[Char](transitionPairs.map(_._1): _*)
 
-      val charTransitions: List[(Char, Set[Nfa.State])] =
-        explicitChars.toList.map { char =>
-          val transitionsTo: Set[Nfa.State] = transitionPairs.filter(_._1.contains(char)).map(_._2).toSet
-          char -> canFreelyTransitionTo(transitionsTo)
-        }
+      val charTransitions: List[(Char, Maybe[Set[Nfa.State]])] =
+        explicitChars.toList
+          .map { char =>
+            val transitionsTo: Set[Nfa.State] =
+              transitionPairs
+                .filter(_._1.contains(char))
+                .map(_._2)
+                .toSet
+            char -> expandEpsilons(transitionsTo)
+          }
+          .map {
+            case (char, states) =>
+              char -> states.ensure(_.nonEmpty)
+          }
 
-      val charMap: Map[Set[Char], Set[Nfa.State]] =
-        charTransitions.groupBy(_._2).map {
+      val charMap: Map[Set[Char], Maybe[Set[Nfa.State]]] =
+        charTransitions.groupMap(_._2)(_._1).map {
           case (k, v) =>
-            v.map(_._1).toSet -> k
+            v.toSet -> k
         }
 
-      val fromExclusive: Set[Nfa.State] =
-        transitionPairs.collect {
-          case (InfiniteSet.Exclusive(_), state) =>
-            state
-        }.toSet
+      val mElse: Maybe[Set[Nfa.State]] =
+        transitionPairs
+          .flatMap {
+            case (InfiniteSet.Exclusive(_), state) => state.some
+            case _                                 => None
+          }
+          .toSet
+          .ensure(_.nonEmpty)
 
-      val mElse = fromExclusive.nonEmpty.maybe(fromExclusive)
-
-      val end: Maybe[(Yields[String], Maybe[NonEmptyList[Lexer.Mode.Line]])] = {
-        val ends: List[Lexer.Mode.Line] = initialStates.toList.flatMap(_.end)
+      val end: Maybe[(Yields[String], Maybe[Blocked])] = {
+        val ends: List[Lexer.Mode.Line] = expandedStates.toList.flatMap(_.end)
         val endsSorted = ends.sortBy(_.priority)
         endsSorted.toNel.map { nel =>
+          val yields = nel.head.yields
           (
-            nel.head.yields,
-            nel.tail.toNel,
+            yields,
+            nel.tail.toNel.map(Blocked(yields, _)),
           )
         }
       }
 
-      // REMOVE : ...
-      {
-        import IndentedString._
-
-        /*
-        println(
-          inline(
-            ">",
-            indented(
-              "else:",
-              indented(
-                mElse.toList.flatMap(_.flatMap(_.end.toList.flatMap(_.yields.yieldsTerminals))).sorted,
-              ),
-              "end:",
-              indented(
-                initialStates.toList.flatMap(_.end.toList.flatMap(_.yields.yieldsTerminals)),
-              ),
-            ),
-          ),
-        )
-         */
-      }
-
       (
-        initialStates,
-        end,
-        IState(charMap, mElse, end.map(_._1)),
+        IState(
+          transitions = charMap,
+          elseTransition = mElse,
+          end = end.map(_._1),
+        ),
+        end.flatMap(_._2),
       )
     }
 
