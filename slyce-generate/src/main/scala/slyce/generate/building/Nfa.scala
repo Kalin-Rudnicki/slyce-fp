@@ -3,7 +3,8 @@ package slyce.generate.building
 import klib.Implicits._
 import klib.fp.types._
 import klib.fp.utils._
-import klib.utils.Pointer
+import klib.utils._
+
 import slyce.core._
 import slyce.generate._
 import slyce.generate.Regex.CharClass
@@ -92,6 +93,7 @@ object Nfa {
               case Regex.Group(seqs) =>
                 seqs.toList.map(fromRegex(_, next)).traverse.map(list => joinStates(list: _*))
               case Regex.Repeat(reg, _min, _max) =>
+                // TODO (KR) : =====| This is most likely where the issue is |=====
                 val min: Attempt[Int] =
                   _min.aliveIf(_ >= 0)(err(Msg.userError(s"min (${_min}) < 0")))
 

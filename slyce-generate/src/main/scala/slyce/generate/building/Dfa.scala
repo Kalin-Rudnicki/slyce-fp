@@ -5,9 +5,8 @@ import scala.annotation.tailrec
 import klib.Implicits._
 import klib.fp.types._
 import klib.utils._
+
 import slyce.core._
-import slyce.generate.Yields.ToMode
-import slyce.generate.Yields.Yield
 import slyce.generate._
 import slyce.generate.input.Lexer
 
@@ -18,21 +17,90 @@ final case class Dfa private (
 
 object Dfa {
 
+  // REMOVE : ...
+  import IndentedString._
+  import klib.utils.Logger.{helpers => L}
+  private val logger: Logger = Logger(Logger.LogLevel.Debug)
+  private implicit class NfaStateSetOps(nfaStates: Set[Nfa.State]) {
+
+    def yieldedTerminals(highlight: Set[String]): List[String] =
+      nfaStates
+        .flatMap(_.end.toList.flatMap(_.yields.yieldsTerminals))
+        .toList
+        .sorted
+        .map { str =>
+          if (highlight.contains(str))
+            str.toColorString.magenta.toString
+          else
+            str.toColorString.cyan.toString
+        }
+
+    def toIdtStr(label: String, highlight: Set[String] = Set.empty): IndentedString =
+      inline(
+        label,
+        indented(yieldedTerminals(highlight)),
+      )
+
+    def mToIdtStr(label: String, highlight: Set[String] = Set.empty): Maybe[IndentedString] = {
+      val yt = yieldedTerminals(highlight)
+      yt.nonEmpty.maybe {
+        inline(
+          label,
+          indented(yt),
+        )
+      }
+    }
+
+  }
+
+  def sect(label: String): Unit =
+    logger.unsafeLog(
+      L(
+        L.break(),
+        L.log.debug(s"=====| ${label.toColorString.red} |====="),
+        L.break(),
+      ),
+    )
+
   private def expandEpsilons(states: Set[Nfa.State]): Set[Nfa.State] = {
     val all = findAll(states)(_.epsilonTransitions.map(_.value))
     val filtered = all.filter { state =>
       state.transition.nonEmpty || state.end.nonEmpty
     }
 
+    // REMOVE : ...
+    logger.unsafeLog(
+      L.log.debug(
+        inline(
+          "expandEpsilons",
+          indented(
+            states.mToIdtStr("[states]", Set("chars")),
+            all.mToIdtStr("[all]", Set("chars")),
+            filtered.mToIdtStr("[filtered]", Set("chars")),
+          ),
+        ).toString("|   "),
+      ),
+    )
+
     filtered
   }
 
   def fromNfa(nfa: Nfa): Attempt[Dfa] = {
+
+    // REMOVE : ...
+    sect("1")
+
     val allNfaStates: Set[Nfa.State] =
       findAll(nfa.modes.toList.map(_._2.value.value).toSet) { state =>
         state.transition.map(_._2.value).toSet |
           state.epsilonTransitions.map(_.value)
       }
+
+    // REMOVE : ...
+    expandEpsilons(allNfaStates)
+
+    // REMOVE : ...
+    sect("2")
 
     allNfaStates
       .flatMap(_.end.map(_.yields.toMode))
@@ -52,12 +120,18 @@ object Dfa {
       }
       .traverse
       .map { _ =>
+        // REMOVE : ...
+        sect("3")
+
         val nfaStatesJoined =
           nfa.modes.toList.map {
             case (k, v) =>
               val expanded = expandEpsilons(Set(v.value.value))
               k -> (expanded, IState.fromNfaStates(expanded))
           }
+
+        // REMOVE : ...
+        sect("4")
 
         val blocked1 = nfaStatesJoined.flatMap(_._2._2._2)
 
@@ -66,6 +140,9 @@ object Dfa {
             case (k, (nfaStates, (iState, _))) =>
               k -> (nfaStates, iState)
           }.toMap
+
+        // REMOVE : ...
+        sect("5")
 
         val (iStateMap: Map[Set[Nfa.State], IState], blocked2: List[IState.Blocked]) = {
           @tailrec
@@ -95,9 +172,11 @@ object Dfa {
           )
         }
 
+        // REMOVE : ...
+        sect("6")
+
         // TODO (KR) :
         val allBlocked = blocked1 ::: blocked2
-        println(s"#allBlocked: ${allBlocked.size}")
 
         val stateMap: Map[Set[Nfa.State], State] =
           Lazy.selfMap[((Set[Nfa.State], IState), Int), Set[Nfa.State], State](iStateMap.toList.zipWithIndex) {
@@ -114,6 +193,9 @@ object Dfa {
                 )
           }
 
+        // REMOVE : ...
+        sect("7")
+
         val modeStarts: Map[String, State] =
           nfa.modes.map {
             case (k, v) =>
@@ -128,6 +210,9 @@ object Dfa {
             stateMap.toList.map(_._2).filterNot(_ == is),
           )
         }
+
+        // REMOVE : ...
+        sect("8")
 
         Dfa(
           modeStarts,
