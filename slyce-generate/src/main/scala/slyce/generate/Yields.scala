@@ -8,7 +8,17 @@ import slyce.core._
 final case class Yields[I](
     yields: List[Marked[Yields.Yield]],
     toMode: Marked[Yields.ToMode[I]] = Marked(Yields.ToMode.Same),
-)
+) {
+
+  def yieldsTerminals: Set[String] =
+    yields.flatMap {
+      _.value match {
+        case Yields.Yield.Terminal(name, _) => name.some
+        case _                              => None
+      }
+    }.toSet
+
+}
 
 object Yields {
 

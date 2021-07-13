@@ -39,17 +39,22 @@ object Build {
       deDuplicatedExpandedGrammar = ExpandedGrammar.simplifyAnonLists(expandedGrammar)
 
       lexerDefines = dfa.states.toList.flatMap { state =>
-        state.end.toList.flatMap { end =>
-          end.yields.flatMap { yields =>
-            yields.value match {
-              case Yields.Yield.Terminal(name, _) => name.some
-              case _                              => None
-            }
-          }
-        }
+        state.end.toList.flatMap(_.yieldsTerminals)
       }.toSet
 
-      _ = lexerDefines.toList.sorted.foreach(println)
+      _ = {
+        import IndentedString._
+
+        // REMOVE : ...
+        println {
+          inline(
+            "lexerDefines:",
+            indented(
+              lexerDefines.toList.sorted,
+            ),
+          )
+        }
+      }
 
       grammarDefines = deDuplicatedExpandedGrammar.nts.map(_.name).toSet
       ntReferences = deDuplicatedExpandedGrammar.nts.flatMap { nt =>
@@ -81,7 +86,6 @@ object Build {
       }
 
       // TODO (KR) : Checks
-      //           : [ERROR] Lexer toMode to DNE mode (possibly already checked)
       //           : [ERROR] Lexer line is completely overshadowed by other lines
       //           : [WARN ] Lexer defines unreferenced terminal
       //           : [?????] Defining Raw/Terminal/NonTerminal with name known to cause problems
