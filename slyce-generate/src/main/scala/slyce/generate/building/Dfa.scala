@@ -20,6 +20,7 @@ object Dfa {
   // REMOVE : ...
   import IndentedString._
   import klib.utils.Logger.{helpers => L}
+  import klib.utils.Logger.helpers.Implicits._
   private val logger: Logger = Logger(Logger.LogLevel.Debug)
   private implicit class NfaStateSetOps(nfaStates: Set[Nfa.State]) {
 
@@ -30,23 +31,27 @@ object Dfa {
         .sorted
         .map { str =>
           if (highlight.contains(str))
-            str.toColorString.magenta.toString
+            str.toColorString.green.toString
           else
-            str.toColorString.cyan.toString
+            str.toColorString.yellow.toString
         }
 
-    def toIdtStr(label: String, highlight: Set[String] = Set.empty): IndentedString =
-      inline(
-        label,
-        indented(yieldedTerminals(highlight)),
+    def logged(label: String, highlight: Set[String] = Set.empty): Logger.Event =
+      L(
+        L.log.debug(label),
+        L.indented(
+          yieldedTerminals(highlight).map(L.log.debug(_)),
+        ),
       )
 
-    def mToIdtStr(label: String, highlight: Set[String] = Set.empty): Maybe[IndentedString] = {
+    def loggedIfAny(label: String, highlight: Set[String] = Set.empty): Maybe[Logger.Event] = {
       val yt = yieldedTerminals(highlight)
       yt.nonEmpty.maybe {
-        inline(
-          label,
-          indented(yt),
+        L(
+          L.log.debug(label),
+          L.indented(
+            yieldedTerminals(highlight).map(L.log.debug(_)),
+          ),
         )
       }
     }
@@ -68,19 +73,39 @@ object Dfa {
       state.transition.nonEmpty || state.end.nonEmpty
     }
 
-    // REMOVE : ...
-    logger.unsafeLog(
-      L.log.debug(
-        inline(
-          "expandEpsilons",
-          indented(
-            states.mToIdtStr("[states]", Set("chars")),
-            all.mToIdtStr("[all]", Set("chars")),
-            filtered.mToIdtStr("[filtered]", Set("chars")),
+    val classNameStarts =
+      List(
+        "slyce.",
+      )
+
+    val statesL = states.loggedIfAny("[states]", Set("chars"))
+    val allL = all.loggedIfAny("[all]", Set("chars"))
+    val filteredL = filtered.loggedIfAny("[filtered]", Set("chars"))
+
+    if (statesL.nonEmpty || allL.nonEmpty || filteredL.nonEmpty)
+      // REMOVE : ...
+      logger.unsafeLog(
+        L(
+          L.log.debug("expandEpsilons"),
+          L.indented(
+            L(
+              statesL.toList,
+              allL.toList,
+              filteredL.toList,
+              // L.requireFlags("stack-trace")(
+              L(
+                L.log.debug("[stack-trace]"),
+                L.indented(
+                  Thread.currentThread.getStackTrace.toList.tail.tail
+                    .filter(ste => classNameStarts.exists(ste.getClassName.startsWith(_)))
+                    .map(ste => L.log.debug(s"${ste.getFileName.toColorString.cyan}:${ste.getLineNumber.toString.toColorString.magenta}")),
+                ),
+              ),
+              // ),
+            ),
           ),
-        ).toString("|   "),
-      ),
-    )
+        ),
+      )
 
     filtered
   }

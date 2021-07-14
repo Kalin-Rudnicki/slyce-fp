@@ -376,6 +376,27 @@ object OutputDebug {
           val nfaStateMap = allNfaStates.toList.zipWithIndex.toMap
 
           subSection("Nfa")(
+            setting("Modes")(
+              table(
+                tr(
+                  th("Name")(
+                    width := "150px",
+                  ),
+                  th("State")(
+                    width := "150px",
+                  ),
+                ),
+                nfa.modes.toList.map {
+                  case (name, mpns) =>
+                    val tsId = nfaStateMap(mpns.value.value)
+                    tr(
+                      td(name),
+                      td(a(tsId, href := s"#nfa-state-$tsId", padding := "3px", margin := "3px")),
+                    )
+                },
+              ),
+            ),
+            br,
             setting("States")(
               table(
                 tr(
