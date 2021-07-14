@@ -48,6 +48,20 @@ object OutputDebug {
           border := "1px solid black",
         )
 
+        "a" - (
+          textDecoration := "none",
+          color := "black",
+          backgroundColor := "#90C3C8",
+          borderRadius := "5px",
+        )
+        "a:hover" - (
+          backgroundColor := "#1F5673"
+        )
+
+        "li" - (
+          height := "fit-content",
+        )
+
         ".section-header" - (
           margin := "0px",
         )
@@ -367,6 +381,25 @@ object OutputDebug {
           buildOutput: BuildOutput,
       ): Frag = {
         def nfaToHtml(nfa: Nfa): Frag = {
+          def stateId(idx: Int): Frag =
+            a(
+              span(
+                idx,
+                padding := "3px 10px",
+                margin := "5px 0px",
+              ),
+              id := s"nfa-state-$idx",
+            )
+          def stateRef(idx: Int): Frag =
+            a(
+              span(
+                idx,
+                padding := "3px 10px",
+                margin := "5px 0px",
+              ),
+              href := s"#nfa-state-$idx",
+            )
+
           val allNfaStates: Set[Nfa.State] =
             findAll(nfa.modes.toList.map(_._2.value.value).toSet) { state =>
               state.transition.map(_._2.value).toSet |
@@ -388,10 +421,12 @@ object OutputDebug {
                 ),
                 nfa.modes.toList.map {
                   case (name, mpns) =>
-                    val tsId = nfaStateMap(mpns.value.value)
                     tr(
                       td(name),
-                      td(a(tsId, href := s"#nfa-state-$tsId", padding := "3px", margin := "3px")),
+                      td(
+                        stateRef(nfaStateMap(mpns.value.value)),
+                        textAlign := "center",
+                      ),
                     )
                 },
               ),
@@ -406,17 +441,16 @@ object OutputDebug {
                   th("Yields", width := "150px"),
                   th("ToMode", width := "125px"),
                 ),
-                nfaStateMap.toList.map {
+                nfaStateMap.toList.sortBy(_._2).map {
                   case (state, idx) =>
                     tr(
-                      td(a(idx, id := s"nfa-state-$idx"), verticalAlign := "top", textAlign := "center"),
+                      td(stateId(idx), verticalAlign := "top", textAlign := "center"),
                       td(
                         state.transition.map {
                           case (cc, ts) =>
-                            val tsId = nfaStateMap(ts.value)
                             ul(
                               li(cc.toString),
-                              li(a(tsId, href := s"#nfa-state-$tsId", padding := "3px", margin := "3px")),
+                              li(stateRef(nfaStateMap(ts.value))),
                             )
                         }.toList,
                       ),
@@ -425,7 +459,7 @@ object OutputDebug {
                           state.epsilonTransitions.toList
                             .map(sp => nfaStateMap(sp.value))
                             .sorted
-                            .map(i => li(a(i, href := s"#nfa-state-$i", padding := "3px", margin := "3px"))),
+                            .map(i => li(stateRef(i))),
                         ),
                       ),
                       td(
@@ -445,6 +479,25 @@ object OutputDebug {
         }
 
         def dfaToHtml(dfa: Dfa): Frag = {
+          def stateId(idx: Int): Frag =
+            a(
+              span(
+                idx,
+                padding := "3px 10px",
+                margin := "5px 0px",
+              ),
+              id := s"dfa-state-$idx",
+            )
+          def stateRef(idx: Int): Frag =
+            a(
+              span(
+                idx,
+                padding := "3px 10px",
+                margin := "5px 0px",
+              ),
+              href := s"#dfa-state-$idx",
+            )
+
           subSection("Dfa")(
             setting("Modes")(
               table(
@@ -460,7 +513,7 @@ object OutputDebug {
                   case (name, dfaState) =>
                     tr(
                       td(name),
-                      td(dfaState.id),
+                      td(stateRef(dfaState.id)),
                     )
                 },
               ),
@@ -485,9 +538,9 @@ object OutputDebug {
                     width := "150px",
                   ),
                 ),
-                dfa.states.toList.map { state =>
+                dfa.states.toList.sortBy(_.id).map { state =>
                   tr(
-                    td(state.id),
+                    td(stateId(state.id), verticalAlign := "top", textAlign := "center"),
                     td(
                       table(
                         tr(
@@ -504,8 +557,9 @@ object OutputDebug {
                               td(on.prettyChars),
                               td(
                                 toState.map { ts =>
-                                  ts.value.id
+                                  stateRef(ts.value.id)
                                 }.toList,
+                                textAlign := "center",
                               ),
                             )
                         },
@@ -515,8 +569,9 @@ object OutputDebug {
                     ),
                     td(
                       state.elseTransition.map { e =>
-                        e.value.id
+                        stateRef(e.value.id)
                       }.toList,
+                      textAlign := "center",
                     ),
                     td(
                       ul(
@@ -529,7 +584,14 @@ object OutputDebug {
                     ),
                     td(
                       state.end.toList.map { e =>
-                        e.toMode.value.map(ls => ls.value.id).toString
+                        {
+                          e.toMode.value match {
+                            case Yields.ToMode.To(mode)   => List[Frag](s"To: ", stateRef(mode.value.id))
+                            case Yields.ToMode.Push(mode) => List[Frag](s"Push: ", stateRef(mode.value.id))
+                            case Yields.ToMode.Same       => "Same"
+                            case Yields.ToMode.Pop        => "Pop"
+                          }
+                        }: Frag
                       },
                     ),
                   )

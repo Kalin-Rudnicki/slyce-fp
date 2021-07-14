@@ -1,7 +1,7 @@
 
 @start: Grammar
 
-Grammar : "@start:" mode (^NonTerminal ";")+
+Grammar : "@start:" mode (^NT ";")+
         ;
 
 ElementList          * Element
@@ -10,7 +10,8 @@ UnIgnoredElementList : Element
                      | ElementList "^" Element ElementList
                      ;
 
-NonTerminal : nonTerminal NTBody
+NT          : nonTerminal NTBody
+            ;
 NTBody      ^ StandardNT
             | ListNT
             | AssocNT

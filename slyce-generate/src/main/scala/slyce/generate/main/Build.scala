@@ -603,8 +603,8 @@ object Build {
                           "),",
                           yields.toMode.value match {
                             case Yields.ToMode.Same       => "Lexer.Yields.ToMode.Same,"
-                            case Yields.ToMode.To(mode)   => s"Lexer.Yields.ToMode.To[Tok](s${mode.value.id}),"
-                            case Yields.ToMode.Push(mode) => s"Lexer.Yields.ToMode.Push[Tok](s${mode.value.id}),"
+                            case Yields.ToMode.To(mode)   => s"Lexer.Yields.ToMode.To[Tok](Lazy(s${mode.value.id})),"
+                            case Yields.ToMode.Push(mode) => s"Lexer.Yields.ToMode.Push[Tok](Lazy(s${mode.value.id})),"
                             case Yields.ToMode.Pop        => "Lexer.Yields.ToMode.Pop,"
                           },
                         ),

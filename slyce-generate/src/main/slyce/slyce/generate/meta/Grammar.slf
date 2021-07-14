@@ -12,6 +12,7 @@
 [*+]                                                 ; listType
 ~                                                    ; tilde
 [<>]                                                 ; assocType
+[:\^;()|.?]                                          ; @
 
 @mode: Mode
 [ \t]+                                               ;

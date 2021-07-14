@@ -4,6 +4,7 @@ import scala.annotation.tailrec
 
 import klib.Implicits._
 import klib.fp.types._
+import klib.utils._
 
 import slyce.core._
 
@@ -132,7 +133,8 @@ final case class Lexer[Tok <: Token](state0: Lexer.State[Tok]) {
                     Nil,
                     None,
                   )
-                case Lexer.Yields.ToMode.To(toState) =>
+                case Lexer.Yields.ToMode.To(lToState) =>
+                  val toState = lToState.value
                   loop(
                     toState,
                     toState,
@@ -143,7 +145,8 @@ final case class Lexer[Tok <: Token](state0: Lexer.State[Tok]) {
                     Nil,
                     None,
                   )
-                case Lexer.Yields.ToMode.Push(toState) =>
+                case Lexer.Yields.ToMode.Push(lToState) =>
+                  val toState = lToState.value
                   loop(
                     toState,
                     toState,
@@ -207,8 +210,8 @@ object Lexer {
     sealed trait ToMode[+Tok]
     object ToMode {
       case object Same extends ToMode[Nothing]
-      final case class To[Tok](state: State[Tok]) extends ToMode[Tok]
-      final case class Push[Tok](state: State[Tok]) extends ToMode[Tok]
+      final case class To[Tok](state: Lazy[State[Tok]]) extends ToMode[Tok]
+      final case class Push[Tok](state: Lazy[State[Tok]]) extends ToMode[Tok]
       case object Pop extends ToMode[Nothing]
     }
 

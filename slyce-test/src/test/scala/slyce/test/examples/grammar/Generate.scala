@@ -163,20 +163,29 @@ object Generate {
                       ),
                     ),
                   ),
+                  Line(
+                    priority = 15,
+                    regex = inclusive(':', '^', ';', '(', ')', '|', '.', '?').marked,
+                    yields = Yields(
+                      yields = List(
+                        Yields.Yield.Text().marked,
+                      ),
+                    ),
+                  ),
                 ),
               ),
               Mode(
                 name = M.Mode,
                 lines = List(
                   Line(
-                    priority = 17,
+                    priority = 18,
                     regex = inclusive(' ', '\t').atLeastOnce.marked,
                     yields = Yields(
                       yields = Nil,
                     ),
                   ),
                   Line(
-                    priority = 18,
+                    priority = 19,
                     regex = Sequence(
                       `[A-Z]`,
                       `[A-Za-z_\\d]`.anyAmount,
@@ -188,7 +197,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 19,
+                    priority = 20,
                     regex = inclusive('\n').marked,
                     yields = Yields(
                       yields = Nil,
@@ -201,7 +210,7 @@ object Generate {
                 name = M.String,
                 lines = List(
                   Line(
-                    priority = 22,
+                    priority = 23,
                     regex = inclusive('"').marked,
                     yields = Yields(
                       yields = List(
@@ -211,7 +220,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 23,
+                    priority = 24,
                     regex = exclusive('\\', '"', '`').atLeastOnce.marked, // TODO (KR) : Revert
                     yields = Yields(
                       yields = List(
@@ -220,7 +229,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 24,
+                    priority = 25,
                     regex = Sequence(
                       inclusive('\\'),
                       inclusive('\\', 'n', 't', '"'),
@@ -242,7 +251,7 @@ object Generate {
             val _Grammar = Grammar.Identifier.unsafeNonTerminal("Grammar".marked)
             val ElementList = Grammar.Identifier.unsafeNonTerminal("ElementList".marked)
             val UnIgnoredElementList = Grammar.Identifier.unsafeNonTerminal("UnIgnoredElementList".marked)
-            val NonTerminal = Grammar.Identifier.unsafeNonTerminal("NonTerminal".marked)
+            val NT = Grammar.Identifier.unsafeNonTerminal("NT".marked)
             val NTBody = Grammar.Identifier.unsafeNonTerminal("NTBody".marked)
             val StandardNT = Grammar.Identifier.unsafeNonTerminal("StandardNT".marked)
             val BasicNT = Grammar.Identifier.unsafeNonTerminal("BasicNT".marked)
@@ -267,7 +276,7 @@ object Generate {
                   T.mode,
                   Grammar.ListNonTerminal.Type.+.repeat(
                     IgnoredList.builder
-                      .unIgnored(NT.NonTerminal)
+                      .unIgnored(NT.NT)
                       .after(T.`;`)
                       .build,
                   ).marked,
@@ -292,7 +301,7 @@ object Generate {
                 ),
               ),
               Grammar.NT(
-                name = NT.NonTerminal,
+                name = NT.NT,
                 nt = Grammar.StandardNonTerminal.`:`.simple(
                   T.nonTerminal,
                   NT.NTBody,
