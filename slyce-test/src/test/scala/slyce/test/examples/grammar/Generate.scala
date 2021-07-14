@@ -212,10 +212,7 @@ object Generate {
                   ),
                   Line(
                     priority = 23,
-                    regex = Sequence(
-                      exclusive('\\', '"'),
-                      exclusive('\\', '"').anyAmount,
-                    ).marked,
+                    regex = exclusive('\\', '"', '`').atLeastOnce.marked, // TODO (KR) : Revert
                     yields = Yields(
                       yields = List(
                         T.chars.map(t => Yields.Yield.Terminal(t.name)),

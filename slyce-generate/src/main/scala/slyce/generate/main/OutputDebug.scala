@@ -388,13 +388,14 @@ object OutputDebug {
                 nfaStateMap.toList.map {
                   case (state, idx) =>
                     tr(
-                      td(a(idx, id := s"nfa-state-$idx")),
+                      td(a(idx, id := s"nfa-state-$idx"), verticalAlign := "top", textAlign := "center"),
                       td(
                         state.transition.map {
                           case (cc, ts) =>
+                            val tsId = nfaStateMap(ts.value)
                             ul(
                               li(cc.toString),
-                              li(a(nfaStateMap(ts.value), href := s"#nfa-state-$i", padding := "3px", margin := "3px")),
+                              li(a(tsId, href := s"#nfa-state-$tsId", padding := "3px", margin := "3px")),
                             )
                         }.toList,
                       ),
