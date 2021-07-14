@@ -6,6 +6,7 @@ import klib.Implicits._
 import klib.fp.types._
 import klib.fp.utils.ado
 import klib.utils._
+
 import slyce.core._
 import slyce.generate._
 import slyce.generate.input._
@@ -365,6 +366,62 @@ object OutputDebug {
       def outputToHtml(
           buildOutput: BuildOutput,
       ): Frag = {
+        def nfaToHtml(nfa: Nfa): Frag = {
+          val allNfaStates: Set[Nfa.State] =
+            findAll(nfa.modes.toList.map(_._2.value.value).toSet) { state =>
+              state.transition.map(_._2.value).toSet |
+                state.epsilonTransitions.map(_.value)
+            }
+
+          val nfaStateMap = allNfaStates.toList.zipWithIndex.toMap
+
+          subSection("Nfa")(
+            setting("States")(
+              table(
+                tr(
+                  th("Id", width := "50px"),
+                  th("Transition", width := "200px"),
+                  th("Epsilon Transitions", width := "150px"),
+                  th("Yields", width := "150px"),
+                  th("ToMode", width := "125px"),
+                ),
+                nfaStateMap.toList.map {
+                  case (state, idx) =>
+                    tr(
+                      td(a(idx, id := s"nfa-state-$idx")),
+                      td(
+                        state.transition.map {
+                          case (cc, ts) =>
+                            ul(
+                              li(cc.toString),
+                              li(a(nfaStateMap(ts.value), href := s"#nfa-state-$i", padding := "3px", margin := "3px")),
+                            )
+                        }.toList,
+                      ),
+                      td(
+                        ul(
+                          state.epsilonTransitions.toList
+                            .map(sp => nfaStateMap(sp.value))
+                            .sorted
+                            .map(i => li(a(i, href := s"#nfa-state-$i", padding := "3px", margin := "3px"))),
+                        ),
+                      ),
+                      td(
+                        ul(
+                          state.end.toList
+                            .flatMap(_.yields.yieldsTerminals)
+                            .sorted
+                            .map(li(_)),
+                        ),
+                      ),
+                      td(state.end.map(_.yields.toMode.value.toString).toList),
+                    )
+                },
+              ),
+            ),
+          )
+        }
+
         def dfaToHtml(dfa: Dfa): Frag = {
           subSection("Dfa")(
             setting("Modes")(
@@ -600,6 +657,8 @@ object OutputDebug {
         section(
           "BuildOutput",
         )(
+          nfaToHtml(buildOutput.nfa),
+          br,
           dfaToHtml(buildOutput.dfa),
           br,
           expandedGrammarToHtml("ExpandedGrammar", buildOutput.expandedGrammar),

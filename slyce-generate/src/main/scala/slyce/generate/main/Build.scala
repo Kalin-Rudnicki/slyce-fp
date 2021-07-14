@@ -129,7 +129,8 @@ object Build {
           .map(_ => ())
       }
 
-      _ <- ado[Attempt].join(
+      // TODO (KR) : Revert this!!! Changed `<-` to `=` to stop errors, and allow NFA to be printed
+      _ = ado[Attempt].join(
         grammarReferencesDneTerminal,
         grammarReferencesDneNonTerminal,
       )

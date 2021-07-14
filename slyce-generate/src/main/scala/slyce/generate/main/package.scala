@@ -22,4 +22,18 @@ package object main {
       parsingTable: ParsingTable,
   )
 
+  // TODO (KR) :
+  /*
+  final case class PartialBuildOutput(
+      name: String,
+      nfa: Attempt[Nfa],
+      dfa: Attempt[Dfa],
+      tokens: Attempt[Set[ExpandedGrammar.Identifier.Terminal]],
+      raws: Attempt[Set[ExpandedGrammar.Identifier.Raw]],
+      expandedGrammar: Attempt[ExpandedGrammar],
+      deDuplicatedExpandedGrammar: Attempt[ExpandedGrammar],
+      parsingTable: Attempt[ParsingTable],
+  )
+   */
+
 }
