@@ -42,20 +42,6 @@ object Build {
         state.end.toList.flatMap(_.yieldsTerminals)
       }.toSet
 
-      _ = {
-        import IndentedString._
-
-        // REMOVE : ...
-        println {
-          inline(
-            "lexerDefines:",
-            indented(
-              lexerDefines.toList.sorted,
-            ),
-          )
-        }
-      }
-
       grammarDefines = deDuplicatedExpandedGrammar.nts.map(_.name).toSet
       ntReferences = deDuplicatedExpandedGrammar.nts.flatMap { nt =>
         nt.reductions.toList.zipWithIndex.flatMap {
@@ -129,8 +115,7 @@ object Build {
           .map(_ => ())
       }
 
-      // TODO (KR) : Revert this!!! Changed `<-` to `=` to stop errors, and allow NFA to be printed
-      _ = ado[Attempt].join(
+      _ <- ado[Attempt].join(
         grammarReferencesDneTerminal,
         grammarReferencesDneNonTerminal,
       )

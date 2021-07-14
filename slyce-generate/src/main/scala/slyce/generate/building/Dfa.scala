@@ -73,59 +73,16 @@ object Dfa {
       state.transition.nonEmpty || state.end.nonEmpty
     }
 
-    val classNameStarts =
-      List(
-        "slyce.",
-      )
-
-    val statesL = states.loggedIfAny("[states]", Set("chars"))
-    val allL = all.loggedIfAny("[all]", Set("chars"))
-    val filteredL = filtered.loggedIfAny("[filtered]", Set("chars"))
-
-    if (statesL.nonEmpty || allL.nonEmpty || filteredL.nonEmpty)
-      // REMOVE : ...
-      logger.unsafeLog(
-        L(
-          L.log.debug("expandEpsilons"),
-          L.indented(
-            L(
-              statesL.toList,
-              allL.toList,
-              filteredL.toList,
-              // L.requireFlags("stack-trace")(
-              L(
-                L.log.debug("[stack-trace]"),
-                L.indented(
-                  Thread.currentThread.getStackTrace.toList.tail.tail
-                    .filter(ste => classNameStarts.exists(ste.getClassName.startsWith(_)))
-                    .map(ste => L.log.debug(s"${ste.getFileName.toColorString.cyan}:${ste.getLineNumber.toString.toColorString.magenta}")),
-                ),
-              ),
-              // ),
-            ),
-          ),
-        ),
-      )
-
     filtered
   }
 
   def fromNfa(nfa: Nfa): Attempt[Dfa] = {
-
-    // REMOVE : ...
-    sect("1")
 
     val allNfaStates: Set[Nfa.State] =
       findAll(nfa.modes.toList.map(_._2.value.value).toSet) { state =>
         state.transition.map(_._2.value).toSet |
           state.epsilonTransitions.map(_.value)
       }
-
-    // REMOVE : ...
-    expandEpsilons(allNfaStates)
-
-    // REMOVE : ...
-    sect("2")
 
     allNfaStates
       .flatMap(_.end.map(_.yields.toMode))
@@ -145,18 +102,12 @@ object Dfa {
       }
       .traverse
       .map { _ =>
-        // REMOVE : ...
-        sect("3")
-
         val nfaStatesJoined =
           nfa.modes.toList.map {
             case (k, v) =>
               val expanded = expandEpsilons(Set(v.value.value))
               k -> (expanded, IState.fromNfaStates(expanded))
           }
-
-        // REMOVE : ...
-        sect("4")
 
         val blocked1 = nfaStatesJoined.flatMap(_._2._2._2)
 
@@ -165,9 +116,6 @@ object Dfa {
             case (k, (nfaStates, (iState, _))) =>
               k -> (nfaStates, iState)
           }.toMap
-
-        // REMOVE : ...
-        sect("5")
 
         val (iStateMap: Map[Set[Nfa.State], IState], blocked2: List[IState.Blocked]) = {
           @tailrec
@@ -197,9 +145,6 @@ object Dfa {
           )
         }
 
-        // REMOVE : ...
-        sect("6")
-
         // TODO (KR) :
         val allBlocked = blocked1 ::: blocked2
 
@@ -218,9 +163,6 @@ object Dfa {
                 )
           }
 
-        // REMOVE : ...
-        sect("7")
-
         val modeStarts: Map[String, State] =
           nfa.modes.map {
             case (k, v) =>
@@ -235,9 +177,6 @@ object Dfa {
             stateMap.toList.map(_._2).filterNot(_ == is),
           )
         }
-
-        // REMOVE : ...
-        sect("8")
 
         Dfa(
           modeStarts,
@@ -299,6 +238,7 @@ object Dfa {
           }
           .toSet
           .ensure(_.nonEmpty)
+          .map(expandEpsilons)
 
       val end: Maybe[(Yields[String], Maybe[Blocked])] = {
         val ends: List[Lexer.Mode.Line] = expandedStates.toList.flatMap(_.end)

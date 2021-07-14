@@ -93,9 +93,6 @@ object Nfa {
               case Regex.Group(seqs) =>
                 seqs.toList.map(fromRegex(_, next)).traverse.map(list => joinStates(list: _*))
               case Regex.Repeat(reg, _min, _max) =>
-                // TODO (KR) : =====| This is most likely where the issue is |=====
-                //           : I believe it is correctly calculating things,
-                //           : but just not adding `end` somewhere where it should be...
                 val min: Attempt[Int] =
                   _min.aliveIf(_ >= 0)(err(Msg.userError(s"min (${_min}) < 0")))
 
