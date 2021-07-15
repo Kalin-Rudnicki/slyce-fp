@@ -202,20 +202,27 @@ object Generate {
                       ),
                     ),
                   ),
+                  Line(
+                    priority = 16,
+                    regex = inclusive(' ').repeat(4, None).marked,
+                    yields = Yields(
+                      yields = Nil,
+                    ),
+                  ),
                 ),
               ),
               Mode(
                 name = M.Mode,
                 lines = List(
                   Line(
-                    priority = 19,
+                    priority = 20,
                     regex = inclusive(' ', '\t').atLeastOnce.marked,
                     yields = Yields(
                       yields = Nil,
                     ),
                   ),
                   Line(
-                    priority = 20,
+                    priority = 21,
                     regex = Sequence(
                       `[A-Z]`,
                       `[A-Za-z_\\d]`.anyAmount,
@@ -227,7 +234,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 21,
+                    priority = 22,
                     regex = inclusive('\n').marked,
                     yields = Yields(
                       yields = Nil,
@@ -240,7 +247,7 @@ object Generate {
                 name = M.String,
                 lines = List(
                   Line(
-                    priority = 24,
+                    priority = 25,
                     regex = inclusive('"').marked,
                     yields = Yields(
                       yields = List(
@@ -250,7 +257,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 25,
+                    priority = 26,
                     regex = exclusive('\\', '"').atLeastOnce.marked,
                     yields = Yields(
                       yields = List(
@@ -259,7 +266,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 26,
+                    priority = 27,
                     regex = Sequence(
                       inclusive('\\'),
                       inclusive('\\', 'n', 't', '"'),
@@ -276,14 +283,14 @@ object Generate {
                 name = M.LineEnd,
                 lines = List(
                   Line(
-                    priority = 29,
+                    priority = 30,
                     regex = inclusive(' ', '\t').atLeastOnce.marked,
                     yields = Yields(
                       yields = Nil,
                     ),
                   ),
                   Line(
-                    priority = 20,
+                    priority = 31,
                     regex = Sequence(
                       inclusive('/'),
                       inclusive('/'),
@@ -296,7 +303,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 31,
+                    priority = 32,
                     regex = Sequence(
                       inclusive('/'),
                       inclusive('*'),
@@ -312,7 +319,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 32,
+                    priority = 33,
                     regex = Group(
                       Sequence(inclusive('[', ']', ',', '@')),
                       Sequence(">>"),
@@ -326,7 +333,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 33,
+                    priority = 34,
                     regex = Sequence(
                       inclusive('?').maybe,
                       `\\d`.atLeastOnce,
@@ -338,7 +345,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 34,
+                    priority = 35,
                     regex = inclusive('"').marked,
                     yields = Yields(
                       yields = List(
@@ -348,7 +355,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 35,
+                    priority = 36,
                     regex = Sequence(
                       `[A-Z]`,
                       `[A-Za-z_\\d]`.anyAmount,
@@ -360,7 +367,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 36,
+                    priority = 37,
                     regex = Sequence(
                       `[a-z]`,
                       `[A-Za-z_\\d]`.anyAmount,
@@ -372,7 +379,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 37,
+                    priority = 38,
                     regex = inclusive('\n').marked,
                     yields = Yields(
                       yields = Nil,
@@ -385,7 +392,7 @@ object Generate {
                 name = M.CharClass,
                 lines = List(
                   Line(
-                    priority = 40,
+                    priority = 41,
                     regex = inclusive(']').marked,
                     yields = Yields(
                       yields = List(
@@ -395,7 +402,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 41,
+                    priority = 42,
                     regex = inclusive('^', '-').marked,
                     yields = Yields(
                       yields = List(
@@ -404,7 +411,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 42,
+                    priority = 43,
                     regex = Sequence(
                       inclusive('\\'),
                       inclusive('\\', ']', '^', 'n', 't', '-'),
@@ -416,7 +423,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 43,
+                    priority = 44,
                     regex = Sequence("\\d").marked,
                     yields = Yields(
                       yields = List(
@@ -425,7 +432,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 44,
+                    priority = 45,
                     regex = exclusive('\\').marked,
                     yields = Yields(
                       yields = List(
@@ -439,14 +446,14 @@ object Generate {
                 name = M.Quant,
                 lines = List(
                   Line(
-                    priority = 47,
+                    priority = 48,
                     regex = inclusive(' ', '\t').atLeastOnce.marked,
                     yields = Yields(
                       yields = Nil,
                     ),
                   ),
                   Line(
-                    priority = 48,
+                    priority = 49,
                     regex = Sequence(
                       inclusive('?').maybe,
                       `\\d`.atLeastOnce,
@@ -458,7 +465,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 49,
+                    priority = 50,
                     regex = inclusive(',').marked,
                     yields = Yields(
                       yields = List(
@@ -467,7 +474,7 @@ object Generate {
                     ),
                   ),
                   Line(
-                    priority = 50,
+                    priority = 51,
                     regex = inclusive('}').marked,
                     yields = Yields(
                       yields = List(
