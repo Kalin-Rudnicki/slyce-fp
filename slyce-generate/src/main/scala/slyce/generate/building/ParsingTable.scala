@@ -451,44 +451,51 @@ object ParsingTable {
             .mkString("/")
         val listMsgs =
           inline(
-            _2s
+            _2s.zipWithIndex
               .map {
-                case PreParseState.Shift(State(entries, on)) =>
+                case (action, idx) =>
                   indented(
-                    "Shift",
-                    indented(
-                      entries.toList.map { entry =>
+                    action match {
+                      case PreParseState.Shift(State(entries, _)) =>
                         inline(
-                          entry.produces.cata(p => s"${p._1}[${p._2}]", "[TreeRoot]"),
+                          s"[$idx] Shift",
                           indented(
-                            "seen:",
-                            indented(entry.rSeen.reverseMap(_.toString)),
-                            "unseen:",
-                            indented(entry.unseen.map(_.toString)),
+                            entries.toList.map { entry =>
+                              inline(
+                                entry.produces.cata(p => s"${p._1}[${p._2}]", "[TreeRoot]"),
+                                indented(
+                                  "seen:",
+                                  indented(entry.rSeen.reverseMap(_.toString)),
+                                  "unseen:",
+                                  indented(entry.unseen.map(_.toString)),
+                                  "lookahead:",
+                                  indented(entry.lookahead.toString),
+                                ),
+                              )
+                            },
                           ),
                         )
-                      },
-                    ),
-                  )
-                case PreParseState.Reduce(produces, rIdentifiers) =>
-                  indented(
-                    "Reduce",
-                    indented(
-                      produces match {
-                        case Some((nt, idx)) =>
-                          inline(
-                            s"$nt[$idx]",
-                            indented(
-                              rIdentifiers.reverseMap(_.toString),
-                            ),
-                          )
-                        case None =>
-                          "[TreeRoot]"
-                      },
-                    ),
+                      case PreParseState.Reduce(produces, rIdentifiers) =>
+                        inline(
+                          s"[$idx] Reduce",
+                          indented(
+                            produces match {
+                              case Some((nt, idx)) =>
+                                inline(
+                                  s"$nt[$idx]",
+                                  indented(
+                                    rIdentifiers.reverseMap(_.toString),
+                                  ),
+                                )
+                              case None =>
+                                "[TreeRoot]"
+                            },
+                          ),
+                        )
+                    },
                   )
               },
-          ).toString("    ")
+          ).toString("|   ")
 
         s"$conflictType Conflict [$base] (${_1}) :\n$listMsgs"
       }

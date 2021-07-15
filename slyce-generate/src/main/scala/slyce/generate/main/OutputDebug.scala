@@ -147,7 +147,7 @@ object OutputDebug {
         def convertMessage(msg: Marked[Msg]): Frag = {
 
           tr(
-            td(msg.value.toString),
+            td(msg.value.toString, whiteSpace := "pre"),
             td(msg.span.map(_.toString).toList),
           )
         }
@@ -158,7 +158,7 @@ object OutputDebug {
           table(
             tr(
               th("Message")(
-                width := "350px",
+                width := "600px",
               ),
               th("Span")(
                 width := "200px",
@@ -617,7 +617,7 @@ object OutputDebug {
                     width := "150px",
                   ),
                 ),
-                expandedGrammar.nts.map { nt =>
+                expandedGrammar.nts.sortBy(_.name.toString).map { nt =>
                   List[Frag](
                     tr(
                       td(nt.name.toString)(

@@ -535,7 +535,7 @@ object Generate {
                 name = NT.Yield,
                 nt = Grammar.StandardNonTerminal.`:`.simple(
                   NT.YieldType,
-                  NT.SubString.map(Grammar.Optional),
+                  NT.SubString,
                 ),
               ),
               Grammar.NT(

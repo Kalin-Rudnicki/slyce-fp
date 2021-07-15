@@ -9,7 +9,7 @@ Mode : "@mode:" mode Line+
 
 Line      : GroupInner ";" (Yield . "," ^Yield)* ToMode?
           ;
-Yield     : YieldType SubString?
+Yield     : YieldType SubString // TODO : Make this optional, once slyce decides to figure it out...
           ;
 YieldType ^ "@"
           | terminal

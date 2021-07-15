@@ -575,7 +575,9 @@ object ExpandedGrammar {
     )
   }
 
-  def simplifyAnonLists(expandedGrammar: ExpandedGrammar): ExpandedGrammar = {
+  // =====|  |=====
+
+  def deDuplicate(expandedGrammar: ExpandedGrammar): ExpandedGrammar = {
     val anonListUUIDMap: Map[UUID, NT[Identifier.NonTerminal.AnonListNt]] =
       expandedGrammar.nts.flatMap { nt =>
         nt.name match {
@@ -706,10 +708,10 @@ object ExpandedGrammar {
 
     ExpandedGrammar(
       startNt = expandedGrammar.startNt,
-      nts = deReferenceAliases,
+      nts = deReferenceAliases.distinct,
       aliases = filteredAliases,
-      extras = expandedGrammar.extras, // TODO (KR) : unalias as well?
-      withs = expandedGrammar.withs, // TODO (KR) : unalias as well?
+      extras = expandedGrammar.extras.distinct, // TODO (KR) : unalias as well?
+      withs = expandedGrammar.withs.distinct, // TODO (KR) : unalias as well?
     )
   }
 

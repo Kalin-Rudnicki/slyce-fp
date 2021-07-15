@@ -36,7 +36,7 @@ object Build {
         grammarItems,
       )
       ((nfa, dfa), expandedGrammar) = joinedItems
-      deDuplicatedExpandedGrammar = ExpandedGrammar.simplifyAnonLists(expandedGrammar)
+      deDuplicatedExpandedGrammar = ExpandedGrammar.deDuplicate(expandedGrammar)
 
       lexerDefines = dfa.states.toList.flatMap { state =>
         state.end.toList.flatMap(_.yieldsTerminals)
@@ -316,7 +316,7 @@ object Build {
                       .sortBy(_._2)
                       .map {
                         case (raw, rawName) =>
-                          s"case ${raw.name.unesc} => $rawName(text, span).pure[Attempt]"
+                          s"case ${raw.name.unesc} => Tok.$rawName(text, span).pure[Attempt]"
                       },
                     """case _ => Dead(Marked(s"Invalid raw-terminal : ${text.unesc}", span.some) :: Nil)""",
                   ),
@@ -460,7 +460,7 @@ object Build {
                                             idxs.toList.zipWithIndex.map {
                                               case (liftIdx, rIdx) =>
                                                 inline(
-                                                  s"case nt: $ntName._${rIdx + 1} => nt._$liftIdx",
+                                                  s"case nt: $ntName${ntIsCollapsed(nt.name) ? "" | s"._${rIdx + 1}"} => nt._$liftIdx",
                                                 )
                                             },
                                           ),
