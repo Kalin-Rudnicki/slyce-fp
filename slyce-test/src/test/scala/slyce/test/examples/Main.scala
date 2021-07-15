@@ -49,6 +49,7 @@ object Main {
           Executable.fromSubCommands(
             "calc" -> calc.Parse.executable,
             "grammar" -> grammar.Parse.executable,
+            "lexer" -> lexer.Parse.executable,
           ),
         "test" -> test,
       )(args)

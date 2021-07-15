@@ -5,21 +5,21 @@
 \/\/[^\n]*\n                                         ;
 /\*([^*]|\*[^/])*\*/                                 ;
 [ \t\n]+                                             ;
-\@start:                                             ; @ -> Mode
-[A-Z][A-Za-z_\d]*                                    ; nonTerminal
-[a-z][A-Za-z_\d]*                                    ; terminal
-"                                                    ; @ -> String
-[*+]                                                 ; listType
-~                                                    ; tilde
-[<>]                                                 ; assocType
-[:\^;()|.?]                                          ; @
+\@start:                                             ; @[] -> Mode
+[A-Z][A-Za-z_\d]*                                    ; nonTerminal[]
+[a-z][A-Za-z_\d]*                                    ; terminal[]
+"                                                    ; @[] -> String
+[*+]                                                 ; listType[]
+~                                                    ; tilde[]
+[<>]                                                 ; assocType[]
+[:\^;()|.?]                                          ; @[]
 
 @mode: Mode
 [ \t]+                                               ;
-[A-Z][A-Za-z_\d]*                                    ; mode
+[A-Z][A-Za-z_\d]*                                    ; mode[]
 \n                                                   ; <-
 
 @mode: String
-"                                                    ; @ <-
+"                                                    ; @[] <-
 \\[\\nt"]                                            ; escChar[1]
-[^\\"]+                                              ; chars
+[^\\"]+                                              ; chars[]
