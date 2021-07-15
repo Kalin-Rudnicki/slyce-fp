@@ -126,8 +126,6 @@ object Main {
             }
 
             def convertYield(y: lexer.NonTerminal.Yield): Marked[Yields.Yield] = {
-              logger.unsafeLog(L.log.debug(y))
-
               val lexer.NonTerminal.Yield(yieldType, subString) = y
               val bounds =
                 subString match {
@@ -169,14 +167,11 @@ object Main {
                   Yields.ToMode.Same.marked
               }
 
-            val yields = line._2.toList.map(convertYield)
-            logger.unsafeLog(L.log.debug(yields))
-
             Lexer.Mode.Line(
               priority = line._1.span.start.lineNo,
               regex = convertGroupInner(line._0).marked, // TODO (KR) : Proper marking
               yields = Yields(
-                yields = yields,
+                yields = line._2.toList.map(convertYield),
                 toMode = convertToMode(line._3),
               ),
             )
@@ -411,7 +406,12 @@ object Main {
       }
     }
 
-    def makePair(pkg: List[String], name: String, map: Map[String, File]): (Maybe[Pair], Maybe[Logger.Event]) = {
+    def makePair(
+        pkg: List[String],
+        name: String,
+        map: Map[String, File],
+        nameMap: Maybe[String],
+    ): (Maybe[Pair], Maybe[Logger.Event]) = {
       val lexer = map.get(LexerExtension).toMaybe
       val grammar = map.get(GrammarExtension).toMaybe
       // TODO (KR) :
@@ -424,7 +424,7 @@ object Main {
           (
             Pair(
               pkg = pkg,
-              baseName = name,
+              baseName = nameMap.cata(_.replaceAll("%n", name), name),
               lexerFile = lexer,
               grammarFile = grammar,
             ).some,
@@ -448,12 +448,57 @@ object Main {
       }
     }
 
+    // =====| generate |=====
+
     val generate = {
+      // --- all ---
       val all = {
         final class Conf(args: Seq[String]) extends Executable.Conf(args) {
-          val inputDir: ScallopOption[File] = opt(required = true)
-          val outputDir: ScallopOption[File] = opt(required = true)
-          val debugOutputDir: ScallopOption[File] = opt()
+          helpWidth(125)
+
+          version(s"Slyce v${slyce.BuildInfo.version}")
+
+          banner {
+            s"""
+              |Recursively search for matching [baseName].(slf/sgf) file pairs.
+              |Generates parsing files in a matching structure in the output directory.
+              |
+              |Example: -i src/main/slyce -o src/main/scala
+              | .
+              | |-- src
+              | |   |-- main
+              | |   |   |-- slyce
+              | |   |   |   |-- myPkg
+              | |   |   |   |   |-- test.slf
+              | |   |   |   |   |-- test.sgf
+              | |   |   |-- scala
+              | |   |   |   |-- myPkg
+              | |   |   |   |   |-- test.scala
+              |""".stripMargin
+          }
+
+          val inputDir: ScallopOption[File] =
+            opt(
+              required = true,
+              descr = "Directory to recursively search for .slf & .sgf files",
+            )
+          val outputDir: ScallopOption[File] =
+            opt(
+              required = true,
+              descr = {
+                """Directory to output generated files
+                  |(in same tree structure as inputDir)""".stripMargin
+              },
+            )
+          val debugOutputDir: ScallopOption[File] = opt(descr = "Write html debug output for generation")
+
+          val nameMap: ScallopOption[String] = opt(
+            descr = {
+              """Map generated filename
+                |ex: ex.(slf/sgf) => -n "%n2" => ex2.scala
+                |""".stripMargin
+            },
+          )
 
           verify()
         }
@@ -481,7 +526,7 @@ object Main {
                     .groupMap(_._2._1)(p => (p._2._2, p._1))
                     .toList
                     .map { case (k, v) => k -> v.toMap }
-                pairTs = groupedFileMap.map { case (name, map) => makePair(myPkg, name, map) }
+                pairTs = groupedFileMap.map { case (name, map) => makePair(myPkg, name, map, conf.nameMap.toOption.toMaybe) }
                 pairs = pairTs.flatMap(_._1)
                 logEvents = pairTs.flatMap(_._2)
 
@@ -518,6 +563,8 @@ object Main {
           }
       }
 
+      // --- one ---
+
       val one = {
         final class Conf(args: Seq[String]) extends Executable.Conf(args) {
           // TODO (KR) :
@@ -540,12 +587,17 @@ object Main {
           }
       }
 
+      // --- generate ---
+
       Executable
         .fromSubCommands(
           "all" -> all,
-          "one" -> one,
+          // TODO (KR) : Implement
+          // "one" -> one,
         )
     }
+
+    // =====| everything |=====
 
     Executable
       .fromSubCommands(
@@ -555,3 +607,7 @@ object Main {
   }
 
 }
+/*
+  -o, --output-dir  <arg>         Directory to output generated files in
+                                  In same tree structure as inputDir
+ */

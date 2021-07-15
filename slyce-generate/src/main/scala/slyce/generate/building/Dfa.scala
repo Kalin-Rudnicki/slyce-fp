@@ -58,15 +58,6 @@ object Dfa {
 
   }
 
-  def sect(label: String): Unit =
-    logger.unsafeLog(
-      L(
-        L.break(),
-        L.log.debug(s"=====| ${label.toColorString.red} |====="),
-        L.break(),
-      ),
-    )
-
   private def expandEpsilons(states: Set[Nfa.State]): Set[Nfa.State] = {
     val all = findAll(states)(_.epsilonTransitions.map(_.value))
     val filtered = all.filter { state =>
