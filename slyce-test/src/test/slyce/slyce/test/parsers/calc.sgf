@@ -1,0 +1,18 @@
+
+@start: Lines
+
+Lines  + ^Line ";"
+       ;
+Line   : Assign
+       | Expr "~"?
+       ;
+Assign : variable "=" Expr
+       ;
+Expr   ~ >powOp
+       | <multOp
+       | <addOp
+       ^ variable
+       | int
+       | float
+       | "(" ^Expr ")"
+       ;

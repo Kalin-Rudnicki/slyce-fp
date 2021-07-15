@@ -1,0 +1,12 @@
+
+@start: General
+
+@mode: General
+[+\-]                                       ; addOp[]
+[*/]                                        ; multOp[]
+^                                           ; powOp[]
+-?\d+                                       ; int[]
+-?\d+\.\d+                                  ; float[]
+[a-z][A-Za-z_\d]*                           ; variable[]
+[=();~]                                     ; @[]
+[ \t\n]                                     ;

@@ -19,6 +19,7 @@ object OutputDebug {
   def outputDebug(
       buildInput: BuildInput,
       aBuildOutput: Attempt[BuildOutput],
+      debutOutputDir: Maybe[File],
   ): IO[Unit] = {
     import scalatags.Text.all.{name => _, _}
     def htmlFrag: Frag = {
@@ -779,9 +780,10 @@ object OutputDebug {
       )
     }
 
+    val doDir = debutOutputDir.getOrElse(DebugOutputDir)
     for {
-      _ <- DebugOutputDir.mkdirs.pure[IO]
-      outputFile = new File(DebugOutputDir, s"${buildInput.name}.html")
+      _ <- doDir.mkdirs.pure[IO]
+      outputFile = new File(doDir, s"${buildInput.name}.html")
       htmlText = htmlFrag.render
       _ <- IO.writeFile(outputFile, htmlText)
     } yield ()

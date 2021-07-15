@@ -366,6 +366,7 @@ object Generate {
                     NT.AssocPair,
                     T.`|`,
                   ).marked,
+                  NT.StandardNT,
                 ),
               ),
               Grammar.NT(
