@@ -12,9 +12,12 @@ val SharedSettings =
 lazy val `slyce-core` =
   project
     .in(file("slyce-core"))
+    .enablePlugins(BuildInfoPlugin)
     .settings(
       name := "slyce-core",
       SharedSettings,
+      buildInfoKeys := Seq[BuildInfoKey](version),
+      buildInfoPackage := "slyce",
       libraryDependencies += MyOrg %% "klib-core" % "0.5.9",
     )
 

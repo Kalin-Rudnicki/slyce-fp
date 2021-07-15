@@ -42,6 +42,7 @@ object Main {
             // "list" -> list.Generate.executable,
             "calc" -> calc.Generate.executable,
             "grammar" -> grammar.Generate.executable,
+            "lexer" -> lexer.Generate.executable,
             "tmp" -> tmp.Generate.executable,
           ),
         "parse" ->

@@ -13,29 +13,30 @@ import slyce.test.examples._
 object Generate {
   import Marked.Implicits._
 
-  private object T {
-    val nonTerminal = Grammar.Identifier.unsafeTerminal("nonTerminal".marked)
-    val terminal = Grammar.Identifier.unsafeTerminal("terminal".marked)
-    val mode = Grammar.Identifier.unsafeTerminal("mode".marked)
-    val chars = Grammar.Identifier.unsafeTerminal("chars".marked)
-    val escChar = Grammar.Identifier.unsafeTerminal("escChar".marked)
-    val listType = Grammar.Identifier.unsafeTerminal("listType".marked)
-    val tilde = Grammar.Identifier.unsafeTerminal("tilde".marked)
-    val assocType = Grammar.Identifier.unsafeTerminal("assocType".marked)
+  val executable: Executable = {
 
-    val `@start:` = Grammar.Identifier.raw("@start:").marked
-    val `:` = Grammar.Identifier.raw(":").marked
-    val `^` = Grammar.Identifier.raw("^").marked
-    val `|` = Grammar.Identifier.raw("|").marked
-    val `;` = Grammar.Identifier.raw(";").marked
-    val `?` = Grammar.Identifier.raw("?").marked
-    val `"` = Grammar.Identifier.raw("\"").marked
-    val `.` = Grammar.Identifier.raw(".").marked
-    val `(` = Grammar.Identifier.raw("(").marked
-    val `)` = Grammar.Identifier.raw(")").marked
-  }
+    object T {
+      val nonTerminal = Grammar.Identifier.unsafeTerminal("nonTerminal".marked)
+      val terminal = Grammar.Identifier.unsafeTerminal("terminal".marked)
+      val mode = Grammar.Identifier.unsafeTerminal("mode".marked)
+      val chars = Grammar.Identifier.unsafeTerminal("chars".marked)
+      val escChar = Grammar.Identifier.unsafeTerminal("escChar".marked)
+      val listType = Grammar.Identifier.unsafeTerminal("listType".marked)
+      val tilde = Grammar.Identifier.unsafeTerminal("tilde".marked)
+      val assocType = Grammar.Identifier.unsafeTerminal("assocType".marked)
 
-  val executable: Executable =
+      val `@start:` = Grammar.Identifier.raw("@start:").marked
+      val `:` = Grammar.Identifier.raw(":").marked
+      val `^` = Grammar.Identifier.raw("^").marked
+      val `|` = Grammar.Identifier.raw("|").marked
+      val `;` = Grammar.Identifier.raw(";").marked
+      val `?` = Grammar.Identifier.raw("?").marked
+      val `"` = Grammar.Identifier.raw("\"").marked
+      val `.` = Grammar.Identifier.raw(".").marked
+      val `(` = Grammar.Identifier.raw("(").marked
+      val `)` = Grammar.Identifier.raw(")").marked
+    }
+
     debugGenerate(
       BuildInput(
         "grammar",
@@ -221,7 +222,7 @@ object Generate {
                   ),
                   Line(
                     priority = 24,
-                    regex = exclusive('\\', '"', '`').atLeastOnce.marked, // TODO (KR) : Revert
+                    regex = exclusive('\\', '"').atLeastOnce.marked,
                     yields = Yields(
                       yields = List(
                         T.chars.map(t => Yields.Yield.Terminal(t.name)),
@@ -433,5 +434,6 @@ object Generate {
         },
       ),
     )
+  }
 
 }

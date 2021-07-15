@@ -5,14 +5,15 @@
 \@(start|mode):                                      ; @ -> Mode
 \/\/[^\n]*\n                                         ;
 /\*([^*]|\*[^/])*\*/                                 ;
-\\[/@;n\\[\](){}+*?]                                 ; escChar[1]
+\\[./@;nt\\[\](){}?*+]                               ; escChar[1]
 \n                                                   ;
 \;                                                   ; @ -> LineEnd
-[()+*?]                                              ; @
+[()?*+]                                              ; @
 \[                                                   ; @ -> CharClass
 \{                                                   ; @ -> Quant
 \\d                                                  ; escChars[1]
 [^\\]                                                ; char
+\.                                                   ; escChars
 
 @mode: Mode
 [ \t]+                                               ;
@@ -21,8 +22,8 @@
 
 @mode: String
 "                                                    ; @ <-
-[^\\]+                                               ; chars
-\\[\\\n\t"]                                          ; escChar[1]
+\\[\\nt"]                                            ; escChar[1]
+[^\\"]+                                              ; chars
 
 @mode: LineEnd
 [ \t]+                                               ;
@@ -32,17 +33,18 @@
 -?\d+                                                ; int
 "                                                    ; @ -> String
 [A-Z][A-Za-z_\d]*                                    ; mode
+[a-z][A-Za-z_\d]*                                    ; term
 \n                                                   ; <-
 
 @mode: CharClass
 ]                                                    ; @ <-
-[\^\]\-]                                             ; @
+[\^\-]                                               ; @
 \\[\\\]\^nt]                                         ; escChar[1]
 \\d                                                  ; escChars[1]
 [^\\]                                                ; char
 
 @mode: Quant
--?\d+                                                ; int
 [ \t]+                                               ;
+-?\d+                                                ; int
 ,                                                    ; @
 }                                                    ; @ <-

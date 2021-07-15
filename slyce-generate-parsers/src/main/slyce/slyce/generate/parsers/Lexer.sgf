@@ -54,6 +54,6 @@ CCChars    : CCChar "-" CCChar
            | CCChar
            | escChars
            ;
-CCChar     : char
+CCChar     ^ char
            | escChar
            ;
