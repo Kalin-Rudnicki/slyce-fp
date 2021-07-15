@@ -341,7 +341,7 @@ object Build {
               .sortBy(_._2)
               .map {
                 case (tok, tokName) =>
-                  s"final case class $tokName(text: String, span: Span) extends Tok(${tok.name.unesc})${identifierWithString(tok)}"
+                  s"final case class $tokName(text: String, span: Span.Highlight) extends Tok(${tok.name.unesc})${identifierWithString(tok)}"
               },
             output.raws.nonEmpty ?
               inline(
@@ -351,10 +351,10 @@ object Build {
                   .sortBy(_._2)
                   .map {
                     case (raw, rawName) =>
-                      s"final case class $rawName(text: String, span: Span) extends Tok(${raw.name.unesc("""""""""")})${identifierWithString(raw)}"
+                      s"final case class $rawName(text: String, span: Span.Highlight) extends Tok(${raw.name.unesc("""""""""")})${identifierWithString(raw)}"
                   },
                 Break,
-                "def findRawTerminal(text: String, span: Span): Attempt[Tok] =",
+                "def findRawTerminal(text: String, span: Span.Highlight): Attempt[Tok] =",
                 indented(
                   "text match {",
                   indented(
@@ -365,7 +365,7 @@ object Build {
                         case (raw, rawName) =>
                           s"case ${raw.name.unesc} => Tok.$rawName(text, span).pure[Attempt]"
                       },
-                    """case _ => Dead(Marked(s"Invalid raw-terminal : ${text.unesc}", span.some) :: Nil)""",
+                    """case _ => Dead(Marked(s"Invalid raw-terminal : ${text.unesc}", span) :: Nil)""",
                   ),
                   "}",
                 ),
@@ -802,7 +802,7 @@ object Build {
                             },
                           "case tok =>",
                           indented(
-                            """Dead(Marked("Unexpected token", tok.span.some) :: Nil)""",
+                            """Dead(Marked("Unexpected token", tok.span) :: Nil)""",
                           ),
                         ),
                         "}",

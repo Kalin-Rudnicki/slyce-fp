@@ -18,27 +18,27 @@ object grammar {
   
   sealed abstract class Tok(val tokName: String) extends Token
   object Tok {
-    final case class assocType(text: String, span: Span) extends Tok("assocType")
-    final case class chars(text: String, span: Span) extends Tok("chars") with NonTerminal.Char.LiftType
-    final case class escChar(text: String, span: Span) extends Tok("escChar") with NonTerminal.Char.LiftType
-    final case class listType(text: String, span: Span) extends Tok("listType")
-    final case class mode(text: String, span: Span) extends Tok("mode")
-    final case class nonTerminal(text: String, span: Span) extends Tok("nonTerminal") with NonTerminal.NonOptElement.LiftType
-    final case class terminal(text: String, span: Span) extends Tok("terminal") with NonTerminal.NonOptElement.LiftType
-    final case class tilde(text: String, span: Span) extends Tok("tilde")
+    final case class assocType(text: String, span: Span.Highlight) extends Tok("assocType")
+    final case class chars(text: String, span: Span.Highlight) extends Tok("chars") with NonTerminal.Char.LiftType
+    final case class escChar(text: String, span: Span.Highlight) extends Tok("escChar") with NonTerminal.Char.LiftType
+    final case class listType(text: String, span: Span.Highlight) extends Tok("listType")
+    final case class mode(text: String, span: Span.Highlight) extends Tok("mode")
+    final case class nonTerminal(text: String, span: Span.Highlight) extends Tok("nonTerminal") with NonTerminal.NonOptElement.LiftType
+    final case class terminal(text: String, span: Span.Highlight) extends Tok("terminal") with NonTerminal.NonOptElement.LiftType
+    final case class tilde(text: String, span: Span.Highlight) extends Tok("tilde")
     
-    final case class `(`(text: String, span: Span) extends Tok(""""("""")
-    final case class `)`(text: String, span: Span) extends Tok("""")"""")
-    final case class `.`(text: String, span: Span) extends Tok(""""."""")
-    final case class `:`(text: String, span: Span) extends Tok("""":"""")
-    final case class `;`(text: String, span: Span) extends Tok("""";"""")
-    final case class `?`(text: String, span: Span) extends Tok(""""?"""")
-    final case class `@start:`(text: String, span: Span) extends Tok(""""@start:"""")
-    final case class `\"`(text: String, span: Span) extends Tok(""""\""""")
-    final case class `^`(text: String, span: Span) extends Tok(""""^"""")
-    final case class `|`(text: String, span: Span) extends Tok(""""|"""")
+    final case class `(`(text: String, span: Span.Highlight) extends Tok(""""("""")
+    final case class `)`(text: String, span: Span.Highlight) extends Tok("""")"""")
+    final case class `.`(text: String, span: Span.Highlight) extends Tok(""""."""")
+    final case class `:`(text: String, span: Span.Highlight) extends Tok("""":"""")
+    final case class `;`(text: String, span: Span.Highlight) extends Tok("""";"""")
+    final case class `?`(text: String, span: Span.Highlight) extends Tok(""""?"""")
+    final case class `@start:`(text: String, span: Span.Highlight) extends Tok(""""@start:"""")
+    final case class `\"`(text: String, span: Span.Highlight) extends Tok(""""\""""")
+    final case class `^`(text: String, span: Span.Highlight) extends Tok(""""^"""")
+    final case class `|`(text: String, span: Span.Highlight) extends Tok(""""|"""")
     
-    def findRawTerminal(text: String, span: Span): Attempt[Tok] =
+    def findRawTerminal(text: String, span: Span.Highlight): Attempt[Tok] =
       text match {
         case "(" => Tok.`(`(text, span).pure[Attempt]
         case ")" => Tok.`)`(text, span).pure[Attempt]
@@ -50,7 +50,7 @@ object grammar {
         case "\"" => Tok.`\"`(text, span).pure[Attempt]
         case "^" => Tok.`^`(text, span).pure[Attempt]
         case "|" => Tok.`|`(text, span).pure[Attempt]
-        case _ => Dead(Marked(s"Invalid raw-terminal : ${text.unesc}", span.some) :: Nil)
+        case _ => Dead(Marked(s"Invalid raw-terminal : ${text.unesc}", span) :: Nil)
       }
   }
   
@@ -1369,7 +1369,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.NTBody), _) :: (Left(_1: Tok.nonTerminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -1401,7 +1401,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -1574,7 +1574,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_6: Tok.listType), _) :: (Left(_5: Tok.`)`), _) :: (Right(_4: NonTerminal.UnIgnoredElementList), _) :: (Left(_3: Tok.`.`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -1670,7 +1670,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -1768,7 +1768,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -1941,7 +1941,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_2: Tok.listType), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -1978,7 +1978,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.Char), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2117,7 +2117,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList9Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2239,7 +2239,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.`Opt_?`), _) :: (Right(_1: NonTerminal.NonOptElement), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2259,7 +2259,7 @@ object grammar {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -2396,7 +2396,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2424,7 +2424,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2546,7 +2546,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.`Opt_?`), _) :: (Right(_1: NonTerminal.NonOptElement), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2719,7 +2719,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.nonTerminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2763,7 +2763,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2845,7 +2845,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2911,7 +2911,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2949,7 +2949,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3105,7 +3105,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_4: Tok.listType), _) :: (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3159,7 +3159,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.ElementListSimple), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3298,7 +3298,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.AnonList), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3408,7 +3408,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3454,7 +3454,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3484,7 +3484,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3516,7 +3516,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3542,7 +3542,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3647,7 +3647,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_2: Tok.listType), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3673,7 +3673,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3816,7 +3816,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3836,7 +3836,7 @@ object grammar {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -3990,7 +3990,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.nonTerminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4163,7 +4163,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_4: Tok.listType), _) :: (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4189,7 +4189,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4364,7 +4364,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.nonTerminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4520,7 +4520,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList9Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4659,7 +4659,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4715,7 +4715,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4883,7 +4883,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4920,7 +4920,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.ElementListSimple), _) :: (Right(_3: NonTerminal.Element), _) :: (Left(_2: Tok.`^`), _) :: (Right(_1: NonTerminal.ElementListSimple), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5008,7 +5008,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.`Opt_?`), _) :: (Right(_1: NonTerminal.NonOptElement), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5064,7 +5064,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5132,7 +5132,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5170,7 +5170,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5238,7 +5238,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5423,7 +5423,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_4: Tok.listType), _) :: (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5596,7 +5596,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_2: Tok.listType), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5622,7 +5622,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5720,7 +5720,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5818,7 +5818,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6001,7 +6001,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList9Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6057,7 +6057,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6208,7 +6208,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.AnonList), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6347,7 +6347,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.terminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6373,7 +6373,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6529,7 +6529,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_6: Tok.listType), _) :: (Left(_5: Tok.`)`), _) :: (Right(_4: NonTerminal.UnIgnoredElementList), _) :: (Left(_3: Tok.`.`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6555,7 +6555,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6611,7 +6611,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6779,7 +6779,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_6: Tok.listType), _) :: (Left(_5: Tok.`)`), _) :: (Right(_4: NonTerminal.UnIgnoredElementList), _) :: (Left(_3: Tok.`.`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6918,7 +6918,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList9Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -7023,7 +7023,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.nonTerminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -7049,7 +7049,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -7105,7 +7105,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -7273,7 +7273,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.AnonList), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -7299,7 +7299,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -7438,7 +7438,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Raw), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -7594,7 +7594,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.nonTerminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -7750,7 +7750,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -7776,7 +7776,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -7815,7 +7815,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.BasicNT), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -7847,7 +7847,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8024,7 +8024,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.terminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8180,7 +8180,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.nonTerminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8217,7 +8217,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.AnonList4Tail), _) :: (Right(_2: NonTerminal.ElementListSimple), _) :: (Left(_1: Tok.`|`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8327,7 +8327,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8468,7 +8468,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8624,7 +8624,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.`Opt_?`), _) :: (Right(_1: NonTerminal.NonOptElement), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8763,7 +8763,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.AnonList), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8789,7 +8789,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8821,7 +8821,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8966,7 +8966,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_2: Tok.listType), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8992,7 +8992,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9048,7 +9048,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9086,7 +9086,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9130,7 +9130,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9294,7 +9294,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_6: Tok.listType), _) :: (Left(_5: Tok.`)`), _) :: (Right(_4: NonTerminal.UnIgnoredElementList), _) :: (Left(_3: Tok.`.`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9450,7 +9450,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList9Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9476,7 +9476,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9615,7 +9615,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.nonTerminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9652,7 +9652,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.UnIgnoredElementList), _) :: (Left(_3: Tok.`.`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.listType), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9808,7 +9808,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_4: Tok.listType), _) :: (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9845,7 +9845,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.ElementListSimple), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9871,7 +9871,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   val nt: NonTerminal = NonTerminal.AnonList2Tail._2
@@ -9959,7 +9959,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10125,7 +10125,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.nonTerminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10151,7 +10151,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10273,7 +10273,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10352,7 +10352,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10406,7 +10406,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.ElementListSimple), _) :: (Right(_3: NonTerminal.Element), _) :: (Left(_2: Tok.`^`), _) :: (Right(_1: NonTerminal.ElementListSimple), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10438,7 +10438,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10598,7 +10598,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList9Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10771,7 +10771,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_6: Tok.listType), _) :: (Left(_5: Tok.`)`), _) :: (Right(_4: NonTerminal.UnIgnoredElementList), _) :: (Left(_3: Tok.`.`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10797,7 +10797,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10834,7 +10834,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.Char), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10890,7 +10890,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11075,7 +11075,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Raw), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11231,7 +11231,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_2: Tok.listType), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11327,7 +11327,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11369,7 +11369,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11525,7 +11525,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.terminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11569,7 +11569,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11597,7 +11597,7 @@ object grammar {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -11775,7 +11775,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.nonTerminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11819,7 +11819,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11966,7 +11966,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.`Opt_?`), _) :: (Right(_1: NonTerminal.NonOptElement), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12122,7 +12122,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Raw), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12148,7 +12148,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12174,7 +12174,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12211,7 +12211,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.LiftNT), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12248,7 +12248,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.ElementListSimple), _) :: (Right(_3: NonTerminal.Element), _) :: (Left(_2: Tok.`^`), _) :: (Right(_1: NonTerminal.ElementListSimple), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12274,7 +12274,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12430,7 +12430,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList9Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12456,7 +12456,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12488,7 +12488,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12525,7 +12525,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.StandardNT), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12557,7 +12557,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12635,7 +12635,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12671,7 +12671,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12708,7 +12708,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList5Head), _) :: (Left(_1: Tok.`^`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12734,7 +12734,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12890,7 +12890,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.terminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12940,7 +12940,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12968,7 +12968,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13124,7 +13124,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.`Opt_?`), _) :: (Right(_1: NonTerminal.NonOptElement), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13156,7 +13156,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13188,7 +13188,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13218,7 +13218,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13250,7 +13250,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13410,7 +13410,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.AnonList), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13566,7 +13566,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_4: Tok.listType), _) :: (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13637,7 +13637,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.chars), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13693,7 +13693,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13861,7 +13861,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.terminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13915,7 +13915,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.ElementListSimple), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13971,7 +13971,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -14141,7 +14141,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_4: Tok.listType), _) :: (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -14297,7 +14297,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Raw), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -14341,7 +14341,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -14509,7 +14509,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_4: Tok.listType), _) :: (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -14546,7 +14546,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.ElementListSimple), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -14572,7 +14572,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -14745,7 +14745,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.AnonList), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -14799,7 +14799,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.ElementListSimple), _) :: (Right(_3: NonTerminal.Element), _) :: (Left(_2: Tok.`^`), _) :: (Right(_1: NonTerminal.ElementListSimple), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -14825,7 +14825,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -14981,7 +14981,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.AnonList), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -15018,7 +15018,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.ElementListSimple), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -15080,7 +15080,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -15229,7 +15229,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Raw), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -15255,7 +15255,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -15411,7 +15411,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_2: Tok.listType), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -15567,7 +15567,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_2: Tok.listType), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -15623,7 +15623,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -15757,7 +15757,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.`Opt_?`), _) :: (Right(_1: NonTerminal.NonOptElement), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -15783,7 +15783,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   val nt: NonTerminal = NonTerminal.AnonList2Tail._2
@@ -15823,7 +15823,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -15962,7 +15962,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList9Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -16101,7 +16101,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_4: Tok.listType), _) :: (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -16240,7 +16240,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_2: Tok.listType), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -16350,7 +16350,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -16408,7 +16408,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -16446,7 +16446,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -16472,7 +16472,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -16509,7 +16509,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.UnIgnoredElementList), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -16614,7 +16614,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_4: Tok.listType), _) :: (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -16652,7 +16652,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -16708,7 +16708,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.AnonList8Tail), _) :: (Right(_2: NonTerminal.AssocPair), _) :: (Left(_1: Tok.`|`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -16740,7 +16740,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -16917,7 +16917,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.AnonList), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -17073,7 +17073,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Raw), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -17099,7 +17099,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -17155,7 +17155,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -17306,7 +17306,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.`Opt_?`), _) :: (Right(_1: NonTerminal.NonOptElement), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -17445,7 +17445,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_6: Tok.listType), _) :: (Left(_5: Tok.`)`), _) :: (Right(_4: NonTerminal.UnIgnoredElementList), _) :: (Left(_3: Tok.`.`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -17477,7 +17477,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -17616,7 +17616,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_6: Tok.listType), _) :: (Left(_5: Tok.`)`), _) :: (Right(_4: NonTerminal.UnIgnoredElementList), _) :: (Left(_3: Tok.`.`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -17672,7 +17672,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -17794,7 +17794,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -17834,7 +17834,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -17892,7 +17892,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -17966,7 +17966,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -18014,7 +18014,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -18042,7 +18042,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -18181,7 +18181,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_2: Tok.listType), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -18255,7 +18255,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -18413,7 +18413,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.AnonList), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -18445,7 +18445,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -18601,7 +18601,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.nonTerminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -18706,7 +18706,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList9Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -18845,7 +18845,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.`Opt_?`), _) :: (Right(_1: NonTerminal.NonOptElement), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -19001,7 +19001,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -19111,7 +19111,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -19184,7 +19184,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChar), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -19210,7 +19210,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -19366,7 +19366,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_2: Tok.listType), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -19434,7 +19434,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -19523,7 +19523,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -19589,7 +19589,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -19774,7 +19774,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.AnonList), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -19830,7 +19830,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -19964,7 +19964,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -20028,7 +20028,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -20064,7 +20064,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -20090,7 +20090,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -20246,7 +20246,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_6: Tok.listType), _) :: (Left(_5: Tok.`)`), _) :: (Right(_4: NonTerminal.UnIgnoredElementList), _) :: (Left(_3: Tok.`.`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -20300,7 +20300,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.ElementListSimple), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -20456,7 +20456,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_6: Tok.listType), _) :: (Left(_5: Tok.`)`), _) :: (Right(_4: NonTerminal.UnIgnoredElementList), _) :: (Left(_3: Tok.`.`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -20510,7 +20510,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.ElementListSimple), _) :: (Right(_3: NonTerminal.Element), _) :: (Left(_2: Tok.`^`), _) :: (Right(_1: NonTerminal.ElementListSimple), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -20566,7 +20566,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -20604,7 +20604,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -20636,7 +20636,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -20792,7 +20792,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList9Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -20818,7 +20818,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -20844,7 +20844,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -20900,7 +20900,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -21051,7 +21051,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.terminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -21224,7 +21224,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_4: Tok.listType), _) :: (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -21261,7 +21261,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`|`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -21383,7 +21383,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -21409,7 +21409,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -21435,7 +21435,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -21491,7 +21491,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -21676,7 +21676,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Raw), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -21832,7 +21832,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Raw), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -21858,7 +21858,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -21884,7 +21884,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -21910,7 +21910,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -21942,7 +21942,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -21990,7 +21990,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -22171,7 +22171,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList9Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -22208,7 +22208,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.ListNT), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -22240,7 +22240,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -22270,7 +22270,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -22426,7 +22426,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.AnonList), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -22458,7 +22458,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -22508,7 +22508,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -22542,7 +22542,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -22698,7 +22698,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.nonTerminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -22772,7 +22772,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -22955,7 +22955,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList9Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -23094,7 +23094,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.nonTerminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -23233,7 +23233,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_6: Tok.listType), _) :: (Left(_5: Tok.`)`), _) :: (Right(_4: NonTerminal.UnIgnoredElementList), _) :: (Left(_3: Tok.`.`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -23372,7 +23372,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Raw), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -23428,7 +23428,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -23545,7 +23545,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_6: Tok.listType), _) :: (Left(_5: Tok.`)`), _) :: (Right(_4: NonTerminal.UnIgnoredElementList), _) :: (Left(_3: Tok.`.`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -23701,7 +23701,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Raw), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -23763,7 +23763,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -23829,7 +23829,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -23861,7 +23861,7 @@ object grammar {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -23974,7 +23974,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -24013,7 +24013,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.StandardNT), _) :: (Right(_2: NonTerminal.AnonList7Head), _) :: (Left(_1: Tok.tilde), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -24152,7 +24152,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_4: Tok.listType), _) :: (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -24257,7 +24257,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.terminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -24379,7 +24379,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -24411,7 +24411,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -24571,7 +24571,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.terminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -24710,7 +24710,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.`Opt_?`), _) :: (Right(_1: NonTerminal.NonOptElement), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -24784,7 +24784,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -24820,7 +24820,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -24997,7 +24997,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_2: Tok.listType), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -25023,7 +25023,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -25060,7 +25060,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList3Head), _) :: (Left(_1: Tok.`:`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -25199,7 +25199,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -25231,7 +25231,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -25289,7 +25289,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList8Tail), _) :: (Right(_1: NonTerminal.AssocPair), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -25368,7 +25368,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -25404,7 +25404,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -25577,7 +25577,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Raw), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -25716,7 +25716,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.terminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -25821,7 +25821,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Raw), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -25977,7 +25977,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.`Opt_?`), _) :: (Right(_1: NonTerminal.NonOptElement), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26003,7 +26003,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26029,7 +26029,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26055,7 +26055,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26092,7 +26092,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.AssocNT), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26166,7 +26166,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26238,7 +26238,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26274,7 +26274,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26318,7 +26318,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26352,7 +26352,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26378,7 +26378,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26551,7 +26551,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.terminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26595,7 +26595,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26625,7 +26625,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26651,7 +26651,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26807,7 +26807,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_2: Tok.listType), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -26839,7 +26839,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -27012,7 +27012,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.terminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -27185,7 +27185,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_6: Tok.listType), _) :: (Left(_5: Tok.`)`), _) :: (Right(_4: NonTerminal.UnIgnoredElementList), _) :: (Left(_3: Tok.`.`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -27241,7 +27241,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -27309,7 +27309,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -27377,7 +27377,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -27545,7 +27545,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.terminal), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -27577,7 +27577,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -27624,7 +27624,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.listType), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -27722,7 +27722,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -27750,7 +27750,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -27855,7 +27855,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.AnonList), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -27994,7 +27994,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.`Opt_?`), _) :: (Right(_1: NonTerminal.NonOptElement), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -28116,7 +28116,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -28154,7 +28154,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -28188,7 +28188,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -28229,7 +28229,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.ElementListSimple), _) :: (Right(_1: NonTerminal.Element), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -28285,7 +28285,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -28436,7 +28436,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_4: Tok.listType), _) :: (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.UnIgnoredElementList), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -28468,7 +28468,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -28524,7 +28524,7 @@ object grammar {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -28675,7 +28675,7 @@ object grammar {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -28701,7 +28701,7 @@ object grammar {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)

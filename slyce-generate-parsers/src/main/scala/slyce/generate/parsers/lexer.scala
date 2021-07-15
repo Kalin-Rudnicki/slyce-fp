@@ -18,37 +18,37 @@ object lexer {
   
   sealed abstract class Tok(val tokName: String) extends Token
   object Tok {
-    final case class char(text: String, span: Span) extends Tok("char") with NonTerminal.CCChar.LiftType
-    final case class chars(text: String, span: Span) extends Tok("chars") with NonTerminal.Char.LiftType
-    final case class escChar(text: String, span: Span) extends Tok("escChar") with NonTerminal.Char.LiftType with NonTerminal.CCChar.LiftType
-    final case class escChars(text: String, span: Span) extends Tok("escChars")
-    final case class int(text: String, span: Span) extends Tok("int")
-    final case class mode(text: String, span: Span) extends Tok("mode")
-    final case class term(text: String, span: Span) extends Tok("term") with NonTerminal.YieldType.LiftType
+    final case class char(text: String, span: Span.Highlight) extends Tok("char") with NonTerminal.CCChar.LiftType
+    final case class chars(text: String, span: Span.Highlight) extends Tok("chars") with NonTerminal.Char.LiftType
+    final case class escChar(text: String, span: Span.Highlight) extends Tok("escChar") with NonTerminal.Char.LiftType with NonTerminal.CCChar.LiftType
+    final case class escChars(text: String, span: Span.Highlight) extends Tok("escChars")
+    final case class int(text: String, span: Span.Highlight) extends Tok("int")
+    final case class mode(text: String, span: Span.Highlight) extends Tok("mode")
+    final case class term(text: String, span: Span.Highlight) extends Tok("term") with NonTerminal.YieldType.LiftType
     
-    final case class `(`(text: String, span: Span) extends Tok(""""("""")
-    final case class `)`(text: String, span: Span) extends Tok("""")"""")
-    final case class `*`(text: String, span: Span) extends Tok(""""*"""")
-    final case class `+`(text: String, span: Span) extends Tok(""""+"""")
-    final case class `,`(text: String, span: Span) extends Tok("""","""")
-    final case class `->`(text: String, span: Span) extends Tok(""""->"""")
-    final case class `-`(text: String, span: Span) extends Tok(""""-"""")
-    final case class `;`(text: String, span: Span) extends Tok("""";"""")
-    final case class `<-`(text: String, span: Span) extends Tok(""""<-"""")
-    final case class `>>`(text: String, span: Span) extends Tok("""">>"""")
-    final case class `?`(text: String, span: Span) extends Tok(""""?"""")
-    final case class `@`(text: String, span: Span) extends Tok(""""@"""") with NonTerminal.YieldType.LiftType
-    final case class `@mode:`(text: String, span: Span) extends Tok(""""@mode:"""")
-    final case class `@start:`(text: String, span: Span) extends Tok(""""@start:"""")
-    final case class `[`(text: String, span: Span) extends Tok(""""["""")
-    final case class `\"`(text: String, span: Span) extends Tok(""""\""""")
-    final case class `]`(text: String, span: Span) extends Tok(""""]"""")
-    final case class `^`(text: String, span: Span) extends Tok(""""^"""")
-    final case class `{`(text: String, span: Span) extends Tok(""""{"""")
-    final case class `|`(text: String, span: Span) extends Tok(""""|"""")
-    final case class `}`(text: String, span: Span) extends Tok(""""}"""")
+    final case class `(`(text: String, span: Span.Highlight) extends Tok(""""("""")
+    final case class `)`(text: String, span: Span.Highlight) extends Tok("""")"""")
+    final case class `*`(text: String, span: Span.Highlight) extends Tok(""""*"""")
+    final case class `+`(text: String, span: Span.Highlight) extends Tok(""""+"""")
+    final case class `,`(text: String, span: Span.Highlight) extends Tok("""","""")
+    final case class `->`(text: String, span: Span.Highlight) extends Tok(""""->"""")
+    final case class `-`(text: String, span: Span.Highlight) extends Tok(""""-"""")
+    final case class `;`(text: String, span: Span.Highlight) extends Tok("""";"""")
+    final case class `<-`(text: String, span: Span.Highlight) extends Tok(""""<-"""")
+    final case class `>>`(text: String, span: Span.Highlight) extends Tok("""">>"""")
+    final case class `?`(text: String, span: Span.Highlight) extends Tok(""""?"""")
+    final case class `@`(text: String, span: Span.Highlight) extends Tok(""""@"""") with NonTerminal.YieldType.LiftType
+    final case class `@mode:`(text: String, span: Span.Highlight) extends Tok(""""@mode:"""")
+    final case class `@start:`(text: String, span: Span.Highlight) extends Tok(""""@start:"""")
+    final case class `[`(text: String, span: Span.Highlight) extends Tok(""""["""")
+    final case class `\"`(text: String, span: Span.Highlight) extends Tok(""""\""""")
+    final case class `]`(text: String, span: Span.Highlight) extends Tok(""""]"""")
+    final case class `^`(text: String, span: Span.Highlight) extends Tok(""""^"""")
+    final case class `{`(text: String, span: Span.Highlight) extends Tok(""""{"""")
+    final case class `|`(text: String, span: Span.Highlight) extends Tok(""""|"""")
+    final case class `}`(text: String, span: Span.Highlight) extends Tok(""""}"""")
     
-    def findRawTerminal(text: String, span: Span): Attempt[Tok] =
+    def findRawTerminal(text: String, span: Span.Highlight): Attempt[Tok] =
       text match {
         case "(" => Tok.`(`(text, span).pure[Attempt]
         case ")" => Tok.`)`(text, span).pure[Attempt]
@@ -71,7 +71,7 @@ object lexer {
         case "{" => Tok.`{`(text, span).pure[Attempt]
         case "|" => Tok.`|`(text, span).pure[Attempt]
         case "}" => Tok.`}`(text, span).pure[Attempt]
-        case _ => Dead(Marked(s"Invalid raw-terminal : ${text.unesc}", span.some) :: Nil)
+        case _ => Dead(Marked(s"Invalid raw-terminal : ${text.unesc}", span) :: Nil)
       }
   }
   
@@ -2127,7 +2127,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.ToMode), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -2179,7 +2179,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.CCChars), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2205,7 +2205,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2412,7 +2412,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`+`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2438,7 +2438,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2488,7 +2488,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2527,7 +2527,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.AnonList3Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@mode:`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -2579,7 +2579,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.int), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2611,7 +2611,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2705,7 +2705,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CCChar), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -2929,7 +2929,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`]`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -3015,7 +3015,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`^`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3173,7 +3173,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   val nt: NonTerminal = NonTerminal.AnonList6Tail._2
@@ -3283,7 +3283,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3319,7 +3319,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   val nt: NonTerminal = NonTerminal.AnonList2Tail._2
@@ -3370,7 +3370,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList8Tail), _) :: (Right(_1: NonTerminal.Char), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3420,7 +3420,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3527,7 +3527,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3734,7 +3734,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -3941,7 +3941,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4039,7 +4039,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4086,7 +4086,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.CCChars), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4112,7 +4112,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4272,7 +4272,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   val nt: NonTerminal = NonTerminal.AnonList6Tail._2
@@ -4338,7 +4338,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4364,7 +4364,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4390,7 +4390,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4548,7 +4548,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -4770,7 +4770,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -4977,7 +4977,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5051,7 +5051,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5229,7 +5229,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   val nt: NonTerminal = NonTerminal.AnonList5Head._2
@@ -5267,7 +5267,7 @@ object lexer {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -5298,7 +5298,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5318,7 +5318,7 @@ object lexer {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -5359,7 +5359,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5519,7 +5519,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`>>`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -5690,7 +5690,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`<-`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -5743,7 +5743,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5783,7 +5783,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5839,7 +5839,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5871,7 +5871,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5897,7 +5897,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -5934,7 +5934,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.GroupInnerTail), _) :: (Right(_2: NonTerminal.SequenceSimple), _) :: (Left(_1: Tok.`|`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6008,7 +6008,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6042,7 +6042,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6079,7 +6079,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.GroupInnerTail), _) :: (Right(_1: NonTerminal.SequenceSimple), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6286,7 +6286,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6493,7 +6493,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChar), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6530,7 +6530,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.int), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6737,7 +6737,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6787,7 +6787,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -6996,7 +6996,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -7203,7 +7203,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -7442,7 +7442,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.SubString), _) :: (Right(_1: NonTerminal.YieldType), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -7664,7 +7664,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -7738,7 +7738,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -7785,7 +7785,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -8007,7 +8007,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8093,7 +8093,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   val nt: NonTerminal = NonTerminal.AnonList4Tail._2
@@ -8154,7 +8154,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList7Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8191,7 +8191,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.GroupInnerTail), _) :: (Right(_1: NonTerminal.SequenceSimple), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8223,7 +8223,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8432,7 +8432,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8503,7 +8503,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.chars), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8540,7 +8540,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.GroupInnerTail), _) :: (Right(_2: NonTerminal.SequenceSimple), _) :: (Left(_1: Tok.`|`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8747,7 +8747,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -8773,7 +8773,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   val nt: NonTerminal = NonTerminal.AnonList2Tail._2
@@ -8994,7 +8994,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9080,7 +9080,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   val nt: NonTerminal = NonTerminal.AnonList4Tail._2
@@ -9311,7 +9311,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9348,7 +9348,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`@`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9374,7 +9374,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9406,7 +9406,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9484,7 +9484,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9586,7 +9586,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9793,7 +9793,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -9837,7 +9837,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10048,7 +10048,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10086,7 +10086,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10118,7 +10118,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10274,7 +10274,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`->`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -10327,7 +10327,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10400,7 +10400,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChar), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10607,7 +10607,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10661,7 +10661,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.int), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -10868,7 +10868,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -11017,7 +11017,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   val nt: NonTerminal = NonTerminal.OptToMode._2
@@ -11069,7 +11069,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11159,7 +11159,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChar), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11197,7 +11197,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11237,7 +11237,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11277,7 +11277,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11333,7 +11333,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11546,7 +11546,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11753,7 +11753,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11960,7 +11960,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -11997,7 +11997,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList8Tail), _) :: (Right(_1: NonTerminal.Char), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12023,7 +12023,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12049,7 +12049,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12256,7 +12256,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12463,7 +12463,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12501,7 +12501,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12557,7 +12557,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12764,7 +12764,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12796,7 +12796,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12822,7 +12822,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -12859,7 +12859,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -13081,7 +13081,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`+`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13125,7 +13125,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13203,7 +13203,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13267,7 +13267,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.int), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13299,7 +13299,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13337,7 +13337,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13563,7 +13563,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`]`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -13640,7 +13640,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13747,7 +13747,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChar), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13809,7 +13809,7 @@ object lexer {
                           dead
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13899,7 +13899,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.CCChar), _) :: (Left(_2: Tok.`-`), _) :: (Right(_1: NonTerminal.CCChar), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13936,7 +13936,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.term), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -13956,7 +13956,7 @@ object lexer {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -14059,7 +14059,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -14096,7 +14096,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Raw), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -14303,7 +14303,7 @@ object lexer {
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChar), poppedState)") :: Nil)
                       }
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)
@@ -14323,7 +14323,7 @@ object lexer {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   stack match {
@@ -14364,7 +14364,7 @@ object lexer {
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
-                      Dead(Marked("Unexpected token", tok.span.some) :: Nil)
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
                   Dead(Marked("Unexpected EOF") :: Nil)

@@ -156,7 +156,7 @@ object OutputDebug {
 
           tr(
             td(msg.value.toString, whiteSpace := "pre"),
-            td(msg.span.map(_.toString).toList),
+            td(msg.toString(false)),
           )
         }
 

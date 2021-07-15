@@ -8,6 +8,7 @@ import slyce.core._
 
 object Main {
 
+  /*
   val test: Executable =
     Executable { (logger, _) =>
       for {
@@ -55,5 +56,6 @@ object Main {
       )(args)
       .runSync
   }
+   */
 
 }

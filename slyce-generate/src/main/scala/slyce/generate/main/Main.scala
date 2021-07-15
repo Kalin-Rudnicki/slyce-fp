@@ -159,8 +159,8 @@ object Main {
               tm.toMaybe match {
                 case Some(tm) =>
                   tm match {
-                    case Lex.NonTerminal.ToMode._1(to, mode)   => Yields.ToMode.To(mode.text).marked(Span.joinNE(to.span, mode.span))
-                    case Lex.NonTerminal.ToMode._2(push, mode) => Yields.ToMode.Push(mode.text).marked(Span.joinNE(push.span, mode.span))
+                    case Lex.NonTerminal.ToMode._1(to, mode)   => Yields.ToMode.To(mode.text).marked(Span.joinHighlightsNE(to.span, mode.span))
+                    case Lex.NonTerminal.ToMode._2(push, mode) => Yields.ToMode.Push(mode.text).marked(Span.joinHighlightsNE(push.span, mode.span))
                     case Lex.NonTerminal.ToMode._3(pop)        => Yields.ToMode.Pop.marked(pop.span)
                   }
                 case None =>

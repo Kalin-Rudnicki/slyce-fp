@@ -5,13 +5,16 @@ import scala.annotation.tailrec
 import klib.Implicits._
 import klib.fp.types._
 
-final case class Span(
-    start: Span.Pos,
-    end: Span.Pos,
-) {
+sealed trait Span {
+
+  val mSource: Maybe[Source]
 
   def toString(showAbsolute: Boolean): String =
-    s"Span(${start.toString(showAbsolute)} -> ${end.toString(showAbsolute)})"
+    this match {
+      case Span.Highlight(start, end, _) => s"Highlight(${start.toString(showAbsolute)} -> ${end.toString(showAbsolute)})"
+      case Span.EOF(_)                   => "EOF"
+      case Span.Unknown                  => "Unknown"
+    }
 
   override def toString: String =
     toString(false)
@@ -19,44 +22,62 @@ final case class Span(
 }
 
 object Span {
+  sealed trait HasSource extends Span {
+    val source: Source
+    override val mSource: Maybe[Source] = source.some
+  }
 
-  def joinNE(span0: Span, spanN: Span*): Span = {
-    import Ordering.Implicits._
+  final case class Highlight(
+      start: Span.Pos,
+      end: Span.Pos,
+      source: Source,
+  ) extends HasSource
+  final case class EOF(
+      source: Source,
+  ) extends HasSource
+  case object Unknown extends Span {
+    override val mSource: Maybe[Source] = None
+  }
 
-    @tailrec
-    def loop(
-        start: Span.Pos,
-        end: Span.Pos,
-        queue: List[Span],
-    ): Span =
-      queue match {
-        case Span(_start, _end) :: rest =>
-          loop(
-            start.min(_start),
-            end.min(_end),
-            rest,
-          )
-        case Nil =>
-          Span(start, end)
-      }
+  def apply(start: Pos, end: Pos, source: Source): Highlight =
+    Highlight(start, end, source)
 
-    loop(
-      span0.start,
-      span0.end,
-      spanN.toList,
+  def apply(source: Source): EOF =
+    EOF(source)
+
+  def apply(): Unknown.type =
+    Unknown
+
+  /*
+      NOTE : Do not be a buffoon and call these with spans from different sources...
+   */
+
+  def joinHighlightsNE(span0: Highlight, spanN: Highlight*): Highlight = {
+    val all = span0 :: spanN.toList
+    Highlight(
+      all.minBy(_.start).start,
+      all.maxBy(_.end).end,
+      span0.source,
     )
   }
 
-  def joinId(spans: Span*): Maybe[Span] =
-    spans.toList match {
-      case head :: tail =>
-        joinNE(head, tail: _*).some
-      case Nil =>
-        None
+  def joinHasSourcesNE(span0: HasSource, spanN: HasSource*): HasSource = {
+    val all = span0 :: spanN.toList
+    val highlights = all.flatMap { case highlight: Highlight => highlight.some; case _ => None }
+    highlights.toNel match {
+      case Some(highlights) => joinHighlightsNE(highlights.head, highlights.tail: _*)
+      case None             => span0
     }
+  }
 
-  def joinM(spans: Maybe[Span]*): Maybe[Span] =
-    joinId(spans.flatMap(_.toOption): _*)
+  def joinSpans(spans: Span*): Span = {
+    val all = spans.toList
+    val hasSources = all.flatMap { case hasSource: HasSource => hasSource.some; case _ => None }
+    hasSources.toNel match {
+      case Some(hasSources) => joinHasSourcesNE(hasSources.head, hasSources.tail: _*)
+      case None             => Unknown
+    }
+  }
 
   final case class Pos private (
       absolutePos: Int,

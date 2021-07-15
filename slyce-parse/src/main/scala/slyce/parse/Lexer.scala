@@ -25,14 +25,14 @@ final case class Lexer[Tok <: Token](state0: Lexer.State[Tok]) {
       hit match {
         case Some((yields, pos, chars, rCharAndPos)) =>
           val charAndPos = rCharAndPos.reverse.toArray
-          val wholeSpan = Span(charAndPos.head._2, charAndPos.last._2)
+          val wholeSpan = Span(charAndPos.head._2, charAndPos.last._2, source)
 
           yields.yields.map {
             case Lexer.Yields.Yield(ySpan, build) =>
               def getIdx(i: Int, label: String): Attempt[Int] = {
                 val i2 = (i >= 0) ? i | (charAndPos.length + i)
                 (i2 < 0 || i2 > charAndPos.length) ?
-                  Dead(Marked(s"Substring $label out of bounds [$i2] (length = ${charAndPos.length})", wholeSpan.some) :: Nil) |
+                  Dead(Marked(s"Substring $label out of bounds [$i2] (length = ${charAndPos.length})", wholeSpan) :: Nil) |
                   i2.pure[Attempt]
               }
 
@@ -42,11 +42,11 @@ final case class Lexer[Tok <: Token](state0: Lexer.State[Tok]) {
                 _ <-
                   (startIdx <= endIdx) ?
                     ().pure[Attempt] |
-                    Dead(Marked(s"Substring end before start ($endIdx < $startIdx)", wholeSpan.some) :: Nil)
+                    Dead(Marked(s"Substring end before start ($endIdx < $startIdx)", wholeSpan) :: Nil)
                 spanStart = charAndPos(startIdx)._2
                 spanEnd = charAndPos(endIdx)._2
                 string = charAndPos.slice(startIdx, endIdx + 1).map(_._1).mkString
-                tok <- build(string, Span(spanStart, spanEnd))
+                tok <- build(string, Span(spanStart, spanEnd, source))
               } yield tok
           }.traverse match {
             case Alive(newToks) =>
@@ -57,7 +57,7 @@ final case class Lexer[Tok <: Token](state0: Lexer.State[Tok]) {
         case None =>
           lastChar match {
             case Some((c, p)) =>
-              Dead(Marked(s"Unexpected char ${c.unesc}", Span(p, p).some) :: Nil)
+              Dead(Marked(s"Unexpected char ${c.unesc}", Span(p, p, source)) :: Nil)
             case None =>
               Dead(Marked("Unexpected EOF") :: Nil)
           }
@@ -171,7 +171,7 @@ final case class Lexer[Tok <: Token](state0: Lexer.State[Tok]) {
                         None,
                       )
                     case Nil =>
-                      Dead(Marked("No state to pop to", Span(pos, pos).some) :: Nil)
+                      Dead(Marked("No state to pop to", Span(pos, pos, source)) :: Nil)
                   }
               }
             case dead @ Dead(_) =>
@@ -204,7 +204,7 @@ object Lexer {
 
     final case class Yield[Tok](
         span: (Maybe[Int], Maybe[Int]),
-        build: (String, Span) => Attempt[Tok],
+        build: (String, Span.Highlight) => Attempt[Tok],
     )
 
     sealed trait ToMode[+Tok]

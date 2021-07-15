@@ -17,13 +17,12 @@ final case class Source(input: String, name: Maybe[String] = None) {
       config: Source.Config = Source.Config.Default,
   ): String = {
     val (eofs, _marked) =
-      messages.partitionMap { msg =>
-        msg.span match {
-          case Some(span) =>
-            scala.Right((msg.value, span))
-          case None =>
-            scala.Left(msg.value)
-        }
+      messages.partitionMap {
+        case Marked(msg, span) =>
+          span match {
+            case highlight: Span.Highlight => scala.Right((msg, highlight))
+            case _                         => scala.Left(msg)
+          }
       }
     val marked =
       _marked
@@ -36,10 +35,10 @@ final case class Source(input: String, name: Maybe[String] = None) {
       @tailrec
       def filter(
           min: Span.Pos,
-          unseen: List[(Span, List[String])],
-          good: List[(Span, List[String])],
+          unseen: List[(Span.Highlight, List[String])],
+          good: List[(Span.Highlight, List[String])],
           bad: List[List[String]],
-      ): (List[(Span, List[String])], List[List[String]]) =
+      ): (List[(Span.Highlight, List[String])], List[List[String]]) =
         unseen match {
           case (head @ (span, msgs)) :: tail =>
             if (span.start <= min)
@@ -94,7 +93,7 @@ final case class Source(input: String, name: Maybe[String] = None) {
     val stringBuilder = new StringBuilder
 
     final case class Show(
-        span: Span,
+        span: Span.Highlight,
         messages: List[String],
         colorizeAndDeColorize: Maybe[(String, String)],
     )
@@ -184,7 +183,7 @@ final case class Source(input: String, name: Maybe[String] = None) {
         pos: Span.Pos,
         state: State,
         chars: List[Char],
-        waiting: List[(Span, List[String])],
+        waiting: List[(Span.Highlight, List[String])],
         colors: NonEmptyList[ColorString.Color],
     ): NonEmptyList[ColorString.Color] =
       chars match {

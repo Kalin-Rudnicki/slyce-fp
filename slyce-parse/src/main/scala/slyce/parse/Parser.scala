@@ -34,7 +34,7 @@ final case class Parser[Tok <: Token, Nt, NtRoot <: Nt](
 
         source.mark(
           tokens.map { tok =>
-            Marked(tokLabel(tok), tok.span.some)
+            Marked(tokLabel(tok), tok.span)
           },
         )
       case Dead(errors) =>

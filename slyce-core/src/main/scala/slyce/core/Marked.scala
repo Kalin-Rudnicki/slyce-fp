@@ -6,11 +6,11 @@ import klib.fp.types._
 
 final case class Marked[+T](
     value: T,
-    span: Maybe[Span] = None,
+    span: Span = Span.Unknown,
 ) {
 
   def toString(showAbsolute: Boolean): String =
-    s"${span.cata(s => s"[${s.toString(showAbsolute)}]; ", "")}$value"
+    s"$value @ ${span.toString(showAbsolute)}"
 
   override def toString: String =
     toString(false)
@@ -27,7 +27,7 @@ object Marked {
         Marked(i)
 
       def marked(span: Span): Marked[I] =
-        Marked(i, span.some)
+        Marked(i, span)
 
     }
 
@@ -40,13 +40,13 @@ object Marked {
         Marked(f(t.value), t.span)
 
       override def apply[A, B](t: Marked[A], f: Marked[A => B]): Marked[B] =
-        Marked(f.value(t.value), Span.joinM(t.span, f.span))
+        Marked(f.value(t.value), Span.joinSpans(t.span, f.span))
 
       override def pure[A](a: => A): Marked[A] =
         Marked(a)
 
       override def flatten[A](t: Marked[Marked[A]]): Marked[A] =
-        Marked(t.value.value, Span.joinM(t.span, t.value.span))
+        Marked(t.value.value, Span.joinSpans(t.span, t.value.span))
 
     }
 

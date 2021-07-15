@@ -20,6 +20,7 @@ import klib.utils.IndentedString.Break
 
 package object examples {
 
+  /*
   def debugGenerate(buildInput: BuildInput): Executable = {
     final class Conf(args: Seq[String]) extends Executable.Conf(args) {
       val debugOutput: ScallopOption[Boolean] = opt()
@@ -158,5 +159,6 @@ package object examples {
       "time" -> time,
     )
   }
+   */
 
 }
