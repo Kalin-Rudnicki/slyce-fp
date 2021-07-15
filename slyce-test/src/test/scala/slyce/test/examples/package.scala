@@ -16,11 +16,8 @@ import slyce.generate.input._
 import slyce.generate.main._
 import slyce.parse._
 
-import klib.utils.IndentedString.Break
-
 package object examples {
 
-  /*
   def debugGenerate(buildInput: BuildInput): Executable = {
     final class Conf(args: Seq[String]) extends Executable.Conf(args) {
       val debugOutput: ScallopOption[Boolean] = opt()
@@ -44,13 +41,13 @@ package object examples {
           if (conf.debugOutput())
             for {
               _ <- logger(L.log.info("Writing DebugOutput..."))
-              _ <- OutputDebug.outputDebug(buildInput, aBuildResult)
+              _ <- OutputDebug.outputDebug(buildInput, aBuildResult, None) // TODO (KR) :
             } yield ()
           else
             ().pure[IO],
           if (conf.fileOutput())
             aBuildResult match {
-              case Alive(buildResult) =>
+              case Right(buildResult) =>
                 for {
                   _ <- logger(L.log.info("Writing FileOutput..."))
                   pkg = List("slyce", "test", "examples", buildInput.name)
@@ -60,8 +57,14 @@ package object examples {
                     new File(List(List("slyce-test", "src", "test", "scala"), pkg, List(s"${buildInput.name}.scala")).flatten.mkString("/"))
                   _ <- IO.writeFile(outputFile, outputStr)
                 } yield ()
-              case Dead(errors) =>
-                logger(L(errors.map(e => L.log.fatal(e.value.toString))))
+              case Left(partial) =>
+                partial.toBuildOutput match {
+                  case Alive(_) =>
+                    IO.error(Message("This should not be possible..."))
+                  case Dead(errors) =>
+                    // TODO (KR) :
+                    logger(L(errors.map(e => L.log.fatal(e.value.toString))))
+                }
             }
           else
             ().pure[IO],
@@ -159,6 +162,5 @@ package object examples {
       "time" -> time,
     )
   }
-   */
 
 }

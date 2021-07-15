@@ -16,6 +16,7 @@ final case class Source(input: String, name: Maybe[String] = None) {
       messages: List[Marked[String]],
       config: Source.Config = Source.Config.Default,
   ): String = {
+    // TODO (KR) : Possibly do something separate with EOF/Unknown (?)
     val (eofs, _marked) =
       messages.partitionMap {
         case Marked(msg, span) =>
@@ -372,6 +373,12 @@ final case class Source(input: String, name: Maybe[String] = None) {
 
     // ---  ---
 
+    if (config.showName)
+      name match {
+        case Some(name) => stringBuilder.append(s"source: $name\n")
+        case None       => stringBuilder.append("source: [UNKNOWN]\n")
+      }
+
     val colorsAfterSpanMessages =
       printSpanMessages(
         Span.Pos.Start,
@@ -401,7 +408,36 @@ object Source {
     IO.readFile(file)
       .map(Source(_, file.toString.some))
 
+  def showAll(
+      msgs: List[Marked[String]],
+      config: Config = Config.Default,
+  ): String = {
+    val (unknownSource, knownSource) =
+      msgs
+        .groupBy(_.span.mSource)
+        .toList
+        .partitionMap {
+          case (mSource, msgs) =>
+            mSource match {
+              case Some(source) => scala.Right((source, msgs))
+              case None         => scala.Left(msgs)
+            }
+        }
+
+    val fromKnown =
+      knownSource.map {
+        case (source, msgs) =>
+          source.mark(msgs, config)
+      }
+
+    val fromUnknown =
+      unknownSource.flatten.ensure(_.nonEmpty).map(Source("").mark(_, config))
+
+    (fromKnown ++ fromUnknown).mkString("\n\n")
+  }
+
   final case class Config(
+      showName: Boolean,
       markerString: String,
       markerIndentString: String,
       eofMarkerString: String,
@@ -412,6 +448,7 @@ object Source {
 
     val Default: Config =
       Config(
+        showName = true,
         // format: off
         markerString =          "    *** ",
         markerIndentString =    "     >  ",

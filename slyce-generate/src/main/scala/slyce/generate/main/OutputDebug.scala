@@ -14,7 +14,7 @@ import slyce.generate.building._
 
 object OutputDebug {
 
-  private val DebugOutputDir: File = new File("target/slyce/debug")
+  val DebugOutputDir: File = new File("target/slyce/debug")
 
   def outputDebug(
       buildInput: BuildInput,
@@ -156,7 +156,7 @@ object OutputDebug {
 
           tr(
             td(msg.value.toString, whiteSpace := "pre"),
-            td(msg.toString(false)),
+            td(msg.span.toString(false)),
           )
         }
 
@@ -196,7 +196,7 @@ object OutputDebug {
                     width := "100px",
                   ),
                   th("Regex")(
-                    width := "750px",
+                    width := "350px",
                   ),
                   th("Yields")(
                     width := "350px",
@@ -216,7 +216,7 @@ object OutputDebug {
                       mode.lines.map { line =>
                         tr(
                           td(line.priority),
-                          td(line.regex.value.toString),
+                          td(line.regex.value.toIdtStr.toString("|   "), whiteSpace := "pre"),
                           td(
                             ul(
                               line.yields.yields.map { y =>

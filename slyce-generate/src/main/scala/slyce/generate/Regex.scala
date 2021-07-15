@@ -2,7 +2,7 @@ package slyce.generate
 
 import klib.Implicits._
 import klib.fp.types._
-import klib.utils.InfiniteSet
+import klib.utils._
 
 import scala.annotation.tailrec
 
@@ -25,6 +25,35 @@ sealed trait Regex {
 
   def atLeastOnce: Regex =
     atLeastN(1)
+
+  def toIdtStr: IndentedString = {
+    import IndentedString._
+    this match {
+      case cc: Regex.CharClass =>
+        cc.toString
+      case Regex.Sequence(seq) =>
+        inline(
+          "Sequence",
+          indented(
+            seq.map(_.toIdtStr),
+          ),
+        )
+      case Regex.Group(seqs) =>
+        inline(
+          "Group",
+          indented(
+            seqs.toList.map(_.toIdtStr),
+          ),
+        )
+      case Regex.Repeat(reg, min, max) =>
+        inline(
+          s"Repeat($min, $max)",
+          indented(
+            reg.toIdtStr,
+          ),
+        )
+    }
+  }
 
 }
 

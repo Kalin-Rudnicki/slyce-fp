@@ -378,7 +378,7 @@ object Main {
                     case Dead(errors) =>
                       // TODO (KR) : Display errors properly (Group by source)
                       for {
-                        _ <- logger(L(errors.map(L.log.fatal(_)), L.break()))
+                        _ <- logger(L(L.log.fatal(Source.showAll(errors.map(_.map(_.toString)))), L.break()))
                         _ <- IO.error(Message(s"Failed to generate: $scopedName")): IO[Unit]
                       } yield ()
                   }
@@ -387,7 +387,7 @@ object Main {
           case Dead(errors) =>
             // TODO (KR) : Display errors properly (Group by source)
             for {
-              _ <- logger(L(errors.map(L.log.fatal(_)), L.break()))
+              _ <- logger(L(L.log.fatal(Source.showAll(errors)), L.break()))
               _ <- IO.error(Message(s"Failed to generate: $scopedName")): IO[Unit]
             } yield ()
         }
