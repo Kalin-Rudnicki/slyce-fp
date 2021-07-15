@@ -407,7 +407,7 @@ object Generate {
                     priority = 42,
                     regex = Sequence(
                       inclusive('\\'),
-                      inclusive('\\', ']', '^', 'n', 't'),
+                      inclusive('\\', ']', '^', 'n', 't', '-'),
                     ).marked,
                     yields = Yields(
                       yields = List(
