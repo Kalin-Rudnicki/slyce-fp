@@ -576,14 +576,13 @@ object lexer {
   lazy val parser: Parser[Tok, NonTerminal, NtRoot] =
     Parser[Tok, NonTerminal, NtRoot](
       Lexer[Tok] {
-        var s47: Lexer.State[Tok] = null
+        var s6: Lexer.State[Tok] = null
         var s0: Lexer.State[Tok] = null
         var s1: Lexer.State[Tok] = null
         var s2: Lexer.State[Tok] = null
         var s3: Lexer.State[Tok] = null
         var s4: Lexer.State[Tok] = null
         var s5: Lexer.State[Tok] = null
-        var s6: Lexer.State[Tok] = null
         var s7: Lexer.State[Tok] = null
         var s8: Lexer.State[Tok] = null
         var s9: Lexer.State[Tok] = null
@@ -624,6 +623,7 @@ object lexer {
         var s44: Lexer.State[Tok] = null
         var s45: Lexer.State[Tok] = null
         var s46: Lexer.State[Tok] = null
+        var s47: Lexer.State[Tok] = null
         var s48: Lexer.State[Tok] = null
         var s49: Lexer.State[Tok] = null
         var s50: Lexer.State[Tok] = null
@@ -647,36 +647,38 @@ object lexer {
         var s68: Lexer.State[Tok] = null
         var s69: Lexer.State[Tok] = null
         
-        s47 =
+        s6 =
           Lexer.State[Tok](
-            47,
+            6,
             char => {
               val int = char.toInt
               
               if (int == 64) // '@'
-                s13.some
+                s4.some
               else if (int == 10) // '\n'
-                s60.some
+                s64.some
               else if (int == 46) // '.'
-                s49.some
+                s58.some
               else if (int == 32) // ' '
-                s37.some
+                s16.some
               else if (int == 123) // '{'
-                s0.some
-              else if (int >= 40 && int <= 43) // '('-'+'
-                s56.some
-              else if (int == 63) // '?'
-                s56.some
-              else if (int == 91) // '['
-                s1.some
-              else if (int == 47) // '/'
-                s32.some
-              else if (int == 59) // ';'
                 s5.some
+              else if (int == 91) // '['
+                s20.some
+              else if (int == 47) // '/'
+                s21.some
+              else if (int >= 40 && int <= 43) // '('-'+'
+                s8.some
+              else if (int == 63) // '?'
+                s8.some
+              else if (int == 124) // '|'
+                s8.some
+              else if (int == 59) // ';'
+                s31.some
               else if (int == 92) // '\\'
-                s53.some
+                s37.some
               else
-                s61.some
+                s65.some
             },
             None,
           )
@@ -684,31 +686,29 @@ object lexer {
         s0 =
           Lexer.State[Tok](
             0,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
-                ),
-              ),
-              Lexer.Yields.ToMode.Push[Tok](Lazy(s34)),
-            ).some,
+            char => {
+              val int = char.toInt
+              
+              if (int == 62) // '>'
+                s14.some
+              else
+                None
+            },
+            None,
           )
         
         s1 =
           Lexer.State[Tok](
             1,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
-                ),
-              ),
-              Lexer.Yields.ToMode.Push[Tok](Lazy(s48)),
-            ).some,
+            char => {
+              val int = char.toInt
+              
+              if (int == 42) // '*'
+                s48.some
+              else
+                s1.some
+            },
+            None,
           )
         
         s2 =
@@ -717,45 +717,61 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 47) // '/'
-                s9.some
-              else if (int == 42) // '*'
-                s42.some
+              if (int >= 48 && int <= 57) // '0'-'9'
+                s2.some
+              else if (int >= 65 && int <= 90) // 'A'-'Z'
+                s2.some
+              else if (int == 95) // '_'
+                s2.some
+              else if (int >= 97 && int <= 122) // 'a'-'z'
+                s2.some
               else
                 None
             },
-            None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.term(_, _).pure[Attempt]
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
           )
         
         s3 =
           Lexer.State[Tok](
             3,
-            char => {
-              val int = char.toInt
-              
-              if (int == 10) // '\n'
-                s35.some
-              else if (int >= 65 && int <= 90) // 'A'-'Z'
-                s55.some
-              else if (int == 9) // '\t'
-                s58.some
-              else if (int == 32) // ' '
-                s58.some
-              else
-                None
-            },
-            None,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.findRawTerminal,
+                ),
+              ),
+              Lexer.Yields.ToMode.Pop,
+            ).some,
           )
         
         s4 =
           Lexer.State[Tok](
             4,
-            _ => None,
+            char => {
+              val int = char.toInt
+              
+              if (int == 109) // 'm'
+                s32.some
+              else if (int == 115) // 's'
+                s25.some
+              else
+                None
+            },
             Lexer.Yields[Tok](
               List(
                 Lexer.Yields.Yield[Tok](
-                  (Some(1),Some(1)),
-                  Tok.escChars(_, _).pure[Attempt]
+                  (None,None),
+                  Tok.char(_, _).pure[Attempt]
                 ),
               ),
               Lexer.Yields.ToMode.Same,
@@ -773,69 +789,33 @@ object lexer {
                   Tok.findRawTerminal,
                 ),
               ),
-              Lexer.Yields.ToMode.Push[Tok](Lazy(s65)),
+              Lexer.Yields.ToMode.Push[Tok](Lazy(s17)),
             ).some,
           )
         
-        s6 =
+        s7 =
           Lexer.State[Tok](
-            6,
+            7,
             char => {
               val int = char.toInt
               
-              if (int == 100) // 'd'
-                s68.some
-              else if (int == 45) // '-'
-                s59.some
-              else if (int >= 92 && int <= 94) // '\\'-'^'
-                s59.some
-              else if (int == 110) // 'n'
-                s59.some
-              else if (int == 116) // 't'
-                s59.some
+              if (int == 32) // ' '
+                s60.some
               else
                 None
             },
             None,
           )
         
-        s7 =
+        s8 =
           Lexer.State[Tok](
-            7,
+            8,
             _ => None,
             Lexer.Yields[Tok](
               List(
                 Lexer.Yields.Yield[Tok](
                   (None,None),
                   Tok.findRawTerminal,
-                ),
-              ),
-              Lexer.Yields.ToMode.Pop,
-            ).some,
-          )
-        
-        s8 =
-          Lexer.State[Tok](
-            8,
-            char => {
-              val int = char.toInt
-              
-              if (int >= 48 && int <= 57) // '0'-'9'
-                s8.some
-              else if (int >= 65 && int <= 90) // 'A'-'Z'
-                s8.some
-              else if (int == 95) // '_'
-                s8.some
-              else if (int >= 97 && int <= 122) // 'a'-'z'
-                s8.some
-              else
-                None
-            },
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.mode(_, _).pure[Attempt]
                 ),
               ),
               Lexer.Yields.ToMode.Same,
@@ -845,15 +825,12 @@ object lexer {
         s9 =
           Lexer.State[Tok](
             9,
-            char => {
-              val int = char.toInt
-              
-              if (int == 10) // '\n'
-                s51.some
-              else
-                s9.some
-            },
-            None,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
           )
         
         s10 =
@@ -873,6 +850,10 @@ object lexer {
             _ => None,
             Lexer.Yields[Tok](
               List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.findRawTerminal,
+                ),
               ),
               Lexer.Yields.ToMode.Same,
             ).some,
@@ -885,8 +866,8 @@ object lexer {
             Lexer.Yields[Tok](
               List(
                 Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
+                  (Some(1),Some(1)),
+                  Tok.escChar(_, _).pure[Attempt]
                 ),
               ),
               Lexer.Yields.ToMode.Same,
@@ -899,10 +880,59 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 109) // 'm'
-                s33.some
-              else if (int == 115) // 's'
-                s21.some
+              if (int == 100) // 'd'
+                s68.some
+              else if (int == 45) // '-'
+                s12.some
+              else if (int >= 92 && int <= 94) // '\\'-'^'
+                s12.some
+              else if (int == 110) // 'n'
+                s12.some
+              else if (int == 116) // 't'
+                s12.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s14 =
+          Lexer.State[Tok](
+            14,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.findRawTerminal,
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s15 =
+          Lexer.State[Tok](
+            15,
+            char => {
+              val int = char.toInt
+              
+              if (int == 116) // 't'
+                s55.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s16 =
+          Lexer.State[Tok](
+            16,
+            char => {
+              val int = char.toInt
+              
+              if (int == 32) // ' '
+                s7.some
               else
                 None
             },
@@ -917,75 +947,28 @@ object lexer {
             ).some,
           )
         
-        s14 =
-          Lexer.State[Tok](
-            14,
-            char => {
-              val int = char.toInt
-              
-              if (int == 116) // 't'
-                s63.some
-              else
-                None
-            },
-            None,
-          )
-        
-        s15 =
-          Lexer.State[Tok](
-            15,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
-        s16 =
-          Lexer.State[Tok](
-            16,
-            char => {
-              val int = char.toInt
-              
-              if (int == 101) // 'e'
-                s63.some
-              else
-                None
-            },
-            None,
-          )
-        
         s17 =
           Lexer.State[Tok](
             17,
             char => {
               val int = char.toInt
               
-              if (int >= 48 && int <= 57) // '0'-'9'
-                s17.some
-              else if (int >= 65 && int <= 90) // 'A'-'Z'
-                s17.some
-              else if (int == 95) // '_'
-                s17.some
-              else if (int >= 97 && int <= 122) // 'a'-'z'
-                s17.some
+              if (int == 9) // '\t'
+                s63.some
+              else if (int == 32) // ' '
+                s63.some
+              else if (int == 44) // ','
+                s59.some
+              else if (int == 125) // '}'
+                s42.some
+              else if (int == 63) // '?'
+                s27.some
+              else if (int >= 48 && int <= 57) // '0'-'9'
+                s43.some
               else
                 None
             },
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.term(_, _).pure[Attempt]
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
+            None,
           )
         
         s18 =
@@ -994,18 +977,12 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 9) // '\t'
-                s18.some
-              else if (int == 32) // ' '
-                s18.some
+              if (int == 97) // 'a'
+                s50.some
               else
                 None
             },
-            Lexer.Yields[Tok](
-              List(
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
+            None,
           )
         
         s19 =
@@ -1014,26 +991,41 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 100) // 'd'
-                s16.some
+              if (int >= 48 && int <= 57) // '0'-'9'
+                s19.some
+              else if (int >= 65 && int <= 90) // 'A'-'Z'
+                s19.some
+              else if (int == 95) // '_'
+                s19.some
+              else if (int >= 97 && int <= 122) // 'a'-'z'
+                s19.some
               else
                 None
             },
-            None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.mode(_, _).pure[Attempt]
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
           )
         
         s20 =
           Lexer.State[Tok](
             20,
-            char => {
-              val int = char.toInt
-              
-              if (int == 47) // '/'
-                s10.some
-              else
-                s42.some
-            },
-            None,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.findRawTerminal,
+                ),
+              ),
+              Lexer.Yields.ToMode.Push[Tok](Lazy(s40)),
+            ).some,
           )
         
         s21 =
@@ -1042,12 +1034,22 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 116) // 't'
-                s27.some
+              if (int == 42) // '*'
+                s26.some
+              else if (int == 47) // '/'
+                s36.some
               else
                 None
             },
-            None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.char(_, _).pure[Attempt]
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
           )
         
         s22 =
@@ -1056,10 +1058,10 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 10) // '\n'
-                s29.some
+              if (int >= 48 && int <= 57) // '0'-'9'
+                s34.some
               else
-                s22.some
+                None
             },
             None,
           )
@@ -1070,8 +1072,8 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 32) // ' '
-                s66.some
+              if (int == 45) // '-'
+                s14.some
               else
                 None
             },
@@ -1084,8 +1086,14 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int >= 48 && int <= 57) // '0'-'9'
-                s40.some
+              if (int == 10) // '\n'
+                s44.some
+              else if (int == 9) // '\t'
+                s35.some
+              else if (int == 32) // ' '
+                s35.some
+              else if (int >= 65 && int <= 90) // 'A'-'Z'
+                s33.some
               else
                 None
             },
@@ -1098,10 +1106,10 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 42) // '*'
-                s46.some
+              if (int == 116) // 't'
+                s18.some
               else
-                s25.some
+                None
             },
             None,
           )
@@ -1109,6 +1117,334 @@ object lexer {
         s26 =
           Lexer.State[Tok](
             26,
+            char => {
+              val int = char.toInt
+              
+              if (int == 42) // '*'
+                s30.some
+              else
+                s26.some
+            },
+            None,
+          )
+        
+        s27 =
+          Lexer.State[Tok](
+            27,
+            char => {
+              val int = char.toInt
+              
+              if (int >= 48 && int <= 57) // '0'-'9'
+                s43.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s28 =
+          Lexer.State[Tok](
+            28,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (Some(1),Some(1)),
+                  Tok.escChars(_, _).pure[Attempt]
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s29 =
+          Lexer.State[Tok](
+            29,
+            char => {
+              val int = char.toInt
+              
+              if (int == 9) // '\t'
+                s29.some
+              else if (int == 32) // ' '
+                s29.some
+              else
+                None
+            },
+            Lexer.Yields[Tok](
+              List(
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s30 =
+          Lexer.State[Tok](
+            30,
+            char => {
+              val int = char.toInt
+              
+              if (int == 47) // '/'
+                s10.some
+              else
+                s26.some
+            },
+            None,
+          )
+        
+        s31 =
+          Lexer.State[Tok](
+            31,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.findRawTerminal,
+                ),
+              ),
+              Lexer.Yields.ToMode.Push[Tok](Lazy(s57)),
+            ).some,
+          )
+        
+        s32 =
+          Lexer.State[Tok](
+            32,
+            char => {
+              val int = char.toInt
+              
+              if (int == 111) // 'o'
+                s39.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s33 =
+          Lexer.State[Tok](
+            33,
+            char => {
+              val int = char.toInt
+              
+              if (int >= 48 && int <= 57) // '0'-'9'
+                s33.some
+              else if (int >= 65 && int <= 90) // 'A'-'Z'
+                s33.some
+              else if (int == 95) // '_'
+                s33.some
+              else if (int >= 97 && int <= 122) // 'a'-'z'
+                s33.some
+              else
+                None
+            },
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.mode(_, _).pure[Attempt]
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s34 =
+          Lexer.State[Tok](
+            34,
+            char => {
+              val int = char.toInt
+              
+              if (int >= 48 && int <= 57) // '0'-'9'
+                s34.some
+              else
+                None
+            },
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.int(_, _).pure[Attempt]
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s35 =
+          Lexer.State[Tok](
+            35,
+            char => {
+              val int = char.toInt
+              
+              if (int == 9) // '\t'
+                s35.some
+              else if (int == 32) // ' '
+                s35.some
+              else
+                None
+            },
+            Lexer.Yields[Tok](
+              List(
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s36 =
+          Lexer.State[Tok](
+            36,
+            char => {
+              val int = char.toInt
+              
+              if (int == 10) // '\n'
+                s41.some
+              else
+                s36.some
+            },
+            None,
+          )
+        
+        s37 =
+          Lexer.State[Tok](
+            37,
+            char => {
+              val int = char.toInt
+              
+              if (int >= 40 && int <= 43) // '('-'+'
+                s46.some
+              else if (int >= 46 && int <= 47) // '.'-'/'
+                s46.some
+              else if (int == 59) // ';'
+                s46.some
+              else if (int >= 63 && int <= 64) // '?'-'@'
+                s46.some
+              else if (int >= 91 && int <= 93) // '['-']'
+                s46.some
+              else if (int == 110) // 'n'
+                s46.some
+              else if (int == 116) // 't'
+                s46.some
+              else if (int >= 123 && int <= 125) // '{'-'}'
+                s46.some
+              else if (int == 100) // 'd'
+                s28.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s38 =
+          Lexer.State[Tok](
+            38,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.findRawTerminal,
+                ),
+              ),
+              Lexer.Yields.ToMode.Pop,
+            ).some,
+          )
+        
+        s39 =
+          Lexer.State[Tok](
+            39,
+            char => {
+              val int = char.toInt
+              
+              if (int == 100) // 'd'
+                s53.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s40 =
+          Lexer.State[Tok](
+            40,
+            char => {
+              val int = char.toInt
+              
+              if (int == 45) // '-'
+                s11.some
+              else if (int == 94) // '^'
+                s11.some
+              else if (int == 92) // '\\'
+                s13.some
+              else if (int == 93) // ']'
+                s38.some
+              else
+                s49.some
+            },
+            None,
+          )
+        
+        s41 =
+          Lexer.State[Tok](
+            41,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s42 =
+          Lexer.State[Tok](
+            42,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.findRawTerminal,
+                ),
+              ),
+              Lexer.Yields.ToMode.Pop,
+            ).some,
+          )
+        
+        s43 =
+          Lexer.State[Tok](
+            43,
+            char => {
+              val int = char.toInt
+              
+              if (int >= 48 && int <= 57) // '0'-'9'
+                s43.some
+              else
+                None
+            },
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.int(_, _).pure[Attempt]
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s44 =
+          Lexer.State[Tok](
+            44,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+              ),
+              Lexer.Yields.ToMode.Pop,
+            ).some,
+          )
+        
+        s45 =
+          Lexer.State[Tok](
+            45,
             char => {
               val int = char.toInt
               
@@ -1126,23 +1462,9 @@ object lexer {
             None,
           )
         
-        s27 =
+        s46 =
           Lexer.State[Tok](
-            27,
-            char => {
-              val int = char.toInt
-              
-              if (int == 97) // 'a'
-                s44.some
-              else
-                None
-            },
-            None,
-          )
-        
-        s28 =
-          Lexer.State[Tok](
-            28,
+            46,
             _ => None,
             Lexer.Yields[Tok](
               List(
@@ -1155,294 +1477,28 @@ object lexer {
             ).some,
           )
         
-        s29 =
+        s47 =
           Lexer.State[Tok](
-            29,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
-        s30 =
-          Lexer.State[Tok](
-            30,
+            47,
             char => {
               val int = char.toInt
               
-              if (int == 62) // '>'
-                s15.some
-              else
+              if (int == 34) // '\"'
                 None
-            },
-            None,
-          )
-        
-        s31 =
-          Lexer.State[Tok](
-            31,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
-                ),
-              ),
-              Lexer.Yields.ToMode.Pop,
-            ).some,
-          )
-        
-        s32 =
-          Lexer.State[Tok](
-            32,
-            char => {
-              val int = char.toInt
-              
-              if (int == 42) // '*'
-                s25.some
-              else if (int == 47) // '/'
-                s22.some
-              else
+              else if (int == 92) // '\\'
                 None
+              else
+                s47.some
             },
             Lexer.Yields[Tok](
               List(
                 Lexer.Yields.Yield[Tok](
                   (None,None),
-                  Tok.char(_, _).pure[Attempt]
+                  Tok.chars(_, _).pure[Attempt]
                 ),
               ),
               Lexer.Yields.ToMode.Same,
             ).some,
-          )
-        
-        s33 =
-          Lexer.State[Tok](
-            33,
-            char => {
-              val int = char.toInt
-              
-              if (int == 111) // 'o'
-                s19.some
-              else
-                None
-            },
-            None,
-          )
-        
-        s34 =
-          Lexer.State[Tok](
-            34,
-            char => {
-              val int = char.toInt
-              
-              if (int == 9) // '\t'
-                s18.some
-              else if (int == 32) // ' '
-                s18.some
-              else if (int == 44) // ','
-                s50.some
-              else if (int == 125) // '}'
-                s31.some
-              else if (int == 63) // '?'
-                s39.some
-              else if (int >= 48 && int <= 57) // '0'-'9'
-                s52.some
-              else
-                None
-            },
-            None,
-          )
-        
-        s35 =
-          Lexer.State[Tok](
-            35,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-              ),
-              Lexer.Yields.ToMode.Pop,
-            ).some,
-          )
-        
-        s36 =
-          Lexer.State[Tok](
-            36,
-            char => {
-              val int = char.toInt
-              
-              if (int == 92) // '\\'
-                s26.some
-              else if (int == 34) // '\"'
-                s67.some
-              else
-                s54.some
-            },
-            None,
-          )
-        
-        s37 =
-          Lexer.State[Tok](
-            37,
-            char => {
-              val int = char.toInt
-              
-              if (int == 32) // ' '
-                s57.some
-              else
-                None
-            },
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.char(_, _).pure[Attempt]
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
-        s38 =
-          Lexer.State[Tok](
-            38,
-            char => {
-              val int = char.toInt
-              
-              if (int == 9) // '\t'
-                s38.some
-              else if (int == 32) // ' '
-                s38.some
-              else
-                None
-            },
-            Lexer.Yields[Tok](
-              List(
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
-        s39 =
-          Lexer.State[Tok](
-            39,
-            char => {
-              val int = char.toInt
-              
-              if (int >= 48 && int <= 57) // '0'-'9'
-                s52.some
-              else
-                None
-            },
-            None,
-          )
-        
-        s40 =
-          Lexer.State[Tok](
-            40,
-            char => {
-              val int = char.toInt
-              
-              if (int >= 48 && int <= 57) // '0'-'9'
-                s40.some
-              else
-                None
-            },
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.int(_, _).pure[Attempt]
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
-        s41 =
-          Lexer.State[Tok](
-            41,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.char(_, _).pure[Attempt]
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
-        s42 =
-          Lexer.State[Tok](
-            42,
-            char => {
-              val int = char.toInt
-              
-              if (int == 42) // '*'
-                s20.some
-              else
-                s42.some
-            },
-            None,
-          )
-        
-        s43 =
-          Lexer.State[Tok](
-            43,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-              ),
-              Lexer.Yields.ToMode.Pop,
-            ).some,
-          )
-        
-        s44 =
-          Lexer.State[Tok](
-            44,
-            char => {
-              val int = char.toInt
-              
-              if (int == 114) // 'r'
-                s14.some
-              else
-                None
-            },
-            None,
-          )
-        
-        s45 =
-          Lexer.State[Tok](
-            45,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
-                ),
-              ),
-              Lexer.Yields.ToMode.Push[Tok](Lazy(s36)),
-            ).some,
-          )
-        
-        s46 =
-          Lexer.State[Tok](
-            46,
-            char => {
-              val int = char.toInt
-              
-              if (int == 47) // '/'
-                s11.some
-              else
-                s25.some
-            },
-            None,
           )
         
         s48 =
@@ -1451,16 +1507,10 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 45) // '-'
-                s12.some
-              else if (int == 94) // '^'
-                s12.some
-              else if (int == 92) // '\\'
-                s6.some
-              else if (int == 93) // ']'
-                s7.some
+              if (int == 47) // '/'
+                s9.some
               else
-                s41.some
+                s1.some
             },
             None,
           )
@@ -1483,16 +1533,15 @@ object lexer {
         s50 =
           Lexer.State[Tok](
             50,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
+            char => {
+              val int = char.toInt
+              
+              if (int == 114) // 'r'
+                s15.some
+              else
+                None
+            },
+            None,
           )
         
         s51 =
@@ -1512,17 +1561,13 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int >= 48 && int <= 57) // '0'-'9'
+              if (int == 32) // ' '
                 s52.some
               else
                 None
             },
             Lexer.Yields[Tok](
               List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.int(_, _).pure[Attempt]
-                ),
               ),
               Lexer.Yields.ToMode.Same,
             ).some,
@@ -1534,26 +1579,8 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 100) // 'd'
-                s4.some
-              else if (int >= 40 && int <= 43) // '('-'+'
-                s28.some
-              else if (int >= 46 && int <= 47) // '.'-'/'
-                s28.some
-              else if (int == 59) // ';'
-                s28.some
-              else if (int >= 63 && int <= 64) // '?'-'@'
-                s28.some
-              else if (int >= 91 && int <= 93) // '['-']'
-                s28.some
-              else if (int == 110) // 'n'
-                s28.some
-              else if (int == 116) // 't'
-                s28.some
-              else if (int == 123) // '{'
-                s28.some
-              else if (int == 125) // '}'
-                s28.some
+              if (int == 101) // 'e'
+                s55.some
               else
                 None
             },
@@ -1566,22 +1593,14 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 34) // '\"'
-                None
-              else if (int == 92) // '\\'
-                None
+              if (int == 47) // '/'
+                s66.some
+              else if (int == 42) // '*'
+                s1.some
               else
-                s54.some
+                None
             },
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.chars(_, _).pure[Attempt]
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
+            None,
           )
         
         s55 =
@@ -1590,26 +1609,12 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int >= 48 && int <= 57) // '0'-'9'
-                s55.some
-              else if (int >= 65 && int <= 90) // 'A'-'Z'
-                s55.some
-              else if (int == 95) // '_'
-                s55.some
-              else if (int >= 97 && int <= 122) // 'a'-'z'
-                s55.some
+              if (int == 58) // ':'
+                s67.some
               else
                 None
             },
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.mode(_, _).pure[Attempt]
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
+            None,
           )
         
         s56 =
@@ -1623,7 +1628,7 @@ object lexer {
                   Tok.findRawTerminal,
                 ),
               ),
-              Lexer.Yields.ToMode.Same,
+              Lexer.Yields.ToMode.Push[Tok](Lazy(s62)),
             ).some,
           )
         
@@ -1633,8 +1638,38 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 32) // ' '
+              if (int == 9) // '\t'
+                s29.some
+              else if (int == 32) // ' '
+                s29.some
+              else if (int == 10) // '\n'
+                s51.some
+              else if (int == 44) // ','
+                s14.some
+              else if (int == 64) // '@'
+                s14.some
+              else if (int == 91) // '['
+                s14.some
+              else if (int == 93) // ']'
+                s14.some
+              else if (int == 34) // '\"'
+                s56.some
+              else if (int >= 97 && int <= 122) // 'a'-'z'
+                s2.some
+              else if (int == 63) // '?'
+                s22.some
+              else if (int >= 65 && int <= 90) // 'A'-'Z'
+                s19.some
+              else if (int == 45) // '-'
+                s0.some
+              else if (int == 62) // '>'
+                s0.some
+              else if (int >= 48 && int <= 57) // '0'-'9'
+                s34.some
+              else if (int == 60) // '<'
                 s23.some
+              else if (int == 47) // '/'
+                s54.some
               else
                 None
             },
@@ -1644,18 +1679,13 @@ object lexer {
         s58 =
           Lexer.State[Tok](
             58,
-            char => {
-              val int = char.toInt
-              
-              if (int == 9) // '\t'
-                s58.some
-              else if (int == 32) // ' '
-                s58.some
-              else
-                None
-            },
+            _ => None,
             Lexer.Yields[Tok](
               List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.char(_, _).pure[Attempt]
+                ),
               ),
               Lexer.Yields.ToMode.Same,
             ).some,
@@ -1669,7 +1699,7 @@ object lexer {
               List(
                 Lexer.Yields.Yield[Tok](
                   (None,None),
-                  Tok.escChar(_, _).pure[Attempt]
+                  Tok.findRawTerminal,
                 ),
               ),
               Lexer.Yields.ToMode.Same,
@@ -1679,6 +1709,67 @@ object lexer {
         s60 =
           Lexer.State[Tok](
             60,
+            char => {
+              val int = char.toInt
+              
+              if (int == 32) // ' '
+                s52.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s61 =
+          Lexer.State[Tok](
+            61,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+              ),
+              Lexer.Yields.ToMode.Pop,
+            ).some,
+          )
+        
+        s62 =
+          Lexer.State[Tok](
+            62,
+            char => {
+              val int = char.toInt
+              
+              if (int == 92) // '\\'
+                s45.some
+              else if (int == 34) // '\"'
+                s3.some
+              else
+                s47.some
+            },
+            None,
+          )
+        
+        s63 =
+          Lexer.State[Tok](
+            63,
+            char => {
+              val int = char.toInt
+              
+              if (int == 9) // '\t'
+                s63.some
+              else if (int == 32) // ' '
+                s63.some
+              else
+                None
+            },
+            Lexer.Yields[Tok](
+              List(
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s64 =
+          Lexer.State[Tok](
+            64,
             _ => None,
             Lexer.Yields[Tok](
               List(
@@ -1687,9 +1778,9 @@ object lexer {
             ).some,
           )
         
-        s61 =
+        s65 =
           Lexer.State[Tok](
-            61,
+            65,
             _ => None,
             Lexer.Yields[Tok](
               List(
@@ -1702,109 +1793,18 @@ object lexer {
             ).some,
           )
         
-        s62 =
-          Lexer.State[Tok](
-            62,
-            char => {
-              val int = char.toInt
-              
-              if (int == 45) // '-'
-                s15.some
-              else
-                None
-            },
-            None,
-          )
-        
-        s63 =
-          Lexer.State[Tok](
-            63,
-            char => {
-              val int = char.toInt
-              
-              if (int == 58) // ':'
-                s64.some
-              else
-                None
-            },
-            None,
-          )
-        
-        s64 =
-          Lexer.State[Tok](
-            64,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
-                ),
-              ),
-              Lexer.Yields.ToMode.Push[Tok](Lazy(s3)),
-            ).some,
-          )
-        
-        s65 =
-          Lexer.State[Tok](
-            65,
-            char => {
-              val int = char.toInt
-              
-              if (int == 9) // '\t'
-                s38.some
-              else if (int == 32) // ' '
-                s38.some
-              else if (int == 10) // '\n'
-                s43.some
-              else if (int == 44) // ','
-                s15.some
-              else if (int == 64) // '@'
-                s15.some
-              else if (int == 91) // '['
-                s15.some
-              else if (int == 93) // ']'
-                s15.some
-              else if (int == 34) // '\"'
-                s45.some
-              else if (int >= 97 && int <= 122) // 'a'-'z'
-                s17.some
-              else if (int == 63) // '?'
-                s24.some
-              else if (int >= 65 && int <= 90) // 'A'-'Z'
-                s8.some
-              else if (int == 45) // '-'
-                s30.some
-              else if (int == 62) // '>'
-                s30.some
-              else if (int >= 48 && int <= 57) // '0'-'9'
-                s40.some
-              else if (int == 60) // '<'
-                s62.some
-              else if (int == 47) // '/'
-                s2.some
-              else
-                None
-            },
-            None,
-          )
-        
         s66 =
           Lexer.State[Tok](
             66,
             char => {
               val int = char.toInt
               
-              if (int == 32) // ' '
-                s66.some
+              if (int == 10) // '\n'
+                s61.some
               else
-                None
+                s66.some
             },
-            Lexer.Yields[Tok](
-              List(
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
+            None,
           )
         
         s67 =
@@ -1818,7 +1818,7 @@ object lexer {
                   Tok.findRawTerminal,
                 ),
               ),
-              Lexer.Yields.ToMode.Pop,
+              Lexer.Yields.ToMode.Push[Tok](Lazy(s24)),
             ).some,
           )
         
@@ -1853,7 +1853,7 @@ object lexer {
           )
         
         
-        s47
+        s6
       },
       Grammar[Tok, NonTerminal, NtRoot] {
         var s0: Grammar.State[Tok, NonTerminal, NtRoot] = null
@@ -1986,31 +1986,6 @@ object lexer {
         s0 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             0,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  stack match {
-                    case (Right(ntRoot: NtRoot), _) :: Nil =>
-                      ntRoot.right.pure[Attempt]
-                    case _ =>
-                      Dead(Marked("This should be impossible (2)...") :: Nil)
-                  }
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s1 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            1,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -2215,6 +2190,60 @@ object lexer {
             },
           )
         
+        s1 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            1,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`,` =>
+                      stack match {
+                        case (Left(_1: Tok.int), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Opt_int._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.int), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`}` =>
+                      stack match {
+                        case (Left(_1: Tok.int), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Opt_int._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.int), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
         s2 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             2,
@@ -2222,12 +2251,23 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`)` =>
-                      (
-                        s96,
-                        (tok.left, s2) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
+                    case tok: Tok.`]` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.CCChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList10Tail._1(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.CCChars), poppedState)") :: Nil)
+                      }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
@@ -2248,58 +2288,50 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`[` =>
+                    case tok: Tok.`@mode:` =>
                       (
-                        s44,
+                        s21,
                         (tok.left, s3) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
-                    case tok: Tok.escChars =>
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  val nt: NonTerminal = NonTerminal.AnonList2Tail._2
+                  s3.onNt(nt) match {
+                    case Alive(to) =>
                       (
-                        s89,
-                        (tok.left, s3) :: stack,
-                        tokens.tail.toNel,
+                        to,
+                        (nt.right, s3) :: stack,
+                        None,
                       ).left.pure[Attempt]
-                    case tok: Tok.escChar =>
-                      (
-                        s124,
-                        (tok.left, s3) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s3.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s3) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.char =>
-                      (
-                        s60,
-                        (tok.left, s3) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
+                    case dead @ Dead(_) =>
+                      dead
+                  }
+              }
+            },
+            {
+              case _: NonTerminal.AnonList2Tail =>
+                s104.pure[Attempt]
+              case _: NonTerminal.Mode =>
+                s60.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s4 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            4,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
                     case tok: Tok.`)` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s3.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s3) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`(` =>
                       (
-                        s3,
-                        (tok.left, s3) :: stack,
+                        s101,
+                        (tok.left, s4) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
@@ -2310,24 +2342,329 @@ object lexer {
               }
             },
             {
-              case _: NonTerminal.SequenceSimple =>
-                s77.pure[Attempt]
-              case _: NonTerminal.Regex =>
-                s57.pure[Attempt]
-              case _: NonTerminal.CharClass =>
-                s68.pure[Attempt]
-              case _: NonTerminal.Group =>
-                s92.pure[Attempt]
-              case _: NonTerminal.GroupInnerHead =>
-                s37.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
           )
         
-        s4 =
+        s5 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            4,
+            5,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      (
+                        s64,
+                        (tok.left, s5) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`(` =>
+                      (
+                        s71,
+                        (tok.left, s5) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChar =>
+                      (
+                        s50,
+                        (tok.left, s5) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`*` =>
+                      (
+                        s69,
+                        (tok.left, s5) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.char =>
+                      (
+                        s57,
+                        (tok.left, s5) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`[` =>
+                      (
+                        s114,
+                        (tok.left, s5) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`{` =>
+                      (
+                        s55,
+                        (tok.left, s5) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`?` =>
+                      (
+                        s79,
+                        (tok.left, s5) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`+` =>
+                      (
+                        s7,
+                        (tok.left, s5) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s5.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s5) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s5.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s5) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.SequenceSimple =>
+                s28.pure[Attempt]
+              case _: NonTerminal.Regex =>
+                s5.pure[Attempt]
+              case _: NonTerminal.CharClass =>
+                s49.pure[Attempt]
+              case _: NonTerminal.Group =>
+                s97.pure[Attempt]
+              case _: NonTerminal.Quant =>
+                s22.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s6 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            6,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`;` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s7 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            7,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -2532,17 +2869,17 @@ object lexer {
             },
           )
         
-        s5 =
+        s8 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            5,
+            8,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.mode =>
                       (
-                        s76,
-                        (tok.left, s5) :: stack,
+                        s82,
+                        (tok.left, s8) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
@@ -2558,26 +2895,26 @@ object lexer {
             },
           )
         
-        s6 =
+        s9 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            6,
+            9,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.int =>
                       (
-                        s84,
-                        (tok.left, s6) :: stack,
+                        s88,
+                        (tok.left, s9) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok: Tok.`,` =>
                       val nt: NonTerminal = NonTerminal.Opt_int._2
-                      s6.onNt(nt) match {
+                      s9.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, s6) :: stack,
+                            (nt.right, s9) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
@@ -2585,11 +2922,11 @@ object lexer {
                       }
                     case tok: Tok.`]` =>
                       val nt: NonTerminal = NonTerminal.Opt_int._2
-                      s6.onNt(nt) match {
+                      s9.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, s6) :: stack,
+                            (nt.right, s9) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
@@ -2604,29 +2941,66 @@ object lexer {
             },
             {
               case _: NonTerminal.Opt_int =>
-                s7.pure[Attempt]
+                s11.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
           )
         
-        s7 =
+        s10 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            7,
+            10,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`]` =>
+                      stack match {
+                        case (Left(_1: Tok.int), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Opt_int._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.int), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s11 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            11,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.`,` =>
                       (
-                        s85,
-                        (tok.left, s7) :: stack,
+                        s92,
+                        (tok.left, s11) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok: Tok.`]` =>
                       (
-                        s115,
-                        (tok.left, s7) :: stack,
+                        s113,
+                        (tok.left, s11) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
@@ -2642,9 +3016,9 @@ object lexer {
             },
           )
         
-        s8 =
+        s12 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            8,
+            12,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -2702,8 +3076,8 @@ object lexer {
                       }
                     case tok: Tok.`-` =>
                       (
-                        s63,
-                        (tok.left, s8) :: stack,
+                        s68,
+                        (tok.left, s12) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok: Tok.char =>
@@ -2736,9 +3110,53 @@ object lexer {
             },
           )
         
-        s9 =
+        s13 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            9,
+            13,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      (
+                        s120,
+                        (tok.left, s13) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChar =>
+                      (
+                        s115,
+                        (tok.left, s13) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.char =>
+                      (
+                        s20,
+                        (tok.left, s13) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.AnonList9Head =>
+                s38.pure[Attempt]
+              case _: NonTerminal.CCChars =>
+                s63.pure[Attempt]
+              case _: NonTerminal.CCChar =>
+                s12.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s14 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            14,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -2975,33 +3393,69 @@ object lexer {
             },
           )
         
-        s10 =
+        s15 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            10,
+            15,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_1: Tok.`^`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.`Opt_^`._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`^`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_1: Tok.`^`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.`Opt_^`._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`^`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_1: Tok.`^`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.`Opt_^`._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`^`), poppedState)") :: Nil)
+                      }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
-                  stack match {
-                    case (Right(_3: NonTerminal.AnonList1Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@start:`), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.Lexer(_1, _2, _3)
-                      poppedState.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            None,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case _ =>
-                      Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.AnonList1Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@start:`), poppedState)") :: Nil)
-                  }
+                  Dead(Marked("Unexpected EOF") :: Nil)
               }
             },
             {
@@ -3010,9 +3464,690 @@ object lexer {
             },
           )
         
-        s11 =
+        s16 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            11,
+            16,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      (
+                        s96,
+                        (tok.left, s16) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChar =>
+                      (
+                        s122,
+                        (tok.left, s16) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`*` =>
+                      (
+                        s32,
+                        (tok.left, s16) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s16.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s16) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.char =>
+                      (
+                        s66,
+                        (tok.left, s16) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`[` =>
+                      (
+                        s23,
+                        (tok.left, s16) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`{` =>
+                      (
+                        s19,
+                        (tok.left, s16) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`?` =>
+                      (
+                        s85,
+                        (tok.left, s16) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`+` =>
+                      (
+                        s109,
+                        (tok.left, s16) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`)` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s16.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s16) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`(` =>
+                      (
+                        s52,
+                        (tok.left, s16) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.SequenceSimple =>
+                s105.pure[Attempt]
+              case _: NonTerminal.Regex =>
+                s16.pure[Attempt]
+              case _: NonTerminal.CharClass =>
+                s73.pure[Attempt]
+              case _: NonTerminal.Group =>
+                s98.pure[Attempt]
+              case _: NonTerminal.Quant =>
+                s31.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s17 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            17,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`\"` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList8Tail), _) :: (Right(_1: NonTerminal.Char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList8Tail._1(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList8Tail), _) :: (Right(_1: NonTerminal.Char), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s18 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            18,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      (
+                        s114,
+                        (tok.left, s18) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChars =>
+                      (
+                        s64,
+                        (tok.left, s18) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`(` =>
+                      (
+                        s71,
+                        (tok.left, s18) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChar =>
+                      (
+                        s50,
+                        (tok.left, s18) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.char =>
+                      (
+                        s57,
+                        (tok.left, s18) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s18.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s18) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s18.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s18) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.CharClass =>
+                s49.pure[Attempt]
+              case _: NonTerminal.SequenceSimple =>
+                s112.pure[Attempt]
+              case _: NonTerminal.Group =>
+                s97.pure[Attempt]
+              case _: NonTerminal.Regex =>
+                s5.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s19 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            19,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.int =>
+                      (
+                        s1,
+                        (tok.left, s19) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`,` =>
+                      val nt: NonTerminal = NonTerminal.Opt_int._2
+                      s19.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s19) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`}` =>
+                      val nt: NonTerminal = NonTerminal.Opt_int._2
+                      s19.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s19) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.Opt_int =>
+                s108.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s20 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            20,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`]` =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`-` =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s21 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            21,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.mode =>
+                      (
+                        s45,
+                        (tok.left, s21) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s22 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            22,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`;` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s23 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            23,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
+                      s23.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s23) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`^` =>
+                      (
+                        s15,
+                        (tok.left, s23) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChar =>
+                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
+                      s23.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s23) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.char =>
+                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
+                      s23.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s23) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.`Opt_^` =>
+                s30.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s24 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            24,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -3232,1167 +4367,6 @@ object lexer {
             },
           )
         
-        s12 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            12,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`]` =>
-                      stack match {
-                        case (Left(_1: Tok.int), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Opt_int._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.int), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s13 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            13,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`]` =>
-                      (
-                        s24,
-                        (tok.left, s13) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s14 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            14,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_1: Tok.`^`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.`Opt_^`._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`^`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.`^`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.`Opt_^`._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`^`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.`^`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.`Opt_^`._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`^`), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s15 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            15,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChar =>
-                      (
-                        s81,
-                        (tok.left, s15) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.chars =>
-                      (
-                        s65,
-                        (tok.left, s15) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`\"` =>
-                      val nt: NonTerminal = NonTerminal.AnonList8Tail._2
-                      s15.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s15) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.AnonList8Tail =>
-                s106.pure[Attempt]
-              case _: NonTerminal.Char =>
-                s98.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s16 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            16,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.int =>
-                      (
-                        s109,
-                        (tok.left, s16) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`,` =>
-                      val nt: NonTerminal = NonTerminal.Opt_int._2
-                      s16.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s16) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`}` =>
-                      val nt: NonTerminal = NonTerminal.Opt_int._2
-                      s16.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s16) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.Opt_int =>
-                s105.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s17 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            17,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`]` =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`-` =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s18 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            18,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  stack match {
-                    case (Right(_2: NonTerminal.AnonList2Tail), _) :: (Right(_1: NonTerminal.Mode), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.AnonList2Tail._1(_1, _2)
-                      poppedState.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            None,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case _ =>
-                      Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList2Tail), _) :: (Right(_1: NonTerminal.Mode), poppedState)") :: Nil)
-                  }
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s19 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            19,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s20 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            20,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`[` =>
-                      (
-                        s44,
-                        (tok.left, s20) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChars =>
-                      (
-                        s89,
-                        (tok.left, s20) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChar =>
-                      (
-                        s124,
-                        (tok.left, s20) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s20.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s20) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.char =>
-                      (
-                        s60,
-                        (tok.left, s20) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`)` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s20.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s20) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`(` =>
-                      (
-                        s3,
-                        (tok.left, s20) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.SequenceSimple =>
-                s77.pure[Attempt]
-              case _: NonTerminal.Regex =>
-                s57.pure[Attempt]
-              case _: NonTerminal.CharClass =>
-                s68.pure[Attempt]
-              case _: NonTerminal.Group =>
-                s92.pure[Attempt]
-              case _: NonTerminal.GroupInnerHead =>
-                s2.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s21 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            21,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s22 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            22,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`[` =>
-                      (
-                        s6,
-                        (tok.left, s22) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.SubString =>
-                s56.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s23 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            23,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.SequenceSimple._1(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.SequenceSimple._1(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s24 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            24,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
         s25 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             25,
@@ -4400,20 +4374,164 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`}` =>
+                    case tok: Tok.`>>` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s25.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s25) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.escChars =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s25.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s25) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`(` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s25.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s25) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.escChar =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s25.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s25) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`@mode:` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s25.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s25) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`<-` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s25.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s25) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.char =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s25.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s25) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`,` =>
                       (
-                        s1,
+                        s91,
                         (tok.left, s25) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
+                    case tok: Tok.`[` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s25.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s25) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`->` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s25.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s25) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s25.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s25) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s25.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s25) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
+                  val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                  s25.onNt(nt) match {
+                    case Alive(to) =>
+                      (
+                        to,
+                        (nt.right, s25) :: stack,
+                        None,
+                      ).left.pure[Attempt]
+                    case dead @ Dead(_) =>
+                      dead
+                  }
               }
             },
             {
+              case _: NonTerminal.AnonList6Tail =>
+                s65.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
@@ -4426,9 +4544,9 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`@mode:` =>
+                    case tok: Tok.`[` =>
                       (
-                        s79,
+                        s9,
                         (tok.left, s26) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
@@ -4436,24 +4554,12 @@ object lexer {
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
-                  val nt: NonTerminal = NonTerminal.AnonList2Tail._2
-                  s26.onNt(nt) match {
-                    case Alive(to) =>
-                      (
-                        to,
-                        (nt.right, s26) :: stack,
-                        None,
-                      ).left.pure[Attempt]
-                    case dead @ Dead(_) =>
-                      dead
-                  }
+                  Dead(Marked("Unexpected EOF") :: Nil)
               }
             },
             {
-              case _: NonTerminal.AnonList2Tail =>
-                s18.pure[Attempt]
-              case _: NonTerminal.Mode =>
-                s26.pure[Attempt]
+              case _: NonTerminal.SubString =>
+                s62.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
@@ -4466,10 +4572,10 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.escChars =>
+                    case tok: Tok.`@mode:` =>
                       stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                        case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList4Tail._1(_1, _2)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -4481,183 +4587,28 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState)") :: Nil)
                       }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
+                  stack match {
+                    case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.AnonList4Tail._1(_1, _2)
+                      poppedState.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            None,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case _ =>
+                      Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState)") :: Nil)
+                  }
               }
             },
             {
@@ -4673,10 +4624,10 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.escChars =>
+                    case tok: Tok.`;` =>
                       stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                        case (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.SequenceSimple._1(_1, _2)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -4688,46 +4639,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
                       }
                     case tok: Tok.`|` =>
                       stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                        case (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.SequenceSimple._1(_1, _2)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -4739,126 +4656,7 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
                       }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
@@ -4880,10 +4678,557 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.`}` =>
+                      (
+                        s0,
+                        (tok.left, s29) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s30 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            30,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      (
+                        s120,
+                        (tok.left, s30) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChar =>
+                      (
+                        s115,
+                        (tok.left, s30) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.char =>
+                      (
+                        s20,
+                        (tok.left, s30) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.AnonList9Head =>
+                s90.pure[Attempt]
+              case _: NonTerminal.CCChars =>
+                s63.pure[Attempt]
+              case _: NonTerminal.CCChar =>
+                s12.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s31 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            31,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s32 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            32,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s33 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            33,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList7Head), _) :: (Left(_1: Tok.`\"`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Raw(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList7Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s34 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            34,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`;` =>
+                      (
+                        s123,
+                        (tok.left, s34) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s35 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            35,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
                     case tok: Tok.`\"` =>
                       stack match {
                         case (Right(_2: NonTerminal.AnonList8Tail), _) :: (Right(_1: NonTerminal.Char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList8Tail._1(_1, _2)
+                          val nt: NonTerminal = NonTerminal.AnonList7Head(_1, _2)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -4910,9 +5255,34 @@ object lexer {
             },
           )
         
-        s30 =
+        s36 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            30,
+            36,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  stack match {
+                    case (Right(ntRoot: NtRoot), _) :: Nil =>
+                      ntRoot.right.pure[Attempt]
+                    case _ =>
+                      Dead(Marked("This should be impossible (2)...") :: Nil)
+                  }
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s37 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            37,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -5081,9 +5451,340 @@ object lexer {
             },
           )
         
-        s31 =
+        s38 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            31,
+            38,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`]` =>
+                      (
+                        s6,
+                        (tok.left, s38) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s39 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            39,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      s39.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s39) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`>>` =>
+                      (
+                        s125,
+                        (tok.left, s39) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChars =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      s39.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s39) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`(` =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      s39.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s39) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.escChar =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      s39.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s39) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`@mode:` =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      s39.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s39) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`<-` =>
+                      (
+                        s44,
+                        (tok.left, s39) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.char =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      s39.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s39) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`->` =>
+                      (
+                        s8,
+                        (tok.left, s39) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      s39.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s39) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      s39.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s39) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  val nt: NonTerminal = NonTerminal.OptToMode._2
+                  s39.onNt(nt) match {
+                    case Alive(to) =>
+                      (
+                        to,
+                        (nt.right, s39) :: stack,
+                        None,
+                      ).left.pure[Attempt]
+                    case dead @ Dead(_) =>
+                      dead
+                  }
+              }
+            },
+            {
+              case _: NonTerminal.OptToMode =>
+                s77.pure[Attempt]
+              case _: NonTerminal.ToMode =>
+                s58.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s40 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            40,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`@mode:` =>
+                      (
+                        s21,
+                        (tok.left, s40) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.AnonList1Head =>
+                s42.pure[Attempt]
+              case _: NonTerminal.Mode =>
+                s3.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s41 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            41,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`)` =>
+                      val nt: NonTerminal = NonTerminal.GroupInnerTail._2
+                      s41.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s41) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`|` =>
+                      (
+                        s106,
+                        (tok.left, s41) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.GroupInnerTail =>
+                s47.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s42 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            42,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  stack match {
+                    case (Right(_3: NonTerminal.AnonList1Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@start:`), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.Lexer(_1, _2, _3)
+                      poppedState.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            None,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case _ =>
+                      Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.AnonList1Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@start:`), poppedState)") :: Nil)
+                  }
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s43 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            43,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`@mode:` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList3Head(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  stack match {
+                    case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.AnonList3Head(_1, _2)
+                      poppedState.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            None,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case _ =>
+                      Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState)") :: Nil)
+                  }
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s44 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            44,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -5252,287 +5953,62 @@ object lexer {
             },
           )
         
-        s32 =
+        s45 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            32,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`\"` =>
-                      (
-                        s94,
-                        (tok.left, s32) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s33 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            33,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`)` =>
-                      val nt: NonTerminal = NonTerminal.GroupInnerTail._2
-                      s33.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s33) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`|` =>
-                      (
-                        s99,
-                        (tok.left, s33) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.GroupInnerTail =>
-                s38.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s34 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            34,
+            45,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.`[` =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
-                      }
+                      (
+                        s114,
+                        (tok.left, s45) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
                     case tok: Tok.escChars =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
-                      }
+                      (
+                        s64,
+                        (tok.left, s45) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
                     case tok: Tok.`(` =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
-                      }
+                      (
+                        s71,
+                        (tok.left, s45) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
                     case tok: Tok.escChar =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`@mode:` =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
-                      }
+                      (
+                        s50,
+                        (tok.left, s45) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
                     case tok: Tok.char =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
-                      }
+                      (
+                        s57,
+                        (tok.left, s45) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
                     case tok: Tok.`;` =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s45.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s45) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
                       }
                     case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  stack match {
-                    case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                      poppedState.onNt(nt) match {
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s45.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, poppedState) :: stack,
-                            None,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case _ =>
-                      Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
-                  }
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s35 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            35,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
-                      s35.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s35) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`^` =>
-                      (
-                        s14,
-                        (tok.left, s35) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChar =>
-                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
-                      s35.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s35) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.char =>
-                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
-                      s35.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s35) :: stack,
+                            (nt.right, s45) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
@@ -5546,60 +6022,36 @@ object lexer {
               }
             },
             {
-              case _: NonTerminal.`Opt_^` =>
-                s122.pure[Attempt]
+              case _: NonTerminal.SequenceSimple =>
+                s95.pure[Attempt]
+              case _: NonTerminal.Regex =>
+                s5.pure[Attempt]
+              case _: NonTerminal.CharClass =>
+                s49.pure[Attempt]
+              case _: NonTerminal.Group =>
+                s97.pure[Attempt]
+              case _: NonTerminal.GroupInnerHead =>
+                s34.pure[Attempt]
+              case _: NonTerminal.Line =>
+                s59.pure[Attempt]
+              case _: NonTerminal.AnonList3Head =>
+                s61.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
           )
         
-        s36 =
+        s46 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            36,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChar =>
-                      (
-                        s81,
-                        (tok.left, s36) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.chars =>
-                      (
-                        s65,
-                        (tok.left, s36) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.Char =>
-                s15.pure[Attempt]
-              case _: NonTerminal.AnonList7Head =>
-                s32.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s37 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            37,
+            46,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.`)` =>
                       (
-                        s100,
-                        (tok.left, s37) :: stack,
+                        s102,
+                        (tok.left, s46) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
@@ -5615,9 +6067,9 @@ object lexer {
             },
           )
         
-        s38 =
+        s47 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            38,
+            47,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -5652,61 +6104,9 @@ object lexer {
             },
           )
         
-        s39 =
+        s48 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            39,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`@mode:` =>
-                      stack match {
-                        case (Right(_3: NonTerminal.AnonList3Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@mode:`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Mode(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.AnonList3Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@mode:`), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  stack match {
-                    case (Right(_3: NonTerminal.AnonList3Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@mode:`), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.Mode(_1, _2, _3)
-                      poppedState.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            None,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case _ =>
-                      Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.AnonList3Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@mode:`), poppedState)") :: Nil)
-                  }
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s40 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            40,
+            48,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -5741,35 +6141,9 @@ object lexer {
             },
           )
         
-        s41 =
+        s49 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            41,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.mode =>
-                      (
-                        s51,
-                        (tok.left, s41) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s42 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            42,
+            49,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -5974,181 +6348,9 @@ object lexer {
             },
           )
         
-        s43 =
+        s50 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            43,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      (
-                        s58,
-                        (tok.left, s43) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`(` =>
-                      (
-                        s20,
-                        (tok.left, s43) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChar =>
-                      (
-                        s45,
-                        (tok.left, s43) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`*` =>
-                      (
-                        s64,
-                        (tok.left, s43) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.char =>
-                      (
-                        s48,
-                        (tok.left, s43) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`[` =>
-                      (
-                        s35,
-                        (tok.left, s43) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`{` =>
-                      (
-                        s47,
-                        (tok.left, s43) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`?` =>
-                      (
-                        s72,
-                        (tok.left, s43) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`+` =>
-                      (
-                        s4,
-                        (tok.left, s43) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s43.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s43) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s43.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s43) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.SequenceSimple =>
-                s23.pure[Attempt]
-              case _: NonTerminal.Regex =>
-                s43.pure[Attempt]
-              case _: NonTerminal.CharClass =>
-                s42.pure[Attempt]
-              case _: NonTerminal.Group =>
-                s91.pure[Attempt]
-              case _: NonTerminal.Quant =>
-                s19.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s44 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            44,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
-                      s44.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s44) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`^` =>
-                      (
-                        s14,
-                        (tok.left, s44) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChar =>
-                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
-                      s44.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s44) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.char =>
-                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
-                      s44.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s44) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.`Opt_^` =>
-                s78.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s45 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            45,
+            50,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -6353,9 +6555,9 @@ object lexer {
             },
           )
         
-        s46 =
+        s51 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            46,
+            51,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -6390,26 +6592,354 @@ object lexer {
             },
           )
         
-        s47 =
+        s52 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            47,
+            52,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      (
+                        s23,
+                        (tok.left, s52) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChars =>
+                      (
+                        s96,
+                        (tok.left, s52) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChar =>
+                      (
+                        s122,
+                        (tok.left, s52) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s52.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s52) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.char =>
+                      (
+                        s66,
+                        (tok.left, s52) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`)` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s52.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s52) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`(` =>
+                      (
+                        s52,
+                        (tok.left, s52) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.SequenceSimple =>
+                s83.pure[Attempt]
+              case _: NonTerminal.Regex =>
+                s16.pure[Attempt]
+              case _: NonTerminal.CharClass =>
+                s73.pure[Attempt]
+              case _: NonTerminal.Group =>
+                s98.pure[Attempt]
+              case _: NonTerminal.GroupInnerHead =>
+                s46.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s53 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            53,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`;` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s54 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            54,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`]` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.CCChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList9Head(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.CCChars), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s55 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            55,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.int =>
                       (
-                        s109,
-                        (tok.left, s47) :: stack,
+                        s1,
+                        (tok.left, s55) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok: Tok.`,` =>
                       val nt: NonTerminal = NonTerminal.Opt_int._2
-                      s47.onNt(nt) match {
+                      s55.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, s47) :: stack,
+                            (nt.right, s55) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
@@ -6417,11 +6947,11 @@ object lexer {
                       }
                     case tok: Tok.`}` =>
                       val nt: NonTerminal = NonTerminal.Opt_int._2
-                      s47.onNt(nt) match {
+                      s55.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, s47) :: stack,
+                            (nt.right, s55) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
@@ -6442,9 +6972,37 @@ object lexer {
             },
           )
         
-        s48 =
+        s56 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            48,
+            56,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`@start:` =>
+                      (
+                        s75,
+                        (tok.left, s56) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.Lexer =>
+                s36.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s57 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            57,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -6649,542 +7207,9 @@ object lexer {
             },
           )
         
-        s49 =
+        s58 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            49,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`@` =>
-                      (
-                        s70,
-                        (tok.left, s49) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.term =>
-                      (
-                        s119,
-                        (tok.left, s49) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`\"` =>
-                      (
-                        s36,
-                        (tok.left, s49) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.YieldType =>
-                s22.pure[Attempt]
-              case _: NonTerminal.Yield =>
-                s103.pure[Attempt]
-              case _: NonTerminal.Raw =>
-                s121.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s50 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            50,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s51 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            51,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`@mode:` =>
-                      (
-                        s79,
-                        (tok.left, s51) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.AnonList1Head =>
-                s10.pure[Attempt]
-              case _: NonTerminal.Mode =>
-                s108.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s52 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            52,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`]` =>
-                      (
-                        s21,
-                        (tok.left, s52) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s53 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            53,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      (
-                        s120,
-                        (tok.left, s53) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`]` =>
-                      val nt: NonTerminal = NonTerminal.AnonList10Tail._2
-                      s53.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s53) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.escChar =>
-                      (
-                        s117,
-                        (tok.left, s53) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.char =>
-                      (
-                        s17,
-                        (tok.left, s53) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.AnonList10Tail =>
-                s61.pure[Attempt]
-              case _: NonTerminal.CCChars =>
-                s82.pure[Attempt]
-              case _: NonTerminal.CCChar =>
-                s8.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s54 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            54,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`>>` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s54.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s54) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.escChars =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s54.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s54) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`(` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s54.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s54) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.escChar =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s54.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s54) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`@mode:` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s54.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s54) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`<-` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s54.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s54) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.char =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s54.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s54) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`,` =>
-                      (
-                        s49,
-                        (tok.left, s54) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`[` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s54.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s54) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`->` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s54.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s54) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s54.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s54) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s54.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s54) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                  s54.onNt(nt) match {
-                    case Alive(to) =>
-                      (
-                        to,
-                        (nt.right, s54) :: stack,
-                        None,
-                      ).left.pure[Attempt]
-                    case dead @ Dead(_) =>
-                      dead
-                  }
-              }
-            },
-            {
-              case _: NonTerminal.AnonList6Tail =>
-                s73.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s55 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            55,
+            58,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -7353,9 +7378,211 @@ object lexer {
             },
           )
         
-        s56 =
+        s59 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            56,
+            59,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      (
+                        s114,
+                        (tok.left, s59) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChars =>
+                      (
+                        s64,
+                        (tok.left, s59) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`(` =>
+                      (
+                        s71,
+                        (tok.left, s59) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChar =>
+                      (
+                        s50,
+                        (tok.left, s59) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`@mode:` =>
+                      val nt: NonTerminal = NonTerminal.AnonList4Tail._2
+                      s59.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s59) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.char =>
+                      (
+                        s57,
+                        (tok.left, s59) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s59.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s59) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s59.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s59) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  val nt: NonTerminal = NonTerminal.AnonList4Tail._2
+                  s59.onNt(nt) match {
+                    case Alive(to) =>
+                      (
+                        to,
+                        (nt.right, s59) :: stack,
+                        None,
+                      ).left.pure[Attempt]
+                    case dead @ Dead(_) =>
+                      dead
+                  }
+              }
+            },
+            {
+              case _: NonTerminal.AnonList4Tail =>
+                s43.pure[Attempt]
+              case _: NonTerminal.SequenceSimple =>
+                s95.pure[Attempt]
+              case _: NonTerminal.Regex =>
+                s5.pure[Attempt]
+              case _: NonTerminal.CharClass =>
+                s49.pure[Attempt]
+              case _: NonTerminal.Group =>
+                s97.pure[Attempt]
+              case _: NonTerminal.Line =>
+                s89.pure[Attempt]
+              case _: NonTerminal.GroupInnerHead =>
+                s34.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s60 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            60,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`@mode:` =>
+                      (
+                        s21,
+                        (tok.left, s60) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  val nt: NonTerminal = NonTerminal.AnonList2Tail._2
+                  s60.onNt(nt) match {
+                    case Alive(to) =>
+                      (
+                        to,
+                        (nt.right, s60) :: stack,
+                        None,
+                      ).left.pure[Attempt]
+                    case dead @ Dead(_) =>
+                      dead
+                  }
+              }
+            },
+            {
+              case _: NonTerminal.AnonList2Tail =>
+                s80.pure[Attempt]
+              case _: NonTerminal.Mode =>
+                s60.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s61 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            61,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`@mode:` =>
+                      stack match {
+                        case (Right(_3: NonTerminal.AnonList3Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@mode:`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Mode(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.AnonList3Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@mode:`), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  stack match {
+                    case (Right(_3: NonTerminal.AnonList3Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@mode:`), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.Mode(_1, _2, _3)
+                      poppedState.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            None,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case _ =>
+                      Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.AnonList3Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@mode:`), poppedState)") :: Nil)
+                  }
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s62 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            62,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -7592,630 +7819,6 @@ object lexer {
             },
           )
         
-        s57 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            57,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      (
-                        s89,
-                        (tok.left, s57) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChar =>
-                      (
-                        s124,
-                        (tok.left, s57) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`*` =>
-                      (
-                        s28,
-                        (tok.left, s57) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s57.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s57) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.char =>
-                      (
-                        s60,
-                        (tok.left, s57) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`[` =>
-                      (
-                        s44,
-                        (tok.left, s57) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`{` =>
-                      (
-                        s16,
-                        (tok.left, s57) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`?` =>
-                      (
-                        s83,
-                        (tok.left, s57) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`+` =>
-                      (
-                        s107,
-                        (tok.left, s57) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`)` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s57.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s57) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`(` =>
-                      (
-                        s3,
-                        (tok.left, s57) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.SequenceSimple =>
-                s102.pure[Attempt]
-              case _: NonTerminal.Regex =>
-                s57.pure[Attempt]
-              case _: NonTerminal.CharClass =>
-                s68.pure[Attempt]
-              case _: NonTerminal.Group =>
-                s92.pure[Attempt]
-              case _: NonTerminal.Quant =>
-                s27.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s58 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            58,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s59 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            59,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`@start:` =>
-                      (
-                        s41,
-                        (tok.left, s59) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.Lexer =>
-                s0.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s60 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            60,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s61 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            61,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`]` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.CCChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList9Head(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.CCChars), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s62 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            62,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.GroupInnerTail), _) :: (Right(_1: NonTerminal.SequenceSimple), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.GroupInnerHead(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.GroupInnerTail), _) :: (Right(_1: NonTerminal.SequenceSimple), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
         s63 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             63,
@@ -8223,15 +7826,33 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.escChars =>
+                      (
+                        s120,
+                        (tok.left, s63) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`]` =>
+                      val nt: NonTerminal = NonTerminal.AnonList10Tail._2
+                      s63.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s63) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
                     case tok: Tok.escChar =>
                       (
-                        s86,
+                        s115,
                         (tok.left, s63) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok: Tok.char =>
                       (
-                        s71,
+                        s20,
                         (tok.left, s63) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
@@ -8243,8 +7864,12 @@ object lexer {
               }
             },
             {
+              case _: NonTerminal.CCChars =>
+                s124.pure[Attempt]
+              case _: NonTerminal.AnonList10Tail =>
+                s54.pure[Attempt]
               case _: NonTerminal.CCChar =>
-                s118.pure[Attempt]
+                s12.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
@@ -8259,8 +7884,8 @@ object lexer {
                   tokens.head match {
                     case tok: Tok.escChars =>
                       stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -8272,12 +7897,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok: Tok.`(` =>
                       stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -8289,12 +7914,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok: Tok.escChar =>
                       stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -8306,12 +7931,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok: Tok.`*` =>
                       stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -8323,12 +7948,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok: Tok.char =>
                       stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -8340,12 +7965,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok: Tok.`[` =>
                       stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -8357,12 +7982,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok: Tok.`{` =>
                       stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -8374,12 +7999,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok: Tok.`?` =>
                       stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -8391,12 +8016,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok: Tok.`+` =>
                       stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -8408,12 +8033,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok: Tok.`;` =>
                       stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -8425,12 +8050,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok: Tok.`|` =>
                       stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -8442,7 +8067,7 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
@@ -8460,912 +8085,6 @@ object lexer {
         s65 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             65,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.chars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Char._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.chars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.chars =>
-                      stack match {
-                        case (Left(_1: Tok.chars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Char._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.chars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`\"` =>
-                      stack match {
-                        case (Left(_1: Tok.chars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Char._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.chars), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s66 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            66,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Right(_3: NonTerminal.GroupInnerTail), _) :: (Right(_2: NonTerminal.SequenceSimple), _) :: (Left(_1: Tok.`|`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.GroupInnerTail._1(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.GroupInnerTail), _) :: (Right(_2: NonTerminal.SequenceSimple), _) :: (Left(_1: Tok.`|`), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s67 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            67,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`@mode:` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList4Tail._1(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  stack match {
-                    case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.AnonList4Tail._1(_1, _2)
-                      poppedState.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            None,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case _ =>
-                      Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState)") :: Nil)
-                  }
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s68 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            68,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s69 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            69,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s70 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            70,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_1: Tok.`@`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.YieldType._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`@`), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s71 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            71,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`]` =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s72 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            72,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s73 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            73,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -9585,17 +8304,17 @@ object lexer {
             },
           )
         
-        s74 =
+        s66 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            74,
+            66,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`]` =>
+                    case tok: Tok.escChars =>
                       stack match {
-                        case (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.CCChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList10Tail._1(_1, _2)
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -9607,7 +8326,1061 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.CCChars), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s67 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            67,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.GroupInnerTail), _) :: (Right(_1: NonTerminal.SequenceSimple), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.GroupInnerHead(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.GroupInnerTail), _) :: (Right(_1: NonTerminal.SequenceSimple), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s68 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            68,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChar =>
+                      (
+                        s93,
+                        (tok.left, s68) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.char =>
+                      (
+                        s78,
+                        (tok.left, s68) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.CCChar =>
+                s116.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s69 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            69,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`;` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`*`), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s70 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            70,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_1: Tok.chars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Char._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.chars), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.chars =>
+                      stack match {
+                        case (Left(_1: Tok.chars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Char._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.chars), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`\"` =>
+                      stack match {
+                        case (Left(_1: Tok.chars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Char._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.chars), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s71 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            71,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      (
+                        s23,
+                        (tok.left, s71) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChars =>
+                      (
+                        s96,
+                        (tok.left, s71) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChar =>
+                      (
+                        s122,
+                        (tok.left, s71) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s71.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s71) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.char =>
+                      (
+                        s66,
+                        (tok.left, s71) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`)` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s71.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s71) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`(` =>
+                      (
+                        s52,
+                        (tok.left, s71) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.SequenceSimple =>
+                s83.pure[Attempt]
+              case _: NonTerminal.Regex =>
+                s16.pure[Attempt]
+              case _: NonTerminal.CharClass =>
+                s73.pure[Attempt]
+              case _: NonTerminal.Group =>
+                s98.pure[Attempt]
+              case _: NonTerminal.GroupInnerHead =>
+                s4.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s72 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            72,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`;` =>
+                      stack match {
+                        case (Right(_3: NonTerminal.GroupInnerTail), _) :: (Right(_2: NonTerminal.SequenceSimple), _) :: (Left(_1: Tok.`|`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.GroupInnerTail._1(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_3: NonTerminal.GroupInnerTail), _) :: (Right(_2: NonTerminal.SequenceSimple), _) :: (Left(_1: Tok.`|`), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s73 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            73,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.CharClass), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s74 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            74,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState)") :: Nil)
                       }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
@@ -9629,115 +9402,703 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.mode =>
+                      (
+                        s40,
+                        (tok.left, s75) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s76 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            76,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
                     case tok: Tok.`[` =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      s75.onNt(nt) match {
+                      stack match {
+                        case (Left(_1: Tok.`@`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.YieldType._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`@`), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s77 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            77,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`@mode:` =>
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`;` =>
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  stack match {
+                    case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                      poppedState.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, s75) :: stack,
+                            (nt.right, poppedState) :: stack,
+                            None,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case _ =>
+                      Dead(Marked("This should be impossible (1)... (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState)") :: Nil)
+                  }
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s78 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            78,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`]` =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_1: Tok.char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChar._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.char), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s79 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            79,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`;` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s80 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            80,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  stack match {
+                    case (Right(_2: NonTerminal.AnonList2Tail), _) :: (Right(_1: NonTerminal.Mode), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.AnonList2Tail._1(_1, _2)
+                      poppedState.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            None,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case _ =>
+                      Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList2Tail), _) :: (Right(_1: NonTerminal.Mode), poppedState)") :: Nil)
+                  }
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s81 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            81,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`>>` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s81.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s81) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
                           dead
                       }
-                    case tok: Tok.`>>` =>
-                      (
-                        s125,
-                        (tok.left, s75) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
                     case tok: Tok.escChars =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      s75.onNt(nt) match {
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s81.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, s75) :: stack,
+                            (nt.right, s81) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
                           dead
                       }
                     case tok: Tok.`(` =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      s75.onNt(nt) match {
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s81.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, s75) :: stack,
+                            (nt.right, s81) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
                           dead
                       }
                     case tok: Tok.escChar =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      s75.onNt(nt) match {
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s81.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, s75) :: stack,
+                            (nt.right, s81) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
                           dead
                       }
                     case tok: Tok.`@mode:` =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      s75.onNt(nt) match {
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s81.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, s75) :: stack,
+                            (nt.right, s81) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
                           dead
                       }
                     case tok: Tok.`<-` =>
-                      (
-                        s31,
-                        (tok.left, s75) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.char =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      s75.onNt(nt) match {
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s81.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, s75) :: stack,
+                            (nt.right, s81) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.char =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s81.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s81) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`,` =>
+                      (
+                        s91,
+                        (tok.left, s81) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`[` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s81.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s81) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
                           dead
                       }
                     case tok: Tok.`->` =>
-                      (
-                        s5,
-                        (tok.left, s75) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      s75.onNt(nt) match {
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s81.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, s75) :: stack,
+                            (nt.right, s81) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s81.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s81) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
                           dead
                       }
                     case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      s75.onNt(nt) match {
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      s81.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, s75) :: stack,
+                            (nt.right, s81) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
@@ -9747,12 +10108,12 @@ object lexer {
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
-                  val nt: NonTerminal = NonTerminal.OptToMode._2
-                  s75.onNt(nt) match {
+                  val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                  s81.onNt(nt) match {
                     case Alive(to) =>
                       (
                         to,
-                        (nt.right, s75) :: stack,
+                        (nt.right, s81) :: stack,
                         None,
                       ).left.pure[Attempt]
                     case dead @ Dead(_) =>
@@ -9761,18 +10122,16 @@ object lexer {
               }
             },
             {
-              case _: NonTerminal.OptToMode =>
-                s34.pure[Attempt]
-              case _: NonTerminal.ToMode =>
-                s55.pure[Attempt]
+              case _: NonTerminal.AnonList6Tail =>
+                s24.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
           )
         
-        s76 =
+        s82 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            76,
+            82,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -9941,20 +10300,20 @@ object lexer {
             },
           )
         
-        s77 =
+        s83 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            77,
+            83,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.`)` =>
                       val nt: NonTerminal = NonTerminal.GroupInnerTail._2
-                      s77.onNt(nt) match {
+                      s83.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, s77) :: stack,
+                            (nt.right, s83) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
@@ -9962,8 +10321,8 @@ object lexer {
                       }
                     case tok: Tok.`|` =>
                       (
-                        s99,
-                        (tok.left, s77) :: stack,
+                        s106,
+                        (tok.left, s83) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
@@ -9975,167 +10334,15 @@ object lexer {
             },
             {
               case _: NonTerminal.GroupInnerTail =>
-                s62.pure[Attempt]
+                s67.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
           )
         
-        s78 =
+        s84 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            78,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      (
-                        s120,
-                        (tok.left, s78) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChar =>
-                      (
-                        s117,
-                        (tok.left, s78) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.char =>
-                      (
-                        s17,
-                        (tok.left, s78) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.CCChars =>
-                s53.pure[Attempt]
-              case _: NonTerminal.AnonList9Head =>
-                s13.pure[Attempt]
-              case _: NonTerminal.CCChar =>
-                s8.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s79 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            79,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.mode =>
-                      (
-                        s90,
-                        (tok.left, s79) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s80 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            80,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`[` =>
-                      (
-                        s35,
-                        (tok.left, s80) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChars =>
-                      (
-                        s58,
-                        (tok.left, s80) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`(` =>
-                      (
-                        s20,
-                        (tok.left, s80) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChar =>
-                      (
-                        s45,
-                        (tok.left, s80) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.char =>
-                      (
-                        s48,
-                        (tok.left, s80) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s80.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s80) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s80.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s80) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.CharClass =>
-                s42.pure[Attempt]
-              case _: NonTerminal.SequenceSimple =>
-                s114.pure[Attempt]
-              case _: NonTerminal.Group =>
-                s91.pure[Attempt]
-              case _: NonTerminal.Regex =>
-                s43.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s81 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            81,
+            84,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -10190,323 +10397,6 @@ object lexer {
                           }
                         case _ =>
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChar), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s82 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            82,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      (
-                        s120,
-                        (tok.left, s82) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`]` =>
-                      val nt: NonTerminal = NonTerminal.AnonList10Tail._2
-                      s82.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s82) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.escChar =>
-                      (
-                        s117,
-                        (tok.left, s82) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.char =>
-                      (
-                        s17,
-                        (tok.left, s82) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.AnonList10Tail =>
-                s74.pure[Attempt]
-              case _: NonTerminal.CCChars =>
-                s82.pure[Attempt]
-              case _: NonTerminal.CCChar =>
-                s8.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s83 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            83,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s84 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            84,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`,` =>
-                      stack match {
-                        case (Left(_1: Tok.int), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Opt_int._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.int), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`]` =>
-                      stack match {
-                        case (Left(_1: Tok.int), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Opt_int._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.int), poppedState)") :: Nil)
                       }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
@@ -10528,23 +10418,192 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.int =>
-                      (
-                        s12,
-                        (tok.left, s85) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`]` =>
-                      val nt: NonTerminal = NonTerminal.Opt_int._2
-                      s85.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s85) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_1: Tok.`?`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.`?`), poppedState)") :: Nil)
                       }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
@@ -10554,8 +10613,6 @@ object lexer {
               }
             },
             {
-              case _: NonTerminal.Opt_int =>
-                s95.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
@@ -10568,6 +10625,354 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.escChar =>
+                      (
+                        s84,
+                        (tok.left, s86) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.chars =>
+                      (
+                        s70,
+                        (tok.left, s86) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`\"` =>
+                      val nt: NonTerminal = NonTerminal.AnonList8Tail._2
+                      s86.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s86) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.AnonList8Tail =>
+                s17.pure[Attempt]
+              case _: NonTerminal.Char =>
+                s86.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s87 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            87,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`\"` =>
+                      (
+                        s33,
+                        (tok.left, s87) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s88 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            88,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`,` =>
+                      stack match {
+                        case (Left(_1: Tok.int), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Opt_int._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.int), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`]` =>
+                      stack match {
+                        case (Left(_1: Tok.int), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Opt_int._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.int), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s89 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            89,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      (
+                        s114,
+                        (tok.left, s89) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChars =>
+                      (
+                        s64,
+                        (tok.left, s89) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`(` =>
+                      (
+                        s71,
+                        (tok.left, s89) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChar =>
+                      (
+                        s50,
+                        (tok.left, s89) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`@mode:` =>
+                      val nt: NonTerminal = NonTerminal.AnonList4Tail._2
+                      s89.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s89) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.char =>
+                      (
+                        s57,
+                        (tok.left, s89) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s89.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s89) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s89.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s89) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  val nt: NonTerminal = NonTerminal.AnonList4Tail._2
+                  s89.onNt(nt) match {
+                    case Alive(to) =>
+                      (
+                        to,
+                        (nt.right, s89) :: stack,
+                        None,
+                      ).left.pure[Attempt]
+                    case dead @ Dead(_) =>
+                      dead
+                  }
+              }
+            },
+            {
+              case _: NonTerminal.AnonList4Tail =>
+                s27.pure[Attempt]
+              case _: NonTerminal.SequenceSimple =>
+                s95.pure[Attempt]
+              case _: NonTerminal.Regex =>
+                s5.pure[Attempt]
+              case _: NonTerminal.CharClass =>
+                s49.pure[Attempt]
+              case _: NonTerminal.Group =>
+                s97.pure[Attempt]
+              case _: NonTerminal.Line =>
+                s89.pure[Attempt]
+              case _: NonTerminal.GroupInnerHead =>
+                s34.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s90 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            90,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`]` =>
+                      (
+                        s110,
+                        (tok.left, s90) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s91 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            91,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`@` =>
+                      (
+                        s76,
+                        (tok.left, s91) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.term =>
+                      (
+                        s117,
+                        (tok.left, s91) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`\"` =>
+                      (
+                        s118,
+                        (tok.left, s91) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.YieldType =>
+                s26.pure[Attempt]
+              case _: NonTerminal.Yield =>
+                s81.pure[Attempt]
+              case _: NonTerminal.Raw =>
+                s121.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s92 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            92,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.int =>
+                      (
+                        s10,
+                        (tok.left, s92) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`]` =>
+                      val nt: NonTerminal = NonTerminal.Opt_int._2
+                      s92.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s92) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.Opt_int =>
+                s100.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s93 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            93,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
                     case tok: Tok.escChars =>
                       stack match {
                         case (Left(_1: Tok.escChar), poppedState) :: stack =>
@@ -10636,821 +11041,6 @@ object lexer {
                         case _ =>
                           Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChar), poppedState)") :: Nil)
                       }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s87 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            87,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.int =>
-                      (
-                        s46,
-                        (tok.left, s87) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`}` =>
-                      val nt: NonTerminal = NonTerminal.Opt_int._2
-                      s87.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s87) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.Opt_int =>
-                s93.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s88 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            88,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.GroupInnerTail._2
-                      s88.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s88) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`|` =>
-                      (
-                        s80,
-                        (tok.left, s88) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.GroupInnerTail =>
-                s40.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s89 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            89,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s90 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            90,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`[` =>
-                      (
-                        s35,
-                        (tok.left, s90) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChars =>
-                      (
-                        s58,
-                        (tok.left, s90) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`(` =>
-                      (
-                        s20,
-                        (tok.left, s90) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChar =>
-                      (
-                        s45,
-                        (tok.left, s90) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.char =>
-                      (
-                        s48,
-                        (tok.left, s90) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s90.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s90) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s90.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s90) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.AnonList3Head =>
-                s39.pure[Attempt]
-              case _: NonTerminal.SequenceSimple =>
-                s88.pure[Attempt]
-              case _: NonTerminal.Regex =>
-                s43.pure[Attempt]
-              case _: NonTerminal.CharClass =>
-                s42.pure[Attempt]
-              case _: NonTerminal.Group =>
-                s91.pure[Attempt]
-              case _: NonTerminal.Line =>
-                s110.pure[Attempt]
-              case _: NonTerminal.GroupInnerHead =>
-                s113.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s91 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            91,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s92 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            92,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s93 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            93,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`}` =>
-                      (
-                        s50,
-                        (tok.left, s93) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
@@ -11471,22 +11061,23 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList7Head), _) :: (Left(_1: Tok.`\"`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Raw(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`\"`), _) :: (Right(_2: NonTerminal.AnonList7Head), _) :: (Left(_1: Tok.`\"`), poppedState)") :: Nil)
+                    case tok: Tok.int =>
+                      (
+                        s51,
+                        (tok.left, s94) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`}` =>
+                      val nt: NonTerminal = NonTerminal.Opt_int._2
+                      s94.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s94) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
                       }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
@@ -11496,6 +11087,8 @@ object lexer {
               }
             },
             {
+              case _: NonTerminal.Opt_int =>
+                s99.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
@@ -11508,9 +11101,21 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`]` =>
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.GroupInnerTail._2
+                      s95.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s95) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`|` =>
                       (
-                        s9,
+                        s18,
                         (tok.left, s95) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
@@ -11522,6 +11127,8 @@ object lexer {
               }
             },
             {
+              case _: NonTerminal.GroupInnerTail =>
+                s48.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
@@ -11536,8 +11143,8 @@ object lexer {
                   tokens.head match {
                     case tok: Tok.escChars =>
                       stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -11549,29 +11156,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok: Tok.escChar =>
                       stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -11583,12 +11173,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok: Tok.`*` =>
                       stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -11600,114 +11190,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok: Tok.`|` =>
                       stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -11719,7 +11207,126 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.escChars), poppedState)") :: Nil)
                       }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
@@ -11741,10 +11348,10 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`@mode:` =>
+                    case tok: Tok.escChars =>
                       stack match {
-                        case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList3Head(_1, _2)
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -11756,28 +11363,183 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`;` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
                       }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
-                  stack match {
-                    case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.AnonList3Head(_1, _2)
-                      poppedState.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            None,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case _ =>
-                      Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState)") :: Nil)
-                  }
+                  Dead(Marked("Unexpected EOF") :: Nil)
               }
             },
             {
@@ -11793,29 +11555,192 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
                     case tok: Tok.escChar =>
-                      (
-                        s81,
-                        (tok.left, s98) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.chars =>
-                      (
-                        s65,
-                        (tok.left, s98) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`\"` =>
-                      val nt: NonTerminal = NonTerminal.AnonList8Tail._2
-                      s98.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s98) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_1: NonTerminal.Group), poppedState)") :: Nil)
                       }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
@@ -11825,10 +11750,6 @@ object lexer {
               }
             },
             {
-              case _: NonTerminal.AnonList8Tail =>
-                s29.pure[Attempt]
-              case _: NonTerminal.Char =>
-                s98.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
@@ -11841,57 +11762,9 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`[` =>
+                    case tok: Tok.`}` =>
                       (
-                        s44,
-                        (tok.left, s99) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChars =>
-                      (
-                        s89,
-                        (tok.left, s99) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChar =>
-                      (
-                        s124,
-                        (tok.left, s99) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s99.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s99) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.char =>
-                      (
-                        s60,
-                        (tok.left, s99) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`)` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s99.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s99) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`(` =>
-                      (
-                        s3,
+                        s53,
                         (tok.left, s99) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
@@ -11903,14 +11776,6 @@ object lexer {
               }
             },
             {
-              case _: NonTerminal.CharClass =>
-                s68.pure[Attempt]
-              case _: NonTerminal.SequenceSimple =>
-                s33.pure[Attempt]
-              case _: NonTerminal.Group =>
-                s92.pure[Attempt]
-              case _: NonTerminal.Regex =>
-                s57.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
@@ -11919,6 +11784,239 @@ object lexer {
         s100 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             100,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`]` =>
+                      (
+                        s14,
+                        (tok.left, s100) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s101 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            101,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`;` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s102 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            102,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -12109,100 +12207,6 @@ object lexer {
                           }
                         case _ =>
                           Dead(Marked("This should be impossible (1)... (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s101 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            101,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.int =>
-                      (
-                        s46,
-                        (tok.left, s101) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`}` =>
-                      val nt: NonTerminal = NonTerminal.Opt_int._2
-                      s101.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s101) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.Opt_int =>
-                s25.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s102 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            102,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.SequenceSimple._1(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.SequenceSimple._1(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
                       }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
@@ -12224,134 +12228,14 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`>>` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s103.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s103) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.escChars =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s103.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s103) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`(` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s103.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s103) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.escChar =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s103.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s103) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`@mode:` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s103.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s103) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`<-` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s103.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s103) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.char =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s103.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s103) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`,` =>
+                    case tok: Tok.int =>
                       (
-                        s49,
+                        s51,
                         (tok.left, s103) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
-                    case tok: Tok.`[` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s103.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s103) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`->` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s103.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s103) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      s103.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s103) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                    case tok: Tok.`}` =>
+                      val nt: NonTerminal = NonTerminal.Opt_int._2
                       s103.onNt(nt) match {
                         case Alive(to) =>
                           (
@@ -12366,22 +12250,12 @@ object lexer {
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
                 case None =>
-                  val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                  s103.onNt(nt) match {
-                    case Alive(to) =>
-                      (
-                        to,
-                        (nt.right, s103) :: stack,
-                        None,
-                      ).left.pure[Attempt]
-                    case dead @ Dead(_) =>
-                      dead
-                  }
+                  Dead(Marked("Unexpected EOF") :: Nil)
               }
             },
             {
-              case _: NonTerminal.AnonList6Tail =>
-                s11.pure[Attempt]
+              case _: NonTerminal.Opt_int =>
+                s29.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
@@ -12390,6 +12264,177 @@ object lexer {
         s104 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             104,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  stack match {
+                    case (Right(_2: NonTerminal.AnonList2Tail), _) :: (Right(_1: NonTerminal.Mode), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.AnonList1Head(_1, _2)
+                      poppedState.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            None,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case _ =>
+                      Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList2Tail), _) :: (Right(_1: NonTerminal.Mode), poppedState)") :: Nil)
+                  }
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s105 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            105,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.SequenceSimple._1(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.SequenceSimple._1(_1, _2)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState)") :: Nil)
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s106 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            106,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      (
+                        s23,
+                        (tok.left, s106) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChars =>
+                      (
+                        s96,
+                        (tok.left, s106) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChar =>
+                      (
+                        s122,
+                        (tok.left, s106) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s106.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s106) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.char =>
+                      (
+                        s66,
+                        (tok.left, s106) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`)` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      s106.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s106) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`(` =>
+                      (
+                        s52,
+                        (tok.left, s106) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.CharClass =>
+                s73.pure[Attempt]
+              case _: NonTerminal.SequenceSimple =>
+                s41.pure[Attempt]
+              case _: NonTerminal.Group =>
+                s98.pure[Attempt]
+              case _: NonTerminal.Regex =>
+                s16.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s107 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            107,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -12594,23 +12639,23 @@ object lexer {
             },
           )
         
-        s105 =
+        s108 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            105,
+            108,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.`,` =>
                       (
-                        s101,
-                        (tok.left, s105) :: stack,
+                        s103,
+                        (tok.left, s108) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok: Tok.`}` =>
                       (
-                        s69,
-                        (tok.left, s105) :: stack,
+                        s74,
+                        (tok.left, s108) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
@@ -12626,46 +12671,9 @@ object lexer {
             },
           )
         
-        s106 =
+        s109 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            106,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`\"` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList8Tail), _) :: (Right(_1: NonTerminal.Char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList7Head(_1, _2)
-                          poppedState.onNt(nt) match {
-                            case Alive(to) =>
-                              (
-                                to,
-                                (nt.right, poppedState) :: stack,
-                                tokens.some,
-                              ).left.pure[Attempt]
-                            case dead @ Dead(_) =>
-                              dead
-                          }
-                        case _ =>
-                          Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList8Tail), _) :: (Right(_1: NonTerminal.Char), poppedState)") :: Nil)
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s107 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            107,
+            109,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -12870,57 +12878,17 @@ object lexer {
             },
           )
         
-        s108 =
+        s110 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            108,
+            110,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`@mode:` =>
-                      (
-                        s79,
-                        (tok.left, s108) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  val nt: NonTerminal = NonTerminal.AnonList2Tail._2
-                  s108.onNt(nt) match {
-                    case Alive(to) =>
-                      (
-                        to,
-                        (nt.right, s108) :: stack,
-                        None,
-                      ).left.pure[Attempt]
-                    case dead @ Dead(_) =>
-                      dead
-                  }
-              }
-            },
-            {
-              case _: NonTerminal.AnonList2Tail =>
-                s116.pure[Attempt]
-              case _: NonTerminal.Mode =>
-                s26.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s109 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            109,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`,` =>
+                    case tok: Tok.escChars =>
                       stack match {
-                        case (Left(_1: Tok.int), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Opt_int._1(_1)
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -12932,12 +12900,12 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.int), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
                       }
-                    case tok: Tok.`}` =>
+                    case tok: Tok.escChar =>
                       stack match {
-                        case (Left(_1: Tok.int), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Opt_int._1(_1)
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
                           poppedState.onNt(nt) match {
                             case Alive(to) =>
                               (
@@ -12949,7 +12917,160 @@ object lexer {
                               dead
                           }
                         case _ =>
-                          Dead(Marked("This should be impossible (1)... (Left(_1: Tok.int), poppedState)") :: Nil)
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          poppedState.onNt(nt) match {
+                            case Alive(to) =>
+                              (
+                                to,
+                                (nt.right, poppedState) :: stack,
+                                tokens.some,
+                              ).left.pure[Attempt]
+                            case dead @ Dead(_) =>
+                              dead
+                          }
+                        case _ =>
+                          Dead(Marked("This should be impossible (1)... (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState)") :: Nil)
                       }
                     case tok =>
                       Dead(Marked("Unexpected token", tok.span) :: Nil)
@@ -12964,116 +13085,6 @@ object lexer {
             },
           )
         
-        s110 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            110,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`[` =>
-                      (
-                        s35,
-                        (tok.left, s110) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChars =>
-                      (
-                        s58,
-                        (tok.left, s110) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`(` =>
-                      (
-                        s20,
-                        (tok.left, s110) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChar =>
-                      (
-                        s45,
-                        (tok.left, s110) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`@mode:` =>
-                      val nt: NonTerminal = NonTerminal.AnonList4Tail._2
-                      s110.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s110) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.char =>
-                      (
-                        s48,
-                        (tok.left, s110) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s110.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s110) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s110.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s110) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  val nt: NonTerminal = NonTerminal.AnonList4Tail._2
-                  s110.onNt(nt) match {
-                    case Alive(to) =>
-                      (
-                        to,
-                        (nt.right, s110) :: stack,
-                        None,
-                      ).left.pure[Attempt]
-                    case dead @ Dead(_) =>
-                      dead
-                  }
-              }
-            },
-            {
-              case _: NonTerminal.SequenceSimple =>
-                s88.pure[Attempt]
-              case _: NonTerminal.Regex =>
-                s43.pure[Attempt]
-              case _: NonTerminal.CharClass =>
-                s42.pure[Attempt]
-              case _: NonTerminal.Group =>
-                s91.pure[Attempt]
-              case _: NonTerminal.Line =>
-                s123.pure[Attempt]
-              case _: NonTerminal.AnonList4Tail =>
-                s97.pure[Attempt]
-              case _: NonTerminal.GroupInnerHead =>
-                s113.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
         s111 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             111,
@@ -13083,13 +13094,13 @@ object lexer {
                   tokens.head match {
                     case tok: Tok.`,` =>
                       (
-                        s87,
+                        s94,
                         (tok.left, s111) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok: Tok.`}` =>
                       (
-                        s104,
+                        s107,
                         (tok.left, s111) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
@@ -13113,227 +13124,13 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`[` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      s112.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s112) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`>>` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      s112.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s112) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.escChars =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      s112.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s112) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`(` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      s112.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s112) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.term =>
-                      (
-                        s119,
-                        (tok.left, s112) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`@mode:` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      s112.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s112) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`<-` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      s112.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s112) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.char =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      s112.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s112) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`\"` =>
-                      (
-                        s36,
-                        (tok.left, s112) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`@` =>
-                      (
-                        s70,
-                        (tok.left, s112) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChar =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      s112.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s112) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`->` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      s112.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s112) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      s112.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s112) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      s112.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s112) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                  s112.onNt(nt) match {
-                    case Alive(to) =>
-                      (
-                        to,
-                        (nt.right, s112) :: stack,
-                        None,
-                      ).left.pure[Attempt]
-                    case dead @ Dead(_) =>
-                      dead
-                  }
-              }
-            },
-            {
-              case _: NonTerminal.YieldType =>
-                s22.pure[Attempt]
-              case _: NonTerminal.Yield =>
-                s54.pure[Attempt]
-              case _: NonTerminal.AnonList5Head =>
-                s75.pure[Attempt]
-              case _: NonTerminal.Raw =>
-                s121.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s113 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            113,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`;` =>
-                      (
-                        s112,
-                        (tok.left, s113) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s114 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            114,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
                     case tok: Tok.`;` =>
                       val nt: NonTerminal = NonTerminal.GroupInnerTail._2
-                      s114.onNt(nt) match {
+                      s112.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, s114) :: stack,
+                            (nt.right, s112) :: stack,
                             tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
@@ -13341,8 +13138,8 @@ object lexer {
                       }
                     case tok: Tok.`|` =>
                       (
-                        s80,
-                        (tok.left, s114) :: stack,
+                        s18,
+                        (tok.left, s112) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
                     case tok =>
@@ -13354,15 +13151,15 @@ object lexer {
             },
             {
               case _: NonTerminal.GroupInnerTail =>
-                s66.pure[Attempt]
+                s72.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
           )
         
-        s115 =
+        s113 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            115,
+            113,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -13599,44 +13396,73 @@ object lexer {
             },
           )
         
-        s116 =
+        s114 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            116,
+            114,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  stack match {
-                    case (Right(_2: NonTerminal.AnonList2Tail), _) :: (Right(_1: NonTerminal.Mode), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.AnonList1Head(_1, _2)
-                      poppedState.onNt(nt) match {
+                    case tok: Tok.escChars =>
+                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
+                      s114.onNt(nt) match {
                         case Alive(to) =>
                           (
                             to,
-                            (nt.right, poppedState) :: stack,
-                            None,
+                            (nt.right, s114) :: stack,
+                            tokens.some,
                           ).left.pure[Attempt]
                         case dead @ Dead(_) =>
                           dead
                       }
-                    case _ =>
-                      Dead(Marked("This should be impossible (1)... (Right(_2: NonTerminal.AnonList2Tail), _) :: (Right(_1: NonTerminal.Mode), poppedState)") :: Nil)
+                    case tok: Tok.`^` =>
+                      (
+                        s15,
+                        (tok.left, s114) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChar =>
+                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
+                      s114.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s114) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.char =>
+                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
+                      s114.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s114) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
                   }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
               }
             },
             {
+              case _: NonTerminal.`Opt_^` =>
+                s13.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
           )
         
-        s117 =
+        s115 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            117,
+            115,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -13739,9 +13565,9 @@ object lexer {
             },
           )
         
-        s118 =
+        s116 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            118,
+            116,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -13827,9 +13653,9 @@ object lexer {
             },
           )
         
-        s119 =
+        s117 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            119,
+            117,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -13859,6 +13685,90 @@ object lexer {
               }
             },
             {
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s118 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            118,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChar =>
+                      (
+                        s84,
+                        (tok.left, s118) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.chars =>
+                      (
+                        s70,
+                        (tok.left, s118) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.AnonList7Head =>
+                s87.pure[Attempt]
+              case _: NonTerminal.Char =>
+                s119.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s119 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            119,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChar =>
+                      (
+                        s84,
+                        (tok.left, s119) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.chars =>
+                      (
+                        s70,
+                        (tok.left, s119) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`\"` =>
+                      val nt: NonTerminal = NonTerminal.AnonList8Tail._2
+                      s119.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s119) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.AnonList8Tail =>
+                s35.pure[Attempt]
+              case _: NonTerminal.Char =>
+                s86.pure[Attempt]
               case _ =>
                 Dead(Marked("This should be impossible (3)...") :: Nil)
             },
@@ -13992,160 +13902,6 @@ object lexer {
         s122 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             122,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      (
-                        s120,
-                        (tok.left, s122) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChar =>
-                      (
-                        s117,
-                        (tok.left, s122) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.char =>
-                      (
-                        s17,
-                        (tok.left, s122) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  Dead(Marked("Unexpected EOF") :: Nil)
-              }
-            },
-            {
-              case _: NonTerminal.CCChars =>
-                s53.pure[Attempt]
-              case _: NonTerminal.AnonList9Head =>
-                s52.pure[Attempt]
-              case _: NonTerminal.CCChar =>
-                s8.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s123 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            123,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`[` =>
-                      (
-                        s35,
-                        (tok.left, s123) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChars =>
-                      (
-                        s58,
-                        (tok.left, s123) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`(` =>
-                      (
-                        s20,
-                        (tok.left, s123) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.escChar =>
-                      (
-                        s45,
-                        (tok.left, s123) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`@mode:` =>
-                      val nt: NonTerminal = NonTerminal.AnonList4Tail._2
-                      s123.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s123) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.char =>
-                      (
-                        s48,
-                        (tok.left, s123) :: stack,
-                        tokens.tail.toNel,
-                      ).left.pure[Attempt]
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s123.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s123) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      s123.onNt(nt) match {
-                        case Alive(to) =>
-                          (
-                            to,
-                            (nt.right, s123) :: stack,
-                            tokens.some,
-                          ).left.pure[Attempt]
-                        case dead @ Dead(_) =>
-                          dead
-                      }
-                    case tok =>
-                      Dead(Marked("Unexpected token", tok.span) :: Nil)
-                  }
-                case None =>
-                  val nt: NonTerminal = NonTerminal.AnonList4Tail._2
-                  s123.onNt(nt) match {
-                    case Alive(to) =>
-                      (
-                        to,
-                        (nt.right, s123) :: stack,
-                        None,
-                      ).left.pure[Attempt]
-                    case dead @ Dead(_) =>
-                      dead
-                  }
-              }
-            },
-            {
-              case _: NonTerminal.SequenceSimple =>
-                s88.pure[Attempt]
-              case _: NonTerminal.Regex =>
-                s43.pure[Attempt]
-              case _: NonTerminal.CharClass =>
-                s42.pure[Attempt]
-              case _: NonTerminal.Group =>
-                s91.pure[Attempt]
-              case _: NonTerminal.Line =>
-                s123.pure[Attempt]
-              case _: NonTerminal.AnonList4Tail =>
-                s67.pure[Attempt]
-              case _: NonTerminal.GroupInnerHead =>
-                s113.pure[Attempt]
-              case _ =>
-                Dead(Marked("This should be impossible (3)...") :: Nil)
-            },
-          )
-        
-        s124 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            124,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -14350,6 +14106,250 @@ object lexer {
             },
           )
         
+        s123 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            123,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      s123.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s123) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`>>` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      s123.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s123) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.escChars =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      s123.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s123) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`(` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      s123.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s123) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.term =>
+                      (
+                        s117,
+                        (tok.left, s123) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`@mode:` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      s123.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s123) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`<-` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      s123.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s123) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.char =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      s123.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s123) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`\"` =>
+                      (
+                        s118,
+                        (tok.left, s123) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`@` =>
+                      (
+                        s76,
+                        (tok.left, s123) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.escChar =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      s123.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s123) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`->` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      s123.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s123) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      s123.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s123) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      s123.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s123) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                  s123.onNt(nt) match {
+                    case Alive(to) =>
+                      (
+                        to,
+                        (nt.right, s123) :: stack,
+                        None,
+                      ).left.pure[Attempt]
+                    case dead @ Dead(_) =>
+                      dead
+                  }
+              }
+            },
+            {
+              case _: NonTerminal.YieldType =>
+                s26.pure[Attempt]
+              case _: NonTerminal.Yield =>
+                s25.pure[Attempt]
+              case _: NonTerminal.Raw =>
+                s121.pure[Attempt]
+              case _: NonTerminal.AnonList5Head =>
+                s39.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
+        s124 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            124,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      (
+                        s120,
+                        (tok.left, s124) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.`]` =>
+                      val nt: NonTerminal = NonTerminal.AnonList10Tail._2
+                      s124.onNt(nt) match {
+                        case Alive(to) =>
+                          (
+                            to,
+                            (nt.right, s124) :: stack,
+                            tokens.some,
+                          ).left.pure[Attempt]
+                        case dead @ Dead(_) =>
+                          dead
+                      }
+                    case tok: Tok.escChar =>
+                      (
+                        s115,
+                        (tok.left, s124) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok: Tok.char =>
+                      (
+                        s20,
+                        (tok.left, s124) :: stack,
+                        tokens.tail.toNel,
+                      ).left.pure[Attempt]
+                    case tok =>
+                      Dead(Marked("Unexpected token", tok.span) :: Nil)
+                  }
+                case None =>
+                  Dead(Marked("Unexpected EOF") :: Nil)
+              }
+            },
+            {
+              case _: NonTerminal.CCChars =>
+                s124.pure[Attempt]
+              case _: NonTerminal.AnonList10Tail =>
+                s2.pure[Attempt]
+              case _: NonTerminal.CCChar =>
+                s12.pure[Attempt]
+              case _ =>
+                Dead(Marked("This should be impossible (3)...") :: Nil)
+            },
+          )
+        
         s125 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             125,
@@ -14359,7 +14359,7 @@ object lexer {
                   tokens.head match {
                     case tok: Tok.mode =>
                       (
-                        s30,
+                        s37,
                         (tok.left, s125) :: stack,
                         tokens.tail.toNel,
                       ).left.pure[Attempt]
@@ -14376,7 +14376,7 @@ object lexer {
             },
           )
         
-        s59
+        s56
       },
     )
   

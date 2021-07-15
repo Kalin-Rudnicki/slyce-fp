@@ -832,7 +832,10 @@ object Build {
                                 "}",
                               )
                             } else {
-                              """Dead(Marked("Unexpected EOF") :: Nil)"""
+                              inline(
+                                "// TODO : Get access to Source",
+                                """Dead(Marked("Unexpected EOF") :: Nil)""",
+                              )
                             }
                         },
                       ),

@@ -15,7 +15,7 @@ import slyce.core._
 import slyce.core.Marked.Implicits._
 import slyce.generate._
 import slyce.generate.input._
-import slyce.generate.parsers.{lexer => Lex, grammar => Gram}
+import slyce.generate.parsers.{lexer2 => Lex, grammar2 => Gram}
 import slyce.parse.Attempt
 
 object Main {
@@ -83,7 +83,7 @@ object Main {
                 escChars.text match {
                   case "d" => InfiniteSet.Inclusive('0'.to('9').toSet)
                   case "." => InfiniteSet.Exclusive()
-                  case _   => ???
+                  case _   => println(Source.showAll(escChars.markedText :: Nil)); ???
                 }
 
               cc match {
@@ -139,7 +139,7 @@ object Main {
                 case Lex.NonTerminal.YieldType._1(at) =>
                   Yields.Yield.Text(bounds).marked(at.span)
                 case Lex.NonTerminal.YieldType._2(term) =>
-                  Yields.Yield.Terminal(term.text).marked(term.span)
+                  Yields.Yield.Terminal(term.text, bounds).marked(term.span)
                 case Lex.NonTerminal.YieldType._3(raw) =>
                   Yields.Yield
                     .Const(

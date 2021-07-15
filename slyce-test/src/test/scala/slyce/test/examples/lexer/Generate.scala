@@ -418,7 +418,7 @@ object Generate {
                     ).marked,
                     yields = Yields(
                       yields = List(
-                        T.escChar.map(t => Yields.Yield.Terminal(t.name)),
+                        T.escChar.map(t => Yields.Yield.Terminal(t.name, (1.some, 1.some))),
                       ),
                     ),
                   ),
