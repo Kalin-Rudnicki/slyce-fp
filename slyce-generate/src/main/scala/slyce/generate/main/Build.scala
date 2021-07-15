@@ -621,7 +621,7 @@ object Build {
                   else
                     state.elseTransition match {
                       case Some(to) =>
-                        s"_ => s${to.value.id},"
+                        s"_ => s${to.value.id}.some,"
                       case None =>
                         "_ => None,"
                     },
