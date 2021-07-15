@@ -15,9 +15,9 @@ import slyce.generate.building._
 
 object Build {
 
-  def buildOutput(buildInput: BuildInput): Attempt[BuildOutput] = {
+  def buildOutput(buildInput: BuildInput): PartialBuildOutput \/ BuildOutput = {
     type LexerItems = (Nfa, Dfa)
-    type GrammarItems = (ExpandedGrammar)
+    type GrammarItems = (ExpandedGrammar, ExpandedGrammar)
 
     val lexerItems: Attempt[LexerItems] =
       for {
@@ -28,109 +28,156 @@ object Build {
     val grammarItems: Attempt[GrammarItems] =
       for {
         expandedGrammar <- ExpandedGrammar.fromGrammar(buildInput.grammar)
-      } yield expandedGrammar
+        deDuplicatedExpandedGrammar = ExpandedGrammar.deDuplicate(expandedGrammar)
+      } yield (expandedGrammar, deDuplicatedExpandedGrammar)
 
-    for {
-      joinedItems <- ado[Attempt].join(
-        lexerItems,
-        grammarItems,
-      )
-      ((nfa, dfa), expandedGrammar) = joinedItems
-      deDuplicatedExpandedGrammar = ExpandedGrammar.deDuplicate(expandedGrammar)
+    (lexerItems, grammarItems) match {
+      case (Alive((nfa, dfa)), Alive((expandedGrammar, deDuplicatedExpandedGrammar))) =>
+        val lexerDefines = dfa.states.toList.flatMap { state =>
+          state.end.toList.flatMap(_.yieldsTerminals)
+        }.toSet
 
-      lexerDefines = dfa.states.toList.flatMap { state =>
-        state.end.toList.flatMap(_.yieldsTerminals)
-      }.toSet
-
-      grammarDefines = deDuplicatedExpandedGrammar.nts.map(_.name).toSet
-      ntReferences = deDuplicatedExpandedGrammar.nts.flatMap { nt =>
-        nt.reductions.toList.zipWithIndex.flatMap {
-          case (r, i1) =>
-            r.elements.zipWithIndex.map {
-              case (e, i2) =>
-                (nt.name, i1, i2, e)
-            }
+        val grammarDefines = deDuplicatedExpandedGrammar.nts.map(_.name).toSet
+        val ntReferences = deDuplicatedExpandedGrammar.nts.flatMap { nt =>
+          nt.reductions.toList.zipWithIndex.flatMap {
+            case (r, i1) =>
+              r.elements.zipWithIndex.map {
+                case (e, i2) =>
+                  (nt.name, i1, i2, e)
+              }
+          }
         }
-      }
-      grammarNTReferences = ntReferences.flatMap {
-        case (inNt, ri, rei, nt: ExpandedGrammar.Identifier.NonTerminal) =>
-          (inNt, ri, rei, nt).some
-        case _ =>
-          None
-      }
-      grammarTReferences = ntReferences.flatMap {
-        case (inNt, ri, rei, t: ExpandedGrammar.Identifier.Terminal) =>
-          (inNt, ri, rei, t).some
-        case _ =>
-          None
-      }
-      grammarRawReferences = ntReferences.flatMap {
-        case (inNt, ri, rei, r: ExpandedGrammar.Identifier.Raw) =>
-          (inNt, ri, rei, r).some
-        case _ =>
-          None
-      }
+        val grammarNTReferences = ntReferences.flatMap {
+          case (inNt, ri, rei, nt: ExpandedGrammar.Identifier.NonTerminal) =>
+            (inNt, ri, rei, nt).some
+          case _ =>
+            None
+        }
+        val grammarTReferences = ntReferences.flatMap {
+          case (inNt, ri, rei, t: ExpandedGrammar.Identifier.Terminal) =>
+            (inNt, ri, rei, t).some
+          case _ =>
+            None
+        }
+        val grammarRawReferences = ntReferences.flatMap {
+          case (inNt, ri, rei, r: ExpandedGrammar.Identifier.Raw) =>
+            (inNt, ri, rei, r).some
+          case _ =>
+            None
+        }
 
-      // TODO (KR) : Checks
-      //           : [ERROR] Lexer line is completely overshadowed by other lines
-      //           : [WARN ] Lexer defines unreferenced terminal
-      //           : [?????] Defining Raw/Terminal/NonTerminal with name known to cause problems
-      //           :         Create a list, possibly 2 levels, 1 that can be `...`'ed and fixed, and one that cant
+        // TODO (KR) : Checks
+        //           : [ERROR] Lexer line is completely overshadowed by other lines
+        //           : [WARN ] Lexer defines unreferenced terminal
+        //           : [?????] Defining Raw/Terminal/NonTerminal with name known to cause problems
+        //           :         Create a list, possibly 2 levels, 1 that can be `...`'ed and fixed, and one that cant
 
-      // TODO (KR) : Possibly get marked data as well?
-      grammarReferencesDneTerminal: Attempt[Unit] = {
-        def checkReference(
-            inNt: ExpandedGrammar.Identifier.NonTerminal,
-            reductionIdx: Int,
-            elementInReduction: Int,
-            t: ExpandedGrammar.Identifier.Terminal,
-        ): Attempt[Unit] =
-          if (lexerDefines.contains(t.name))
-            ().pure[Attempt]
-          else
-            Dead(Marked(Msg(s"Grammar references non-existent terminal: $inNt[$reductionIdx][$elementInReduction] = $t")) :: Nil)
+        // TODO (KR) : Possibly get marked data as well?
+        val grammarReferencesDneTerminal: Attempt[Unit] = {
+          def checkReference(
+              inNt: ExpandedGrammar.Identifier.NonTerminal,
+              reductionIdx: Int,
+              elementInReduction: Int,
+              t: ExpandedGrammar.Identifier.Terminal,
+          ): Attempt[Unit] =
+            if (lexerDefines.contains(t.name))
+              ().pure[Attempt]
+            else
+              Dead(Marked(Msg(s"Grammar references non-existent terminal: $inNt[$reductionIdx][$elementInReduction] = $t")) :: Nil)
 
-        grammarTReferences
-          .map((checkReference _).tupled)
-          .traverse
-          .map(_ => ())
-      }
+          grammarTReferences
+            .map((checkReference _).tupled)
+            .traverse
+            .map(_ => ())
+        }
 
-      // TODO (KR) : Possibly get marked data as well?
-      grammarReferencesDneNonTerminal: Attempt[Unit] = {
-        def checkReference(
-            inNt: ExpandedGrammar.Identifier.NonTerminal,
-            reductionIdx: Int,
-            elementInReduction: Int,
-            nt: ExpandedGrammar.Identifier.NonTerminal,
-        ): Attempt[Unit] =
-          if (grammarDefines.contains(nt))
-            ().pure[Attempt]
-          else
-            Dead(Marked(Msg(s"Grammar references non-existent non-terminal: $inNt[$reductionIdx][$elementInReduction] = $nt")) :: Nil)
+        // TODO (KR) : Possibly get marked data as well?
+        val grammarReferencesDneNonTerminal: Attempt[Unit] = {
+          def checkReference(
+              inNt: ExpandedGrammar.Identifier.NonTerminal,
+              reductionIdx: Int,
+              elementInReduction: Int,
+              nt: ExpandedGrammar.Identifier.NonTerminal,
+          ): Attempt[Unit] =
+            if (grammarDefines.contains(nt))
+              ().pure[Attempt]
+            else
+              Dead(Marked(Msg(s"Grammar references non-existent non-terminal: $inNt[$reductionIdx][$elementInReduction] = $nt")) :: Nil)
 
-        grammarNTReferences
-          .map((checkReference _).tupled)
-          .traverse
-          .map(_ => ())
-      }
+          grammarNTReferences
+            .map((checkReference _).tupled)
+            .traverse
+            .map(_ => ())
+        }
 
-      _ <- ado[Attempt].join(
-        grammarReferencesDneTerminal,
-        grammarReferencesDneNonTerminal,
-      )
+        {
+          for {
+            _ <- ado[Attempt].join(
+              grammarReferencesDneTerminal,
+              grammarReferencesDneNonTerminal,
+            )
 
-      parsingTable <- ParsingTable.fromExpandedGrammar(deDuplicatedExpandedGrammar)
-    } yield BuildOutput(
-      name = buildInput.name,
-      nfa = nfa,
-      dfa = dfa,
-      tokens = grammarTReferences.map(_._4).toSet,
-      raws = grammarRawReferences.map(_._4).toSet,
-      expandedGrammar = expandedGrammar,
-      deDuplicatedExpandedGrammar = deDuplicatedExpandedGrammar,
-      parsingTable = parsingTable,
-    )
+            parsingTable <- ParsingTable.fromExpandedGrammar(deDuplicatedExpandedGrammar)
+          } yield BuildOutput(
+            name = buildInput.name,
+            nfa = nfa,
+            dfa = dfa,
+            tokens = grammarTReferences.map(_._4).toSet,
+            raws = grammarRawReferences.map(_._4).toSet,
+            expandedGrammar = expandedGrammar,
+            deDuplicatedExpandedGrammar = deDuplicatedExpandedGrammar,
+            parsingTable = parsingTable,
+          )
+        } match {
+          case Alive(buildOutput) =>
+            buildOutput.right
+          case dead @ Dead(_) =>
+            PartialBuildOutput(
+              name = buildInput.name,
+              nfa = nfa.pure[Attempt],
+              dfa = dfa.pure[Attempt],
+              tokens = Dead(Nil),
+              raws = Dead(Nil),
+              expandedGrammar = expandedGrammar.pure[Attempt],
+              deDuplicatedExpandedGrammar = deDuplicatedExpandedGrammar.pure[Attempt],
+              parsingTable = dead,
+            ).left
+
+        }
+      case (Alive((nfa, dfa)), grammarErrors @ Dead(_)) =>
+        PartialBuildOutput(
+          name = buildInput.name,
+          nfa = nfa.pure[Attempt],
+          dfa = dfa.pure[Attempt],
+          tokens = Dead(Nil),
+          raws = Dead(Nil),
+          expandedGrammar = grammarErrors,
+          deDuplicatedExpandedGrammar = Dead(Nil),
+          parsingTable = Dead(Nil),
+        ).left
+      case (lexerErrors @ Dead(_), Alive((expandedGrammar, deDuplicatedExpandedGrammar))) =>
+        PartialBuildOutput(
+          name = buildInput.name,
+          nfa = lexerErrors,
+          dfa = Dead(Nil), // TODO (KR) : Not idea...
+          tokens = Dead(Nil),
+          raws = Dead(Nil),
+          expandedGrammar = expandedGrammar.pure[Attempt],
+          deDuplicatedExpandedGrammar = deDuplicatedExpandedGrammar.pure[Attempt],
+          parsingTable = Dead(Nil),
+        ).left
+      case (lexerErrors @ Dead(_), grammarErrors @ Dead(_)) =>
+        PartialBuildOutput(
+          name = buildInput.name,
+          nfa = lexerErrors,
+          dfa = Dead(Nil), // TODO (KR) : Not idea...
+          tokens = Dead(Nil),
+          raws = Dead(Nil),
+          expandedGrammar = grammarErrors,
+          deDuplicatedExpandedGrammar = Dead(Nil),
+          parsingTable = Dead(Nil),
+        ).left
+    }
   }
 
   // =====|  |=====

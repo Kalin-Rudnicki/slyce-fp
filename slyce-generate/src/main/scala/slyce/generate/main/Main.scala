@@ -204,7 +204,7 @@ object Main {
                 case nt: grammar.Tok.nonTerminal =>
                   Grammar.Identifier.unsafeNonTerminal(nt.markedText)
                 case t: grammar.Tok.terminal =>
-                  Grammar.Identifier.unsafeNonTerminal(t.markedText)
+                  Grammar.Identifier.unsafeTerminal(t.markedText)
                 case list: grammar.NonTerminal.AnonList =>
                   list match {
                     case grammar.NonTerminal.AnonList._1(unIgnored, listType) =>
@@ -358,11 +358,6 @@ object Main {
           buildInput = BuildInput(name = baseName, lexer = cLexer, grammar = cGrammar)
         } yield buildInput
 
-        buildOutputA = for {
-          buildInput <- buildInputA
-          buildOutput <- Build.buildOutput(buildInput).mapErrors(_.map(_.toString))
-        } yield buildOutput
-
         _ <- buildInputA match {
           case Alive(buildInput) =>
             val buildOutputA = Build.buildOutput(buildInput)
@@ -374,19 +369,24 @@ object Main {
                   ().pure[IO]
               },
               buildOutputA match {
-                case Alive(buildOutput) =>
+                case Right(buildOutput) =>
                   val outputFile = new File(new File(outputDir, pkg.mkString("/")), s"$baseName.scala")
                   val outputText = Build.outputToString(pkg, buildOutput).toString("  ")
                   for {
                     _ <- Maybe(outputFile.getParentFile).map(_.mkdirs.pure[IO]).traverse
                     _ <- IO.writeFile(outputFile, outputText)
                   } yield ()
-                case Dead(errors) =>
-                  // TODO (KR) : Display errors properly (Group by source)
-                  for {
-                    _ <- logger(L(errors.map(L.log.fatal(_)), L.break()))
-                    _ <- IO.error(Message(s"Failed to generate: $scopedName")): IO[Unit]
-                  } yield ()
+                case Left(partialBuildOutput) =>
+                  partialBuildOutput.toBuildOutput match {
+                    case Alive(_) =>
+                      IO.error(Message("This should not be possible..."))
+                    case Dead(errors) =>
+                      // TODO (KR) : Display errors properly (Group by source)
+                      for {
+                        _ <- logger(L(errors.map(L.log.fatal(_)), L.break()))
+                        _ <- IO.error(Message(s"Failed to generate: $scopedName")): IO[Unit]
+                      } yield ()
+                  }
               },
             )
           case Dead(errors) =>
@@ -396,35 +396,6 @@ object Main {
               _ <- IO.error(Message(s"Failed to generate: $scopedName")): IO[Unit]
             } yield ()
         }
-
-        _ <- ado[IO].join(
-          buildInputA match {
-            case Alive(buildInput) =>
-              debugOutputDir match {
-                case Some(debugOutputDir) =>
-                  OutputDebug.outputDebug(buildInput, ???, debugOutputDir.some)
-                case None =>
-                  ???
-              }
-            case Dead(_) =>
-              ().pure[IO]
-          },
-          buildOutputA match {
-            case Alive(buildOutput) =>
-              val outputFile = new File(new File(outputDir, pkg.mkString("/")), s"$baseName.scala")
-              val outputText = Build.outputToString(pkg, buildOutput).toString("  ")
-              for {
-                _ <- Maybe(outputFile.getParentFile).map(_.mkdirs.pure[IO]).traverse
-                _ <- IO.writeFile(outputFile, outputText)
-              } yield ()
-            case Dead(errors) =>
-              // TODO (KR) : Display errors properly (Group by source)
-              for {
-                _ <- logger(L(errors.map(L.log.fatal(_)), L.break()))
-                _ <- IO.error(Message(s"Failed to generate: $scopedName")): IO[Unit]
-              } yield ()
-          },
-        )
       } yield ()
     }
 
