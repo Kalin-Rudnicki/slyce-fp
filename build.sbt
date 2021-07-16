@@ -4,7 +4,7 @@ val MyOrg = "kalin-rudnicki"
 val SharedSettings =
   Seq(
     organization := MyOrg,
-    version := "0.1.0",
+    version := "1.0.0",
     scalaVersion := "2.13.4",
     resolvers += Resolver.mavenLocal,
   )
