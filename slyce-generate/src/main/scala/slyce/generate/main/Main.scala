@@ -15,7 +15,7 @@ import slyce.core._
 import slyce.core.Marked.Implicits._
 import slyce.generate._
 import slyce.generate.input._
-import slyce.generate.parsers.{lexer2 => Lex, grammar2 => Gram}
+import slyce.generate.parsers.{lexer => Lex, grammar => Gram} // change these and use -n when trying to make modifications
 import slyce.parse.Attempt
 
 object Main {
@@ -34,6 +34,7 @@ object Main {
         logger: Logger,
         outputDir: File,
         debugOutputDir: Maybe[File],
+        tokenize: Boolean,
     ): IO[Unit] = {
       def convertLexer(lexerSource: Source): Attempt[Lexer] = {
         def convertMode(mode: Lex.NonTerminal.Mode): Lexer.Mode = {
@@ -79,17 +80,20 @@ object Main {
             def convertSequence(seq: Lex.NonTerminal.Sequence): Regex.Sequence =
               Regex.Sequence(seq.toList.map(convertRegex))
             def convertCharClass(cc: Lex.NonTerminal.CharClass): Regex = {
+              // TODO (KR) : This is where the issue is...
+              //           : [^\\"]+
+              //           : is creating:
+              //           : [^]
+
               def convertEscChars(escChars: Lex.Tok.escChars): InfiniteSet[Char] =
                 escChars.text match {
                   case "d" => InfiniteSet.Inclusive('0'.to('9').toSet)
                   case "." => InfiniteSet.Exclusive()
-                  case _   => println(Source.showAll(escChars.markedText :: Nil)); ???
+                  case _   => logger.unsafeLog(L.log.debug(Source.showAll(escChars.markedText :: Nil))); ???
                 }
 
               cc match {
                 case Lex.NonTerminal.CharClass._1(_, inverse, ccChars, _) =>
-                  val isInverse = inverse.toMaybe.nonEmpty
-
                   def convertCCChars(ccChars: Lex.NonTerminal.CCChars): Regex.CharClass = {
                     def convertCCChar(ccChar: Lex.NonTerminal.CCChar): Char =
                       ccChar match {
@@ -102,20 +106,16 @@ object Main {
                         val c1 = convertCCChar(rLeft)
                         val c2 = convertCCChar(rRight)
                         val (rangeLeft, rangeRight) = (c1 <= c2) ? (c1, c2) | (c2, c1)
-                        isInverse ?
-                          Regex.CharClass.exclusiveRange(rangeLeft, rangeRight) |
-                          Regex.CharClass.inclusiveRange(rangeLeft, rangeRight)
+                        Regex.CharClass.inclusiveRange(rangeLeft, rangeRight)
                       case Lex.NonTerminal.CCChars._2(ccChar) =>
-                        isInverse ?
-                          Regex.CharClass.exclusive(convertCCChar(ccChar)) |
-                          Regex.CharClass.inclusive(convertCCChar(ccChar))
+                        Regex.CharClass.inclusive(convertCCChar(ccChar))
                       case Lex.NonTerminal.CCChars._3(escChars) =>
-                        val cc = Regex.CharClass(convertEscChars(escChars))
-                        isInverse ? cc.~ | cc
+                        Regex.CharClass(convertEscChars(escChars))
                     }
                   }
 
-                  Regex.CharClass.union(ccChars.toNonEmptyList.map(convertCCChars).toList: _*)
+                  val merged = Regex.CharClass.union(ccChars.toNonEmptyList.map(convertCCChars).toList: _*)
+                  inverse.toMaybe.nonEmpty ? merged.~ | merged
                 case Lex.NonTerminal.CharClass._2(char) =>
                   Regex.CharClass.inclusive(convertChar(char))
                 case Lex.NonTerminal.CharClass._3(escChar) =>
@@ -344,6 +344,17 @@ object Main {
         )
         (lexerSource, grammarSource) = tmp1
 
+        _ <-
+          if (tokenize)
+            logger(
+              L(
+                L.log.detailed(Lex.parser.markTokens(lexerSource)),
+                L.log.detailed(Gram.parser.markTokens(grammarSource)),
+              ),
+            )
+          else
+            ().pure[IO]
+
         buildInputA = for {
           tmp2 <- ado[Attempt].join(
             convertLexer(lexerSource),
@@ -500,6 +511,13 @@ object Main {
             },
           )
 
+          val tokenize: ScallopOption[Boolean] =
+            toggle(
+              default = false.someOpt,
+              prefix = "dont-",
+              descrYes = "Display tokens for all parsed files",
+            )
+
           verify()
         }
         object Conf extends Executable.ConfBuilder(new Conf(_))
@@ -558,7 +576,14 @@ object Main {
                 ),
               )
 
-              _ <- pairs.map(_.generate(logger, conf.outputDir(), conf.debugOutputDir.toOption.toMaybe)).traverse
+              _ <- pairs.map {
+                _.generate(
+                  logger,
+                  conf.outputDir(),
+                  conf.debugOutputDir.toOption.toMaybe,
+                  conf.tokenize(),
+                )
+              }.traverse
             } yield ()
           }
       }

@@ -576,7 +576,7 @@ object lexer {
   lazy val parser: Parser[Tok, NonTerminal, NtRoot] =
     Parser[Tok, NonTerminal, NtRoot](
       Lexer[Tok] {
-        var s17: Lexer.State[Tok] = null
+        var s64: Lexer.State[Tok] = null
         var s0: Lexer.State[Tok] = null
         var s1: Lexer.State[Tok] = null
         var s2: Lexer.State[Tok] = null
@@ -594,6 +594,7 @@ object lexer {
         var s14: Lexer.State[Tok] = null
         var s15: Lexer.State[Tok] = null
         var s16: Lexer.State[Tok] = null
+        var s17: Lexer.State[Tok] = null
         var s18: Lexer.State[Tok] = null
         var s19: Lexer.State[Tok] = null
         var s20: Lexer.State[Tok] = null
@@ -640,45 +641,44 @@ object lexer {
         var s61: Lexer.State[Tok] = null
         var s62: Lexer.State[Tok] = null
         var s63: Lexer.State[Tok] = null
-        var s64: Lexer.State[Tok] = null
         var s65: Lexer.State[Tok] = null
         var s66: Lexer.State[Tok] = null
         var s67: Lexer.State[Tok] = null
         var s68: Lexer.State[Tok] = null
         var s69: Lexer.State[Tok] = null
         
-        s17 =
+        s64 =
           Lexer.State[Tok](
-            17,
+            64,
             char => {
               val int = char.toInt
               
               if (int == 64) // '@'
-                s33.some
-              else if (int == 10) // '\n'
-                s63.some
-              else if (int == 46) // '.'
                 s53.some
+              else if (int == 10) // '\n'
+                s46.some
+              else if (int == 46) // '.'
+                s12.some
               else if (int == 32) // ' '
-                s10.some
+                s69.some
               else if (int == 123) // '{'
-                s14.some
-              else if (int == 91) // '['
-                s27.some
-              else if (int == 47) // '/'
-                s20.some
-              else if (int >= 40 && int <= 43) // '('-'+'
-                s19.some
-              else if (int == 63) // '?'
-                s19.some
-              else if (int == 124) // '|'
-                s19.some
-              else if (int == 59) // ';'
                 s35.some
+              else if (int == 91) // '['
+                s48.some
+              else if (int == 47) // '/'
+                s30.some
+              else if (int >= 40 && int <= 43) // '('-'+'
+                s5.some
+              else if (int == 63) // '?'
+                s5.some
+              else if (int == 124) // '|'
+                s5.some
+              else if (int == 59) // ';'
+                s8.some
               else if (int == 92) // '\\'
-                s57.some
+                s19.some
               else
-                s64.some
+                s37.some
             },
             None,
           )
@@ -686,16 +686,15 @@ object lexer {
         s0 =
           Lexer.State[Tok](
             0,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
+            char => {
+              val int = char.toInt
+              
+              if (int == 116) // 't'
+                s40.some
+              else
+                None
+            },
+            None,
           )
         
         s1 =
@@ -705,15 +704,11 @@ object lexer {
               val int = char.toInt
               
               if (int == 32) // ' '
-                s1.some
+                s45.some
               else
                 None
             },
-            Lexer.Yields[Tok](
-              List(
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
+            None,
           )
         
         s2 =
@@ -722,8 +717,8 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 111) // 'o'
-                s59.some
+              if (int == 62) // '>'
+                s47.some
               else
                 None
             },
@@ -737,17 +732,39 @@ object lexer {
               val int = char.toInt
               
               if (int == 9) // '\t'
-                s3.some
+                s52.some
               else if (int == 32) // ' '
-                s3.some
+                s52.some
+              else if (int == 62) // '>'
+                s2.some
+              else if (int == 10) // '\n'
+                s56.some
+              else if (int == 44) // ','
+                s47.some
+              else if (int == 64) // '@'
+                s47.some
+              else if (int == 91) // '['
+                s47.some
+              else if (int == 93) // ']'
+                s47.some
+              else if (int == 34) // '\"'
+                s34.some
+              else if (int >= 97 && int <= 122) // 'a'-'z'
+                s60.some
+              else if (int >= 48 && int <= 57) // '0'-'9'
+                s57.some
+              else if (int == 45) // '-'
+                s33.some
+              else if (int >= 65 && int <= 90) // 'A'-'Z'
+                s31.some
+              else if (int == 60) // '<'
+                s17.some
+              else if (int == 47) // '/'
+                s32.some
               else
                 None
             },
-            Lexer.Yields[Tok](
-              List(
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
+            None,
           )
         
         s4 =
@@ -756,18 +773,10 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 100) // 'd'
-                s66.some
-              else if (int == 45) // '-'
-                s25.some
-              else if (int >= 92 && int <= 94) // '\\'-'^'
-                s25.some
-              else if (int == 110) // 'n'
-                s25.some
-              else if (int == 116) // 't'
-                s25.some
+              if (int == 47) // '/'
+                s36.some
               else
-                None
+                s25.some
             },
             None,
           )
@@ -783,7 +792,7 @@ object lexer {
                   Tok.findRawTerminal,
                 ),
               ),
-              Lexer.Yields.ToMode.Pop,
+              Lexer.Yields.ToMode.Same,
             ).some,
           )
         
@@ -793,12 +802,26 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 45) // '-'
-                s0.some
+              if (int >= 48 && int <= 57) // '0'-'9'
+                s6.some
+              else if (int >= 65 && int <= 90) // 'A'-'Z'
+                s6.some
+              else if (int == 95) // '_'
+                s6.some
+              else if (int >= 97 && int <= 122) // 'a'-'z'
+                s6.some
               else
                 None
             },
-            None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.mode(_, _).pure[Attempt]
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
           )
         
         s7 =
@@ -824,10 +847,10 @@ object lexer {
               List(
                 Lexer.Yields.Yield[Tok](
                   (None,None),
-                  Tok.char(_, _).pure[Attempt]
+                  Tok.findRawTerminal,
                 ),
               ),
-              Lexer.Yields.ToMode.Same,
+              Lexer.Yields.ToMode.Push[Tok](Lazy(s3)),
             ).some,
           )
         
@@ -837,38 +860,31 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int >= 48 && int <= 57) // '0'-'9'
-                s9.some
+              if (int == 100) // 'd'
+                s67.some
+              else if (int == 45) // '-'
+                s22.some
+              else if (int >= 92 && int <= 94) // '\\'-'^'
+                s22.some
+              else if (int == 110) // 'n'
+                s22.some
+              else if (int == 116) // 't'
+                s22.some
               else
                 None
             },
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.int(_, _).pure[Attempt]
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
+            None,
           )
         
         s10 =
           Lexer.State[Tok](
             10,
-            char => {
-              val int = char.toInt
-              
-              if (int == 32) // ' '
-                s41.some
-              else
-                None
-            },
+            _ => None,
             Lexer.Yields[Tok](
               List(
                 Lexer.Yields.Yield[Tok](
                   (None,None),
-                  Tok.char(_, _).pure[Attempt]
+                  Tok.findRawTerminal,
                 ),
               ),
               Lexer.Yields.ToMode.Same,
@@ -886,32 +902,19 @@ object lexer {
                   Tok.findRawTerminal,
                 ),
               ),
-              Lexer.Yields.ToMode.Pop,
+              Lexer.Yields.ToMode.Same,
             ).some,
           )
         
         s12 =
           Lexer.State[Tok](
             12,
-            char => {
-              val int = char.toInt
-              
-              if (int >= 48 && int <= 57) // '0'-'9'
-                s12.some
-              else if (int >= 65 && int <= 90) // 'A'-'Z'
-                s12.some
-              else if (int == 95) // '_'
-                s12.some
-              else if (int >= 97 && int <= 122) // 'a'-'z'
-                s12.some
-              else
-                None
-            },
+            _ => None,
             Lexer.Yields[Tok](
               List(
                 Lexer.Yields.Yield[Tok](
                   (None,None),
-                  Tok.mode(_, _).pure[Attempt]
+                  Tok.char(_, _).pure[Attempt]
                 ),
               ),
               Lexer.Yields.ToMode.Same,
@@ -924,8 +927,14 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 58) // ':'
-                s65.some
+              if (int == 34) // '\"'
+                s7.some
+              else if (int == 92) // '\\'
+                s7.some
+              else if (int == 110) // 'n'
+                s7.some
+              else if (int == 116) // 't'
+                s7.some
               else
                 None
             },
@@ -943,7 +952,7 @@ object lexer {
                   Tok.findRawTerminal,
                 ),
               ),
-              Lexer.Yields.ToMode.Push[Tok](Lazy(s38)),
+              Lexer.Yields.ToMode.Push[Tok](Lazy(s51)),
             ).some,
           )
         
@@ -953,12 +962,10 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 92) // '\\'
-                s50.some
-              else if (int == 34) // '\"'
-                s11.some
+              if (int == 111) // 'o'
+                s43.some
               else
-                s37.some
+                None
             },
             None,
           )
@@ -966,13 +973,24 @@ object lexer {
         s16 =
           Lexer.State[Tok](
             16,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s17 =
+          Lexer.State[Tok](
+            17,
             char => {
               val int = char.toInt
               
-              if (int == 47) // '/'
-                s23.some
+              if (int == 45) // '-'
+                s47.some
               else
-                s18.some
+                None
             },
             None,
           )
@@ -983,10 +1001,16 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 42) // '*'
-                s16.some
+              if (int == 45) // '-'
+                s10.some
+              else if (int == 94) // '^'
+                s10.some
+              else if (int == 92) // '\\'
+                s9.some
+              else if (int == 93) // ']'
+                s41.some
               else
-                s18.some
+                s42.some
             },
             None,
           )
@@ -994,6 +1018,36 @@ object lexer {
         s19 =
           Lexer.State[Tok](
             19,
+            char => {
+              val int = char.toInt
+              
+              if (int == 100) // 'd'
+                s50.some
+              else if (int >= 40 && int <= 43) // '('-'+'
+                s23.some
+              else if (int >= 46 && int <= 47) // '.'-'/'
+                s23.some
+              else if (int == 59) // ';'
+                s23.some
+              else if (int >= 63 && int <= 64) // '?'-'@'
+                s23.some
+              else if (int >= 91 && int <= 93) // '['-']'
+                s23.some
+              else if (int == 110) // 'n'
+                s23.some
+              else if (int == 116) // 't'
+                s23.some
+              else if (int >= 123 && int <= 125) // '{'-'}'
+                s23.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s20 =
+          Lexer.State[Tok](
+            20,
             _ => None,
             Lexer.Yields[Tok](
               List(
@@ -1002,31 +1056,7 @@ object lexer {
                   Tok.findRawTerminal,
                 ),
               ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
-        s20 =
-          Lexer.State[Tok](
-            20,
-            char => {
-              val int = char.toInt
-              
-              if (int == 42) // '*'
-                s18.some
-              else if (int == 47) // '/'
-                s26.some
-              else
-                None
-            },
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.char(_, _).pure[Attempt]
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
+              Lexer.Yields.ToMode.Pop,
             ).some,
           )
         
@@ -1037,7 +1067,7 @@ object lexer {
               val int = char.toInt
               
               if (int == 101) // 'e'
-                s13.some
+                s40.some
               else
                 None
             },
@@ -1050,6 +1080,10 @@ object lexer {
             _ => None,
             Lexer.Yields[Tok](
               List(
+                Lexer.Yields.Yield[Tok](
+                  (Some(1),Some(1)),
+                  Tok.escChar(_, _).pure[Attempt]
+                ),
               ),
               Lexer.Yields.ToMode.Same,
             ).some,
@@ -1058,32 +1092,6 @@ object lexer {
         s23 =
           Lexer.State[Tok](
             23,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
-        s24 =
-          Lexer.State[Tok](
-            24,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
-        s25 =
-          Lexer.State[Tok](
-            25,
             _ => None,
             Lexer.Yields[Tok](
               List(
@@ -1096,91 +1104,14 @@ object lexer {
             ).some,
           )
         
-        s26 =
+        s24 =
           Lexer.State[Tok](
-            26,
-            char => {
-              val int = char.toInt
-              
-              if (int == 10) // '\n'
-                s39.some
-              else
-                s26.some
-            },
-            None,
-          )
-        
-        s27 =
-          Lexer.State[Tok](
-            27,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
-                ),
-              ),
-              Lexer.Yields.ToMode.Push[Tok](Lazy(s56)),
-            ).some,
-          )
-        
-        s28 =
-          Lexer.State[Tok](
-            28,
+            24,
             char => {
               val int = char.toInt
               
               if (int >= 48 && int <= 57) // '0'-'9'
-                s31.some
-              else
-                None
-            },
-            None,
-          )
-        
-        s29 =
-          Lexer.State[Tok](
-            29,
-            char => {
-              val int = char.toInt
-              
-              if (int == 10) // '\n'
-                s44.some
-              else if (int == 9) // '\t'
-                s46.some
-              else if (int == 32) // ' '
-                s46.some
-              else if (int >= 65 && int <= 90) // 'A'-'Z'
-                s47.some
-              else
-                None
-            },
-            None,
-          )
-        
-        s30 =
-          Lexer.State[Tok](
-            30,
-            char => {
-              val int = char.toInt
-              
-              if (int >= 48 && int <= 57) // '0'-'9'
-                s9.some
-              else
-                None
-            },
-            None,
-          )
-        
-        s31 =
-          Lexer.State[Tok](
-            31,
-            char => {
-              val int = char.toInt
-              
-              if (int >= 48 && int <= 57) // '0'-'9'
-                s31.some
+                s24.some
               else
                 None
             },
@@ -1195,30 +1126,95 @@ object lexer {
             ).some,
           )
         
-        s32 =
+        s25 =
           Lexer.State[Tok](
-            32,
+            25,
             char => {
               val int = char.toInt
               
-              if (int == 97) // 'a'
-                s49.some
+              if (int == 42) // '*'
+                s4.some
+              else
+                s25.some
+            },
+            None,
+          )
+        
+        s26 =
+          Lexer.State[Tok](
+            26,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+              ),
+              Lexer.Yields.ToMode.Pop,
+            ).some,
+          )
+        
+        s27 =
+          Lexer.State[Tok](
+            27,
+            char => {
+              val int = char.toInt
+              
+              if (int == 42) // '*'
+                s65.some
+              else
+                s27.some
+            },
+            None,
+          )
+        
+        s28 =
+          Lexer.State[Tok](
+            28,
+            char => {
+              val int = char.toInt
+              
+              if (int == 34) // '\"'
+                s20.some
+              else if (int == 92) // '\\'
+                s13.some
+              else
+                s54.some
+            },
+            None,
+          )
+        
+        s29 =
+          Lexer.State[Tok](
+            29,
+            char => {
+              val int = char.toInt
+              
+              if (int == 9) // '\t'
+                s44.some
+              else if (int == 32) // ' '
+                s44.some
+              else if (int == 44) // ','
+                s11.some
+              else if (int == 125) // '}'
+                s38.some
+              else if (int >= 48 && int <= 57) // '0'-'9'
+                s24.some
+              else if (int == 45) // '-'
+                s58.some
               else
                 None
             },
             None,
           )
         
-        s33 =
+        s30 =
           Lexer.State[Tok](
-            33,
+            30,
             char => {
               val int = char.toInt
               
-              if (int == 115) // 's'
-                s51.some
-              else if (int == 109) // 'm'
-                s2.some
+              if (int == 47) // '/'
+                s49.some
+              else if (int == 42) // '*'
+                s27.some
               else
                 None
             },
@@ -1233,228 +1229,20 @@ object lexer {
             ).some,
           )
         
-        s34 =
+        s31 =
           Lexer.State[Tok](
-            34,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (Some(1),Some(1)),
-                  Tok.escChars(_, _).pure[Attempt]
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
-        s35 =
-          Lexer.State[Tok](
-            35,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
-                ),
-              ),
-              Lexer.Yields.ToMode.Push[Tok](Lazy(s48)),
-            ).some,
-          )
-        
-        s36 =
-          Lexer.State[Tok](
-            36,
-            char => {
-              val int = char.toInt
-              
-              if (int == 9) // '\t'
-                s36.some
-              else if (int == 32) // ' '
-                s36.some
-              else
-                None
-            },
-            Lexer.Yields[Tok](
-              List(
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
-        s37 =
-          Lexer.State[Tok](
-            37,
-            char => {
-              val int = char.toInt
-              
-              if (int == 34) // '\"'
-                None
-              else if (int == 92) // '\\'
-                None
-              else
-                s37.some
-            },
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.chars(_, _).pure[Attempt]
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
-        s38 =
-          Lexer.State[Tok](
-            38,
-            char => {
-              val int = char.toInt
-              
-              if (int == 9) // '\t'
-                s3.some
-              else if (int == 32) // ' '
-                s3.some
-              else if (int == 44) // ','
-                s54.some
-              else if (int == 125) // '}'
-                s42.some
-              else if (int == 63) // '?'
-                s30.some
-              else if (int >= 48 && int <= 57) // '0'-'9'
-                s9.some
-              else
-                None
-            },
-            None,
-          )
-        
-        s39 =
-          Lexer.State[Tok](
-            39,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
-        s40 =
-          Lexer.State[Tok](
-            40,
-            char => {
-              val int = char.toInt
-              
-              if (int == 47) // '/'
-                s22.some
-              else
-                s43.some
-            },
-            None,
-          )
-        
-        s41 =
-          Lexer.State[Tok](
-            41,
-            char => {
-              val int = char.toInt
-              
-              if (int == 32) // ' '
-                s62.some
-              else
-                None
-            },
-            None,
-          )
-        
-        s42 =
-          Lexer.State[Tok](
-            42,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
-                ),
-              ),
-              Lexer.Yields.ToMode.Pop,
-            ).some,
-          )
-        
-        s43 =
-          Lexer.State[Tok](
-            43,
-            char => {
-              val int = char.toInt
-              
-              if (int == 42) // '*'
-                s40.some
-              else
-                s43.some
-            },
-            None,
-          )
-        
-        s44 =
-          Lexer.State[Tok](
-            44,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-              ),
-              Lexer.Yields.ToMode.Pop,
-            ).some,
-          )
-        
-        s45 =
-          Lexer.State[Tok](
-            45,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-              ),
-              Lexer.Yields.ToMode.Pop,
-            ).some,
-          )
-        
-        s46 =
-          Lexer.State[Tok](
-            46,
-            char => {
-              val int = char.toInt
-              
-              if (int == 9) // '\t'
-                s46.some
-              else if (int == 32) // ' '
-                s46.some
-              else
-                None
-            },
-            Lexer.Yields[Tok](
-              List(
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
-        s47 =
-          Lexer.State[Tok](
-            47,
+            31,
             char => {
               val int = char.toInt
               
               if (int >= 48 && int <= 57) // '0'-'9'
-                s47.some
+                s31.some
               else if (int >= 65 && int <= 90) // 'A'-'Z'
-                s47.some
+                s31.some
               else if (int == 95) // '_'
-                s47.some
+                s31.some
               else if (int >= 97 && int <= 122) // 'a'-'z'
-                s47.some
+                s31.some
               else
                 None
             },
@@ -1469,48 +1257,254 @@ object lexer {
             ).some,
           )
         
-        s48 =
+        s32 =
           Lexer.State[Tok](
-            48,
+            32,
             char => {
               val int = char.toInt
               
-              if (int == 9) // '\t'
-                s36.some
-              else if (int == 32) // ' '
-                s36.some
-              else if (int == 10) // '\n'
-                s45.some
-              else if (int == 44) // ','
-                s0.some
-              else if (int == 64) // '@'
-                s0.some
-              else if (int == 91) // '['
-                s0.some
-              else if (int == 93) // ']'
-                s0.some
-              else if (int == 34) // '\"'
-                s52.some
-              else if (int >= 97 && int <= 122) // 'a'-'z'
-                s61.some
-              else if (int == 63) // '?'
-                s28.some
-              else if (int >= 65 && int <= 90) // 'A'-'Z'
-                s12.some
-              else if (int == 45) // '-'
-                s69.some
-              else if (int == 62) // '>'
-                s69.some
-              else if (int >= 48 && int <= 57) // '0'-'9'
-                s31.some
-              else if (int == 60) // '<'
-                s6.some
-              else if (int == 47) // '/'
+              if (int == 47) // '/'
                 s68.some
+              else if (int == 42) // '*'
+                s25.some
               else
                 None
             },
             None,
+          )
+        
+        s33 =
+          Lexer.State[Tok](
+            33,
+            char => {
+              val int = char.toInt
+              
+              if (int >= 48 && int <= 57) // '0'-'9'
+                s57.some
+              else if (int == 62) // '>'
+                s47.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s34 =
+          Lexer.State[Tok](
+            34,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.findRawTerminal,
+                ),
+              ),
+              Lexer.Yields.ToMode.Push[Tok](Lazy(s28)),
+            ).some,
+          )
+        
+        s35 =
+          Lexer.State[Tok](
+            35,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.findRawTerminal,
+                ),
+              ),
+              Lexer.Yields.ToMode.Push[Tok](Lazy(s29)),
+            ).some,
+          )
+        
+        s36 =
+          Lexer.State[Tok](
+            36,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s37 =
+          Lexer.State[Tok](
+            37,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.char(_, _).pure[Attempt]
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s38 =
+          Lexer.State[Tok](
+            38,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.findRawTerminal,
+                ),
+              ),
+              Lexer.Yields.ToMode.Pop,
+            ).some,
+          )
+        
+        s39 =
+          Lexer.State[Tok](
+            39,
+            char => {
+              val int = char.toInt
+              
+              if (int == 97) // 'a'
+                s61.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s40 =
+          Lexer.State[Tok](
+            40,
+            char => {
+              val int = char.toInt
+              
+              if (int == 58) // ':'
+                s14.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s41 =
+          Lexer.State[Tok](
+            41,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.findRawTerminal,
+                ),
+              ),
+              Lexer.Yields.ToMode.Pop,
+            ).some,
+          )
+        
+        s42 =
+          Lexer.State[Tok](
+            42,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.char(_, _).pure[Attempt]
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s43 =
+          Lexer.State[Tok](
+            43,
+            char => {
+              val int = char.toInt
+              
+              if (int == 100) // 'd'
+                s21.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s44 =
+          Lexer.State[Tok](
+            44,
+            char => {
+              val int = char.toInt
+              
+              if (int == 9) // '\t'
+                s44.some
+              else if (int == 32) // ' '
+                s44.some
+              else
+                None
+            },
+            Lexer.Yields[Tok](
+              List(
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s45 =
+          Lexer.State[Tok](
+            45,
+            char => {
+              val int = char.toInt
+              
+              if (int == 32) // ' '
+                s59.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s46 =
+          Lexer.State[Tok](
+            46,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s47 =
+          Lexer.State[Tok](
+            47,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.findRawTerminal,
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s48 =
+          Lexer.State[Tok](
+            48,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.findRawTerminal,
+                ),
+              ),
+              Lexer.Yields.ToMode.Push[Tok](Lazy(s18)),
+            ).some,
           )
         
         s49 =
@@ -1519,10 +1513,10 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 114) // 'r'
-                s60.some
+              if (int == 10) // '\n'
+                s16.some
               else
-                None
+                s49.some
             },
             None,
           )
@@ -1530,21 +1524,16 @@ object lexer {
         s50 =
           Lexer.State[Tok](
             50,
-            char => {
-              val int = char.toInt
-              
-              if (int == 34) // '\"'
-                s67.some
-              else if (int == 92) // '\\'
-                s67.some
-              else if (int == 110) // 'n'
-                s67.some
-              else if (int == 116) // 't'
-                s67.some
-              else
-                None
-            },
-            None,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (Some(1),Some(1)),
+                  Tok.escChars(_, _).pure[Attempt]
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
           )
         
         s51 =
@@ -1553,8 +1542,14 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 116) // 't'
-                s32.some
+              if (int == 10) // '\n'
+                s62.some
+              else if (int >= 65 && int <= 90) // 'A'-'Z'
+                s6.some
+              else if (int == 9) // '\t'
+                s63.some
+              else if (int == 32) // ' '
+                s63.some
               else
                 None
             },
@@ -1564,22 +1559,36 @@ object lexer {
         s52 =
           Lexer.State[Tok](
             52,
-            _ => None,
+            char => {
+              val int = char.toInt
+              
+              if (int == 9) // '\t'
+                s52.some
+              else if (int == 32) // ' '
+                s52.some
+              else
+                None
+            },
             Lexer.Yields[Tok](
               List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
-                ),
               ),
-              Lexer.Yields.ToMode.Push[Tok](Lazy(s15)),
+              Lexer.Yields.ToMode.Same,
             ).some,
           )
         
         s53 =
           Lexer.State[Tok](
             53,
-            _ => None,
+            char => {
+              val int = char.toInt
+              
+              if (int == 109) // 'm'
+                s15.some
+              else if (int == 115) // 's'
+                s66.some
+              else
+                None
+            },
             Lexer.Yields[Tok](
               List(
                 Lexer.Yields.Yield[Tok](
@@ -1594,12 +1603,21 @@ object lexer {
         s54 =
           Lexer.State[Tok](
             54,
-            _ => None,
+            char => {
+              val int = char.toInt
+              
+              if (int == 34) // '\"'
+                None
+              else if (int == 92) // '\\'
+                None
+              else
+                s54.some
+            },
             Lexer.Yields[Tok](
               List(
                 Lexer.Yields.Yield[Tok](
                   (None,None),
-                  Tok.findRawTerminal,
+                  Tok.chars(_, _).pure[Attempt]
                 ),
               ),
               Lexer.Yields.ToMode.Same,
@@ -1613,28 +1631,19 @@ object lexer {
             Lexer.Yields[Tok](
               List(
               ),
-              Lexer.Yields.ToMode.Pop,
+              Lexer.Yields.ToMode.Same,
             ).some,
           )
         
         s56 =
           Lexer.State[Tok](
             56,
-            char => {
-              val int = char.toInt
-              
-              if (int == 45) // '-'
-                s24.some
-              else if (int == 94) // '^'
-                s24.some
-              else if (int == 92) // '\\'
-                s4.some
-              else if (int == 93) // ']'
-                s5.some
-              else
-                s8.some
-            },
-            None,
+            _ => None,
+            Lexer.Yields[Tok](
+              List(
+              ),
+              Lexer.Yields.ToMode.Pop,
+            ).some,
           )
         
         s57 =
@@ -1643,28 +1652,20 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int >= 40 && int <= 43) // '('-'+'
-                s7.some
-              else if (int >= 46 && int <= 47) // '.'-'/'
-                s7.some
-              else if (int == 59) // ';'
-                s7.some
-              else if (int >= 63 && int <= 64) // '?'-'@'
-                s7.some
-              else if (int >= 91 && int <= 93) // '['-']'
-                s7.some
-              else if (int == 110) // 'n'
-                s7.some
-              else if (int == 116) // 't'
-                s7.some
-              else if (int >= 123 && int <= 125) // '{'-'}'
-                s7.some
-              else if (int == 100) // 'd'
-                s34.some
+              if (int >= 48 && int <= 57) // '0'-'9'
+                s57.some
               else
                 None
             },
-            None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.int(_, _).pure[Attempt]
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
           )
         
         s58 =
@@ -1673,10 +1674,10 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 10) // '\n'
-                s55.some
+              if (int >= 48 && int <= 57) // '0'-'9'
+                s24.some
               else
-                s58.some
+                None
             },
             None,
           )
@@ -1687,12 +1688,16 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 100) // 'd'
-                s21.some
+              if (int == 32) // ' '
+                s59.some
               else
                 None
             },
-            None,
+            Lexer.Yields[Tok](
+              List(
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
           )
         
         s60 =
@@ -1701,28 +1706,14 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 116) // 't'
-                s13.some
-              else
-                None
-            },
-            None,
-          )
-        
-        s61 =
-          Lexer.State[Tok](
-            61,
-            char => {
-              val int = char.toInt
-              
               if (int >= 48 && int <= 57) // '0'-'9'
-                s61.some
+                s60.some
               else if (int >= 65 && int <= 90) // 'A'-'Z'
-                s61.some
+                s60.some
               else if (int == 95) // '_'
-                s61.some
+                s60.some
               else if (int >= 97 && int <= 122) // 'a'-'z'
-                s61.some
+                s60.some
               else
                 None
             },
@@ -1737,41 +1728,46 @@ object lexer {
             ).some,
           )
         
-        s62 =
+        s61 =
           Lexer.State[Tok](
-            62,
+            61,
             char => {
               val int = char.toInt
               
-              if (int == 32) // ' '
-                s1.some
+              if (int == 114) // 'r'
+                s0.some
               else
                 None
             },
             None,
           )
         
-        s63 =
+        s62 =
           Lexer.State[Tok](
-            63,
+            62,
             _ => None,
             Lexer.Yields[Tok](
               List(
               ),
-              Lexer.Yields.ToMode.Same,
+              Lexer.Yields.ToMode.Pop,
             ).some,
           )
         
-        s64 =
+        s63 =
           Lexer.State[Tok](
-            64,
-            _ => None,
+            63,
+            char => {
+              val int = char.toInt
+              
+              if (int == 9) // '\t'
+                s63.some
+              else if (int == 32) // ' '
+                s63.some
+              else
+                None
+            },
             Lexer.Yields[Tok](
               List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.char(_, _).pure[Attempt]
-                ),
               ),
               Lexer.Yields.ToMode.Same,
             ).some,
@@ -1780,21 +1776,34 @@ object lexer {
         s65 =
           Lexer.State[Tok](
             65,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.findRawTerminal,
-                ),
-              ),
-              Lexer.Yields.ToMode.Push[Tok](Lazy(s29)),
-            ).some,
+            char => {
+              val int = char.toInt
+              
+              if (int == 47) // '/'
+                s55.some
+              else
+                s27.some
+            },
+            None,
           )
         
         s66 =
           Lexer.State[Tok](
             66,
+            char => {
+              val int = char.toInt
+              
+              if (int == 116) // 't'
+                s39.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s67 =
+          Lexer.State[Tok](
+            67,
             _ => None,
             Lexer.Yields[Tok](
               List(
@@ -1807,33 +1816,16 @@ object lexer {
             ).some,
           )
         
-        s67 =
-          Lexer.State[Tok](
-            67,
-            _ => None,
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (Some(1),Some(1)),
-                  Tok.escChar(_, _).pure[Attempt]
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
         s68 =
           Lexer.State[Tok](
             68,
             char => {
               val int = char.toInt
               
-              if (int == 47) // '/'
-                s58.some
-              else if (int == 42) // '*'
-                s43.some
+              if (int == 10) // '\n'
+                s26.some
               else
-                None
+                s68.some
             },
             None,
           )
@@ -1844,16 +1836,24 @@ object lexer {
             char => {
               val int = char.toInt
               
-              if (int == 62) // '>'
-                s0.some
+              if (int == 32) // ' '
+                s1.some
               else
                 None
             },
-            None,
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.char(_, _).pure[Attempt]
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
           )
         
         
-        s17
+        s64
       },
       Grammar[Tok, NonTerminal, NtRoot] {
         var s0: Grammar.State[Tok, NonTerminal, NtRoot] = null
@@ -1990,10 +1990,140 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`]` =>
+                    case tok: Tok.`[` =>
                       stack match {
-                        case (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.CCChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList9Head(_1, _2)
+                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`>>` =>
+                      stack match {
+                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`@mode:` =>
+                      stack match {
+                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`<-` =>
+                      stack match {
+                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`->` =>
+                      stack match {
+                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`;` =>
+                      stack match {
+                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
                           val to = poppedState.onNt(nt)
                           (
                             to,
@@ -2007,7 +2137,18 @@ object lexer {
                       None
                   }
                 case None =>
-                  None
+                  stack match {
+                    case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
+                      val to = poppedState.onNt(nt)
+                      (
+                        to,
+                        (nt.right, poppedState) :: stack,
+                        None,
+                      ).left.some
+                    case _ =>
+                      None
+                  }
               }
             },
             {
@@ -2023,10 +2164,10 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.escChars =>
+                    case tok: Tok.`,` =>
                       stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                        case (Left(_1: Tok.int), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Opt_int._1(_1)
                           val to = poppedState.onNt(nt)
                           (
                             to,
@@ -2036,127 +2177,10 @@ object lexer {
                         case _ =>
                           None
                       }
-                    case tok: Tok.escChar =>
+                    case tok: Tok.`}` =>
                       stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                        case (Left(_1: Tok.int), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Opt_int._1(_1)
                           val to = poppedState.onNt(nt)
                           (
                             to,
@@ -2186,13 +2210,26 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.`@mode:` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList4Tail._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
                     case tok =>
                       None
                   }
                 case None =>
                   stack match {
-                    case (Right(_3: NonTerminal.AnonList1Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@start:`), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.Lexer(_1, _2, _3)
+                    case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.AnonList4Tail._1(_1, _2)
                       val to = poppedState.onNt(nt)
                       (
                         to,
@@ -2217,10 +2254,389 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.`[` =>
+                      (
+                        s37,
+                        (tok.left, s3) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.escChars =>
+                      (
+                        s58,
+                        (tok.left, s3) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`(` =>
+                      (
+                        s52,
+                        (tok.left, s3) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.escChar =>
+                      (
+                        s43,
+                        (tok.left, s3) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`@mode:` =>
+                      val nt: NonTerminal = NonTerminal.AnonList4Tail._2
+                      val to = s3.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s3) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.char =>
+                      (
+                        s51,
+                        (tok.left, s3) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s3.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s3) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s3.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s3) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  val nt: NonTerminal = NonTerminal.AnonList4Tail._2
+                  val to = s3.onNt(nt) 
+                  (
+                    to,
+                    (nt.right, s3) :: stack,
+                    None,
+                  ).left.some
+              }
+            },
+            {
+              case _: NonTerminal.AnonList4Tail =>
+                s36
+              case _: NonTerminal.SequenceSimple =>
+                s88
+              case _: NonTerminal.Regex =>
+                s98
+              case _: NonTerminal.CharClass =>
+                s42
+              case _: NonTerminal.Group =>
+                s91
+              case _: NonTerminal.Line =>
+                s29
+              case _: NonTerminal.GroupInnerHead =>
+                s107
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s4 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            4,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`;` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s5 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            5,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`>>` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s5.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s5) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.escChars =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s5.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s5) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`(` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s5.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s5) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.escChar =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s5.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s5) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`@mode:` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s5.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s5) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`<-` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s5.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s5) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.char =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s5.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s5) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`,` =>
+                      (
+                        s48,
+                        (tok.left, s5) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`[` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s5.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s5) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`->` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s5.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s5) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s5.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s5) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s5.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s5) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                  val to = s5.onNt(nt) 
+                  (
+                    to,
+                    (nt.right, s5) :: stack,
+                    None,
+                  ).left.some
+              }
+            },
+            {
+              case _: NonTerminal.AnonList6Tail =>
+                s115
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s6 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            6,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
                     case tok: Tok.`)` =>
                       (
-                        s95,
-                        (tok.left, s3) :: stack,
+                        s99,
+                        (tok.left, s6) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok =>
@@ -2236,9 +2652,9 @@ object lexer {
             },
           )
         
-        s4 =
+        s7 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            4,
+            7,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -2399,105 +2815,35 @@ object lexer {
             },
           )
         
-        s5 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            5,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.mode =>
-                      (
-                        s68,
-                        (tok.left, s5) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s6 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            6,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.int =>
-                      (
-                        s74,
-                        (tok.left, s6) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`,` =>
-                      val nt: NonTerminal = NonTerminal.Opt_int._2
-                      val to = s6.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s6) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`]` =>
-                      val nt: NonTerminal = NonTerminal.Opt_int._2
-                      val to = s6.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s6) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.Opt_int =>
-                s9
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s7 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            7,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.mode =>
-                      (
-                        s92,
-                        (tok.left, s7) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
         s8 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             8,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.mode =>
+                      (
+                        s78,
+                        (tok.left, s8) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s9 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            9,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -2528,23 +2874,23 @@ object lexer {
             },
           )
         
-        s9 =
+        s10 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            9,
+            10,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.`,` =>
                       (
-                        s78,
-                        (tok.left, s9) :: stack,
+                        s84,
+                        (tok.left, s10) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok: Tok.`]` =>
                       (
-                        s114,
-                        (tok.left, s9) :: stack,
+                        s113,
+                        (tok.left, s10) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok =>
@@ -2560,9 +2906,105 @@ object lexer {
             },
           )
         
-        s10 =
+        s11 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            10,
+            11,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.int =>
+                      (
+                        s83,
+                        (tok.left, s11) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`,` =>
+                      val nt: NonTerminal = NonTerminal.Opt_int._2
+                      val to = s11.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s11) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`]` =>
+                      val nt: NonTerminal = NonTerminal.Opt_int._2
+                      val to = s11.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s11) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _: NonTerminal.Opt_int =>
+                s10
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s12 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            12,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      (
+                        s118,
+                        (tok.left, s12) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`]` =>
+                      val nt: NonTerminal = NonTerminal.AnonList10Tail._2
+                      val to = s12.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s12) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.escChar =>
+                      (
+                        s114,
+                        (tok.left, s12) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.char =>
+                      (
+                        s18,
+                        (tok.left, s12) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _: NonTerminal.CCChars =>
+                s56
+              case _: NonTerminal.AnonList10Tail =>
+                s49
+              case _: NonTerminal.CCChar =>
+                s13
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s13 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            13,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -2608,8 +3050,8 @@ object lexer {
                       }
                     case tok: Tok.`-` =>
                       (
-                        s52,
-                        (tok.left, s10) :: stack,
+                        s62,
+                        (tok.left, s13) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok: Tok.char =>
@@ -2638,9 +3080,9 @@ object lexer {
             },
           )
         
-        s11 =
+        s14 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            11,
+            14,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -2825,131 +3267,6 @@ object lexer {
             },
           )
         
-        s12 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            12,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_1: Tok.`^`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.`Opt_^`._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.`^`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.`Opt_^`._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.`^`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.`Opt_^`._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s13 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            13,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`\"` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList8Tail), _) :: (Right(_1: NonTerminal.Char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList7Head(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s14 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            14,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`\"` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList8Tail), _) :: (Right(_1: NonTerminal.Char), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList8Tail._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
         s15 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             15,
@@ -2957,168 +3274,38 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`>>` =>
-                      stack match {
-                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
                     case tok: Tok.escChars =>
-                      stack match {
-                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s118,
+                        (tok.left, s15) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok: Tok.escChar =>
-                      stack match {
-                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`@mode:` =>
-                      stack match {
-                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`<-` =>
-                      stack match {
-                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s114,
+                        (tok.left, s15) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok: Tok.char =>
-                      stack match {
-                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`->` =>
-                      stack match {
-                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s18,
+                        (tok.left, s15) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok =>
                       None
                   }
                 case None =>
-                  stack match {
-                    case (Right(_3: NonTerminal.AnonList6Tail), _) :: (Right(_2: NonTerminal.Yield), _) :: (Left(_1: Tok.`,`), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._1(_1, _2, _3)
-                      val to = poppedState.onNt(nt)
-                      (
-                        to,
-                        (nt.right, poppedState) :: stack,
-                        None,
-                      ).left.some
-                    case _ =>
-                      None
-                  }
+                  None
               }
             },
             {
+              case _: NonTerminal.CCChars =>
+                s12
+              case _: NonTerminal.AnonList9Head =>
+                s44
+              case _: NonTerminal.CCChar =>
+                s13
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
@@ -3131,26 +3318,85 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_1: Tok.`^`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.`Opt_^`._1(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_1: Tok.`^`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.`Opt_^`._1(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_1: Tok.`^`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.`Opt_^`._1(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s17 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            17,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
                     case tok: Tok.int =>
                       (
-                        s109,
-                        (tok.left, s16) :: stack,
+                        s1,
+                        (tok.left, s17) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok: Tok.`,` =>
                       val nt: NonTerminal = NonTerminal.Opt_int._2
-                      val to = s16.onNt(nt) 
+                      val to = s17.onNt(nt) 
                       (
                         to,
-                        (nt.right, s16) :: stack,
+                        (nt.right, s17) :: stack,
                         tokens.some,
                       ).left.some
                     case tok: Tok.`}` =>
                       val nt: NonTerminal = NonTerminal.Opt_int._2
-                      val to = s16.onNt(nt) 
+                      val to = s17.onNt(nt) 
                       (
                         to,
-                        (nt.right, s16) :: stack,
+                        (nt.right, s17) :: stack,
                         tokens.some,
                       ).left.some
                     case tok =>
@@ -3162,15 +3408,15 @@ object lexer {
             },
             {
               case _: NonTerminal.Opt_int =>
-                s104
+                s106
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
           )
         
-        s17 =
+        s18 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            17,
+            18,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -3253,9 +3499,42 @@ object lexer {
             },
           )
         
-        s18 =
+        s19 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            18,
+            19,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`\"` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList8Tail), _) :: (Right(_1: NonTerminal.Char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList7Head(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s20 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            20,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -3394,80 +3673,6 @@ object lexer {
                       stack match {
                         case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
                           val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s19 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            19,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`[` =>
-                      (
-                        s6,
-                        (tok.left, s19) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.SubString =>
-                s46
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s20 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            20,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.SequenceSimple._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.SequenceSimple._1(_1, _2)
                           val to = poppedState.onNt(nt)
                           (
                             to,
@@ -3497,9 +3702,21 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`}` =>
+                    case tok: Tok.escChars =>
                       (
-                        s1,
+                        s118,
+                        (tok.left, s21) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.escChar =>
+                      (
+                        s114,
+                        (tok.left, s21) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.char =>
+                      (
+                        s18,
                         (tok.left, s21) :: stack,
                         tokens.tail.toNel,
                       ).left.some
@@ -3511,6 +3728,12 @@ object lexer {
               }
             },
             {
+              case _: NonTerminal.CCChars =>
+                s12
+              case _: NonTerminal.AnonList9Head =>
+                s47
+              case _: NonTerminal.CCChar =>
+                s13
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
@@ -3523,149 +3746,12 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                    case tok: Tok.`@start:` =>
+                      (
+                        s72,
+                        (tok.left, s22) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok =>
                       None
                   }
@@ -3674,6 +3760,8 @@ object lexer {
               }
             },
             {
+              case _: NonTerminal.Lexer =>
+                s30
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
@@ -3686,149 +3774,12 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
                     case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s11,
+                        (tok.left, s23) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok =>
                       None
                   }
@@ -3837,6 +3788,8 @@ object lexer {
               }
             },
             {
+              case _: NonTerminal.SubString =>
+                s57
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
@@ -3849,12 +3802,32 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`]` =>
-                      (
-                        s118,
-                        (tok.left, s24) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
+                    case tok: Tok.`;` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.SequenceSimple._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.SequenceSimple), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.SequenceSimple._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
                     case tok =>
                       None
                   }
@@ -3871,6 +3844,478 @@ object lexer {
         s25 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             25,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`}` =>
+                      (
+                        s68,
+                        (tok.left, s25) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s26 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            26,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`\"` =>
+                      (
+                        s109,
+                        (tok.left, s26) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s27 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            27,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.Quant), _) :: (Right(_1: NonTerminal.Regex), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._3(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s28 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            28,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_1: Tok.`*`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s29 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            29,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      (
+                        s37,
+                        (tok.left, s29) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.escChars =>
+                      (
+                        s58,
+                        (tok.left, s29) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`(` =>
+                      (
+                        s52,
+                        (tok.left, s29) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.escChar =>
+                      (
+                        s43,
+                        (tok.left, s29) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`@mode:` =>
+                      val nt: NonTerminal = NonTerminal.AnonList4Tail._2
+                      val to = s29.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s29) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.char =>
+                      (
+                        s51,
+                        (tok.left, s29) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s29.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s29) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s29.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s29) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  val nt: NonTerminal = NonTerminal.AnonList4Tail._2
+                  val to = s29.onNt(nt) 
+                  (
+                    to,
+                    (nt.right, s29) :: stack,
+                    None,
+                  ).left.some
+              }
+            },
+            {
+              case _: NonTerminal.AnonList4Tail =>
+                s2
+              case _: NonTerminal.SequenceSimple =>
+                s88
+              case _: NonTerminal.Regex =>
+                s98
+              case _: NonTerminal.CharClass =>
+                s42
+              case _: NonTerminal.Group =>
+                s91
+              case _: NonTerminal.Line =>
+                s29
+              case _: NonTerminal.GroupInnerHead =>
+                s107
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s30 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            30,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -3893,9 +4338,9 @@ object lexer {
             },
           )
         
-        s26 =
+        s31 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            26,
+            31,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -4028,9 +4473,172 @@ object lexer {
             },
           )
         
-        s27 =
+        s32 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            27,
+            32,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s33 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            33,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -4163,20 +4771,209 @@ object lexer {
             },
           )
         
-        s28 =
+        s34 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            28,
+            34,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.`)` =>
+                      val nt: NonTerminal = NonTerminal.GroupInnerTail._2
+                      val to = s34.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s34) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      (
+                        s119,
+                        (tok.left, s34) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _: NonTerminal.GroupInnerTail =>
+                s40
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s35 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            35,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      val to = s35.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s35) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`>>` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      val to = s35.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s35) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.escChars =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      val to = s35.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s35) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`(` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      val to = s35.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s35) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.term =>
+                      (
+                        s121,
+                        (tok.left, s35) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`@mode:` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      val to = s35.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s35) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`<-` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      val to = s35.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s35) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.char =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      val to = s35.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s35) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`\"` =>
+                      (
+                        s53,
+                        (tok.left, s35) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`@` =>
+                      (
+                        s71,
+                        (tok.left, s35) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.escChar =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      val to = s35.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s35) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`->` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      val to = s35.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s35) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      val to = s35.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s35) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                      val to = s35.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s35) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  val nt: NonTerminal = NonTerminal.AnonList5Head._2
+                  val to = s35.onNt(nt) 
+                  (
+                    to,
+                    (nt.right, s35) :: stack,
+                    None,
+                  ).left.some
+              }
+            },
+            {
+              case _: NonTerminal.YieldType =>
+                s23
+              case _: NonTerminal.Yield =>
+                s5
+              case _: NonTerminal.Raw =>
+                s122
+              case _: NonTerminal.AnonList5Head =>
+                s81
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s36 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            36,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`@mode:` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList3Head(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
                     case tok =>
                       None
                   }
                 case None =>
                   stack match {
-                    case (Right(_2: NonTerminal.AnonList2Tail), _) :: (Right(_1: NonTerminal.Mode), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.AnonList1Head(_1, _2)
+                    case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.AnonList3Head(_1, _2)
                       val to = poppedState.onNt(nt)
                       (
                         to,
@@ -4194,26 +4991,42 @@ object lexer {
             },
           )
         
-        s29 =
+        s37 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            29,
+            37,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`)` =>
-                      val nt: NonTerminal = NonTerminal.GroupInnerTail._2
-                      val to = s29.onNt(nt) 
+                    case tok: Tok.escChars =>
+                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
+                      val to = s37.onNt(nt) 
                       (
                         to,
-                        (nt.right, s29) :: stack,
+                        (nt.right, s37) :: stack,
                         tokens.some,
                       ).left.some
-                    case tok: Tok.`|` =>
+                    case tok: Tok.`^` =>
                       (
-                        s49,
-                        (tok.left, s29) :: stack,
+                        s16,
+                        (tok.left, s37) :: stack,
                         tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.escChar =>
+                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
+                      val to = s37.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s37) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.char =>
+                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
+                      val to = s37.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s37) :: stack,
+                        tokens.some,
                       ).left.some
                     case tok =>
                       None
@@ -4223,146 +5036,24 @@ object lexer {
               }
             },
             {
-              case _: NonTerminal.GroupInnerTail =>
-                s32
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s30 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            30,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`>>` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s30.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s30) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.escChars =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s30.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s30) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`(` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s30.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s30) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s30.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s30) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`@mode:` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s30.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s30) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`<-` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s30.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s30) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.char =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s30.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s30) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`,` =>
-                      (
-                        s45,
-                        (tok.left, s30) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`[` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s30.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s30) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`->` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s30.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s30) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s30.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s30) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s30.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s30) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                  val to = s30.onNt(nt) 
-                  (
-                    to,
-                    (nt.right, s30) :: stack,
-                    None,
-                  ).left.some
-              }
-            },
-            {
-              case _: NonTerminal.AnonList6Tail =>
+              case _: NonTerminal.`Opt_^` =>
                 s15
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
           )
         
-        s31 =
+        s38 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            31,
+            38,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.`)` =>
                       (
-                        s99,
-                        (tok.left, s31) :: stack,
+                        s100,
+                        (tok.left, s38) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok =>
@@ -4378,9 +5069,85 @@ object lexer {
             },
           )
         
-        s32 =
+        s39 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            32,
+            39,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      (
+                        s59,
+                        (tok.left, s39) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.escChars =>
+                      (
+                        s89,
+                        (tok.left, s39) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.escChar =>
+                      (
+                        s124,
+                        (tok.left, s39) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s39.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s39) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.char =>
+                      (
+                        s60,
+                        (tok.left, s39) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`)` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s39.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s39) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`(` =>
+                      (
+                        s39,
+                        (tok.left, s39) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _: NonTerminal.SequenceSimple =>
+                s79
+              case _: NonTerminal.Regex =>
+                s66
+              case _: NonTerminal.CharClass =>
+                s67
+              case _: NonTerminal.Group =>
+                s94
+              case _: NonTerminal.GroupInnerHead =>
+                s38
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s40 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            40,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -4411,53 +5178,9 @@ object lexer {
             },
           )
         
-        s33 =
+        s41 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            33,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      (
-                        s119,
-                        (tok.left, s33) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      (
-                        s115,
-                        (tok.left, s33) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.char =>
-                      (
-                        s17,
-                        (tok.left, s33) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.CCChars =>
-                s122
-              case _: NonTerminal.AnonList9Head =>
-                s63
-              case _: NonTerminal.CCChar =>
-                s10
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s34 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            34,
+            41,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -4488,9 +5211,9 @@ object lexer {
             },
           )
         
-        s35 =
+        s42 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            35,
+            42,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -4651,9 +5374,9 @@ object lexer {
             },
           )
         
-        s36 =
+        s43 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            36,
+            43,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -4814,9 +5537,35 @@ object lexer {
             },
           )
         
-        s37 =
+        s44 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            37,
+            44,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`]` =>
+                      (
+                        s4,
+                        (tok.left, s44) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s45 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            45,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -4847,9 +5596,9 @@ object lexer {
             },
           )
         
-        s38 =
+        s46 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            38,
+            46,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -5010,17 +5759,17 @@ object lexer {
             },
           )
         
-        s39 =
+        s47 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            39,
+            47,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.mode =>
+                    case tok: Tok.`]` =>
                       (
-                        s77,
-                        (tok.left, s39) :: stack,
+                        s32,
+                        (tok.left, s47) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok =>
@@ -5036,33 +5785,110 @@ object lexer {
             },
           )
         
-        s40 =
+        s48 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            40,
+            48,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`@` =>
+                      (
+                        s71,
+                        (tok.left, s48) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.term =>
+                      (
+                        s121,
+                        (tok.left, s48) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`\"` =>
+                      (
+                        s53,
+                        (tok.left, s48) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _: NonTerminal.YieldType =>
+                s23
+              case _: NonTerminal.Yield =>
+                s90
+              case _: NonTerminal.Raw =>
+                s122
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s49 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            49,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`]` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.CCChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList9Head(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s50 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            50,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.int =>
                       (
-                        s109,
-                        (tok.left, s40) :: stack,
+                        s1,
+                        (tok.left, s50) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok: Tok.`,` =>
                       val nt: NonTerminal = NonTerminal.Opt_int._2
-                      val to = s40.onNt(nt) 
+                      val to = s50.onNt(nt) 
                       (
                         to,
-                        (nt.right, s40) :: stack,
+                        (nt.right, s50) :: stack,
                         tokens.some,
                       ).left.some
                     case tok: Tok.`}` =>
                       val nt: NonTerminal = NonTerminal.Opt_int._2
-                      val to = s40.onNt(nt) 
+                      val to = s50.onNt(nt) 
                       (
                         to,
-                        (nt.right, s40) :: stack,
+                        (nt.right, s50) :: stack,
                         tokens.some,
                       ).left.some
                     case tok =>
@@ -5080,61 +5906,9 @@ object lexer {
             },
           )
         
-        s41 =
+        s51 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            41,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
-                      val to = s41.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s41) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`^` =>
-                      (
-                        s12,
-                        (tok.left, s41) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
-                      val to = s41.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s41) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.char =>
-                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
-                      val to = s41.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s41) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.`Opt_^` =>
-                s33
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s42 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            42,
+            51,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -5295,17 +6069,129 @@ object lexer {
             },
           )
         
-        s43 =
+        s52 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            43,
+            52,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      (
+                        s59,
+                        (tok.left, s52) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.escChars =>
+                      (
+                        s89,
+                        (tok.left, s52) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.escChar =>
+                      (
+                        s124,
+                        (tok.left, s52) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s52.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s52) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.char =>
+                      (
+                        s60,
+                        (tok.left, s52) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`)` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s52.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s52) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`(` =>
+                      (
+                        s39,
+                        (tok.left, s52) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _: NonTerminal.SequenceSimple =>
+                s79
+              case _: NonTerminal.Regex =>
+                s66
+              case _: NonTerminal.CharClass =>
+                s67
+              case _: NonTerminal.Group =>
+                s94
+              case _: NonTerminal.GroupInnerHead =>
+                s6
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s53 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            53,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChar =>
+                      (
+                        s80,
+                        (tok.left, s53) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.chars =>
+                      (
+                        s64,
+                        (tok.left, s53) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _: NonTerminal.Char =>
+                s123
+              case _: NonTerminal.AnonList7Head =>
+                s26
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s54 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            54,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.`@mode:` =>
                       (
-                        s7,
-                        (tok.left, s43) :: stack,
+                        s76,
+                        (tok.left, s54) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok =>
@@ -5313,27 +6199,27 @@ object lexer {
                   }
                 case None =>
                   val nt: NonTerminal = NonTerminal.AnonList2Tail._2
-                  val to = s43.onNt(nt) 
+                  val to = s54.onNt(nt) 
                   (
                     to,
-                    (nt.right, s43) :: stack,
+                    (nt.right, s54) :: stack,
                     None,
                   ).left.some
               }
             },
             {
               case _: NonTerminal.AnonList2Tail =>
-                s82
+                s105
               case _: NonTerminal.Mode =>
-                s43
+                s54
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
           )
         
-        s44 =
+        s55 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            44,
+            55,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -5466,29 +6352,37 @@ object lexer {
             },
           )
         
-        s45 =
+        s56 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            45,
+            56,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`@` =>
+                    case tok: Tok.escChars =>
                       (
-                        s61,
-                        (tok.left, s45) :: stack,
+                        s118,
+                        (tok.left, s56) :: stack,
                         tokens.tail.toNel,
                       ).left.some
-                    case tok: Tok.term =>
+                    case tok: Tok.`]` =>
+                      val nt: NonTerminal = NonTerminal.AnonList10Tail._2
+                      val to = s56.onNt(nt) 
                       (
-                        s117,
-                        (tok.left, s45) :: stack,
+                        to,
+                        (nt.right, s56) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.escChar =>
+                      (
+                        s114,
+                        (tok.left, s56) :: stack,
                         tokens.tail.toNel,
                       ).left.some
-                    case tok: Tok.`\"` =>
+                    case tok: Tok.char =>
                       (
-                        s90,
-                        (tok.left, s45) :: stack,
+                        s18,
+                        (tok.left, s56) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok =>
@@ -5499,20 +6393,20 @@ object lexer {
               }
             },
             {
-              case _: NonTerminal.YieldType =>
-                s19
-              case _: NonTerminal.Yield =>
-                s30
-              case _: NonTerminal.Raw =>
-                s125
+              case _: NonTerminal.CCChars =>
+                s56
+              case _: NonTerminal.AnonList10Tail =>
+                s95
+              case _: NonTerminal.CCChar =>
+                s13
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
           )
         
-        s46 =
+        s57 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            46,
+            57,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -5697,9 +6591,9 @@ object lexer {
             },
           )
         
-        s47 =
+        s58 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            47,
+            58,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -5860,232 +6754,42 @@ object lexer {
             },
           )
         
-        s48 =
+        s59 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            48,
+            59,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`>>` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
                     case tok: Tok.escChars =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`@mode:` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`<-` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`->` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  stack match {
-                    case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
-                      val to = poppedState.onNt(nt)
+                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
+                      val to = s59.onNt(nt) 
                       (
                         to,
-                        (nt.right, poppedState) :: stack,
-                        None,
+                        (nt.right, s59) :: stack,
+                        tokens.some,
                       ).left.some
-                    case _ =>
-                      None
-                  }
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s49 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            49,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`[` =>
+                    case tok: Tok.`^` =>
                       (
-                        s75,
-                        (tok.left, s49) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChars =>
-                      (
-                        s85,
-                        (tok.left, s49) :: stack,
+                        s16,
+                        (tok.left, s59) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok: Tok.escChar =>
-                      (
-                        s121,
-                        (tok.left, s49) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s49.onNt(nt) 
+                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
+                      val to = s59.onNt(nt) 
                       (
                         to,
-                        (nt.right, s49) :: stack,
+                        (nt.right, s59) :: stack,
                         tokens.some,
                       ).left.some
                     case tok: Tok.char =>
-                      (
-                        s50,
-                        (tok.left, s49) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`)` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s49.onNt(nt) 
+                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
+                      val to = s59.onNt(nt) 
                       (
                         to,
-                        (nt.right, s49) :: stack,
+                        (nt.right, s59) :: stack,
                         tokens.some,
-                      ).left.some
-                    case tok: Tok.`(` =>
-                      (
-                        s71,
-                        (tok.left, s49) :: stack,
-                        tokens.tail.toNel,
                       ).left.some
                     case tok =>
                       None
@@ -6095,22 +6799,16 @@ object lexer {
               }
             },
             {
-              case _: NonTerminal.CharClass =>
-                s57
-              case _: NonTerminal.SequenceSimple =>
-                s29
-              case _: NonTerminal.Group =>
-                s91
-              case _: NonTerminal.Regex =>
-                s67
+              case _: NonTerminal.`Opt_^` =>
+                s21
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
           )
         
-        s50 =
+        s60 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            50,
+            60,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -6271,9 +6969,9 @@ object lexer {
             },
           )
         
-        s51 =
+        s61 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            51,
+            61,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -6304,23 +7002,23 @@ object lexer {
             },
           )
         
-        s52 =
+        s62 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            52,
+            62,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.escChar =>
                       (
-                        s79,
-                        (tok.left, s52) :: stack,
+                        s85,
+                        (tok.left, s62) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok: Tok.char =>
                       (
-                        s64,
-                        (tok.left, s52) :: stack,
+                        s75,
+                        (tok.left, s62) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok =>
@@ -6338,9 +7036,9 @@ object lexer {
             },
           )
         
-        s53 =
+        s63 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            53,
+            63,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -6501,9 +7199,9 @@ object lexer {
             },
           )
         
-        s54 =
+        s64 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            54,
+            64,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -6560,9 +7258,9 @@ object lexer {
             },
           )
         
-        s55 =
+        s65 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            55,
+            65,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -6593,200 +7291,83 @@ object lexer {
             },
           )
         
-        s56 =
+        s66 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            56,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`@mode:` =>
-                      stack match {
-                        case (Right(_3: NonTerminal.AnonList3Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@mode:`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Mode(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  stack match {
-                    case (Right(_3: NonTerminal.AnonList3Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@mode:`), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.Mode(_1, _2, _3)
-                      val to = poppedState.onNt(nt)
-                      (
-                        to,
-                        (nt.right, poppedState) :: stack,
-                        None,
-                      ).left.some
-                    case _ =>
-                      None
-                  }
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s57 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            57,
+            66,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.escChars =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s89,
+                        (tok.left, s66) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok: Tok.escChar =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s124,
+                        (tok.left, s66) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok: Tok.`*` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s28,
+                        (tok.left, s66) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s66.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s66) :: stack,
+                        tokens.some,
+                      ).left.some
                     case tok: Tok.char =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s60,
+                        (tok.left, s66) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok: Tok.`[` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s59,
+                        (tok.left, s66) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok: Tok.`{` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s17,
+                        (tok.left, s66) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok: Tok.`?` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s82,
+                        (tok.left, s66) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok: Tok.`+` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s108,
+                        (tok.left, s66) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok: Tok.`)` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s66.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s66) :: stack,
+                        tokens.some,
+                      ).left.some
                     case tok: Tok.`(` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s39,
+                        (tok.left, s66) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok =>
                       None
                   }
@@ -6795,406 +7376,544 @@ object lexer {
               }
             },
             {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s58 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            58,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s59 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            59,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`@mode:` =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  stack match {
-                    case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
-                      val to = poppedState.onNt(nt)
-                      (
-                        to,
-                        (nt.right, poppedState) :: stack,
-                        None,
-                      ).left.some
-                    case _ =>
-                      None
-                  }
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s60 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            60,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`[` =>
-                      (
-                        s41,
-                        (tok.left, s60) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChars =>
-                      (
-                        s47,
-                        (tok.left, s60) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`(` =>
-                      (
-                        s120,
-                        (tok.left, s60) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      (
-                        s36,
-                        (tok.left, s60) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`@mode:` =>
-                      val nt: NonTerminal = NonTerminal.AnonList4Tail._2
-                      val to = s60.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s60) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.char =>
-                      (
-                        s42,
-                        (tok.left, s60) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s60.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s60) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s60.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s60) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  val nt: NonTerminal = NonTerminal.AnonList4Tail._2
-                  val to = s60.onNt(nt) 
-                  (
-                    to,
-                    (nt.right, s60) :: stack,
-                    None,
-                  ).left.some
-              }
-            },
-            {
-              case _: NonTerminal.AnonList4Tail =>
-                s97
               case _: NonTerminal.SequenceSimple =>
-                s81
+                s102
               case _: NonTerminal.Regex =>
-                s84
+                s66
               case _: NonTerminal.CharClass =>
-                s35
+                s67
               case _: NonTerminal.Group =>
-                s86
-              case _: NonTerminal.Line =>
-                s62
-              case _: NonTerminal.GroupInnerHead =>
-                s124
+                s94
+              case _: NonTerminal.Quant =>
+                s27
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
           )
         
-        s61 =
+        s67 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            61,
+            67,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.CharClass), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s68 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            68,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_5: Tok.`}`), _) :: (Right(_4: NonTerminal.Opt_int), _) :: (Left(_3: Tok.`,`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._5(_1, _2, _3, _4, _5)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s69 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            69,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  stack match {
+                    case (Right(_3: NonTerminal.AnonList1Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@start:`), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.Lexer(_1, _2, _3)
+                      val to = poppedState.onNt(nt)
+                      (
+                        to,
+                        (nt.right, poppedState) :: stack,
+                        None,
+                      ).left.some
+                    case _ =>
+                      None
+                  }
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s70 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            70,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_3: Tok.`}`), _) :: (Right(_2: NonTerminal.Opt_int), _) :: (Left(_1: Tok.`{`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._4(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s71 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            71,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -7225,111 +7944,17 @@ object lexer {
             },
           )
         
-        s62 =
+        s72 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            62,
+            72,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`[` =>
-                      (
-                        s41,
-                        (tok.left, s62) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChars =>
-                      (
-                        s47,
-                        (tok.left, s62) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`(` =>
+                    case tok: Tok.mode =>
                       (
                         s120,
-                        (tok.left, s62) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      (
-                        s36,
-                        (tok.left, s62) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`@mode:` =>
-                      val nt: NonTerminal = NonTerminal.AnonList4Tail._2
-                      val to = s62.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s62) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.char =>
-                      (
-                        s42,
-                        (tok.left, s62) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s62.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s62) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s62.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s62) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  val nt: NonTerminal = NonTerminal.AnonList4Tail._2
-                  val to = s62.onNt(nt) 
-                  (
-                    to,
-                    (nt.right, s62) :: stack,
-                    None,
-                  ).left.some
-              }
-            },
-            {
-              case _: NonTerminal.AnonList4Tail =>
-                s89
-              case _: NonTerminal.SequenceSimple =>
-                s81
-              case _: NonTerminal.Regex =>
-                s84
-              case _: NonTerminal.CharClass =>
-                s35
-              case _: NonTerminal.Group =>
-                s86
-              case _: NonTerminal.Line =>
-                s62
-              case _: NonTerminal.GroupInnerHead =>
-                s124
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s63 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            63,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`]` =>
-                      (
-                        s83,
-                        (tok.left, s63) :: stack,
+                        (tok.left, s72) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok =>
@@ -7345,9 +7970,73 @@ object lexer {
             },
           )
         
-        s64 =
+        s73 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            64,
+            73,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`\"` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList8Tail), _) :: (Right(_1: NonTerminal.Char), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList8Tail._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s74 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            74,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  stack match {
+                    case (Right(_2: NonTerminal.AnonList2Tail), _) :: (Right(_1: NonTerminal.Mode), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.AnonList1Head(_1, _2)
+                      val to = poppedState.onNt(nt)
+                      (
+                        to,
+                        (nt.right, poppedState) :: stack,
+                        None,
+                      ).left.some
+                    case _ =>
+                      None
+                  }
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s75 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            75,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -7417,9 +8106,35 @@ object lexer {
             },
           )
         
-        s65 =
+        s76 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            65,
+            76,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.mode =>
+                      (
+                        s103,
+                        (tok.left, s76) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s77 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            77,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -7580,221 +8295,9 @@ object lexer {
             },
           )
         
-        s66 =
+        s78 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            66,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`[` =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      val to = s66.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s66) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`>>` =>
-                      (
-                        s123,
-                        (tok.left, s66) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChars =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      val to = s66.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s66) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`(` =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      val to = s66.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s66) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      val to = s66.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s66) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`@mode:` =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      val to = s66.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s66) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`<-` =>
-                      (
-                        s27,
-                        (tok.left, s66) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.char =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      val to = s66.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s66) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`->` =>
-                      (
-                        s5,
-                        (tok.left, s66) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      val to = s66.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s66) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.OptToMode._2
-                      val to = s66.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s66) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  val nt: NonTerminal = NonTerminal.OptToMode._2
-                  val to = s66.onNt(nt) 
-                  (
-                    to,
-                    (nt.right, s66) :: stack,
-                    None,
-                  ).left.some
-              }
-            },
-            {
-              case _: NonTerminal.OptToMode =>
-                s59
-              case _: NonTerminal.ToMode =>
-                s44
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s67 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            67,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      (
-                        s85,
-                        (tok.left, s67) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      (
-                        s121,
-                        (tok.left, s67) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`*` =>
-                      (
-                        s23,
-                        (tok.left, s67) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s67.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s67) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.char =>
-                      (
-                        s50,
-                        (tok.left, s67) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`[` =>
-                      (
-                        s75,
-                        (tok.left, s67) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`{` =>
-                      (
-                        s16,
-                        (tok.left, s67) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`?` =>
-                      (
-                        s72,
-                        (tok.left, s67) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`+` =>
-                      (
-                        s107,
-                        (tok.left, s67) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`)` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s67.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s67) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`(` =>
-                      (
-                        s71,
-                        (tok.left, s67) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.SequenceSimple =>
-                s101
-              case _: NonTerminal.Regex =>
-                s67
-              case _: NonTerminal.CharClass =>
-                s57
-              case _: NonTerminal.Group =>
-                s91
-              case _: NonTerminal.Quant =>
-                s22
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s68 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            68,
+            78,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -7927,25 +8430,25 @@ object lexer {
             },
           )
         
-        s69 =
+        s79 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            69,
+            79,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.`)` =>
                       val nt: NonTerminal = NonTerminal.GroupInnerTail._2
-                      val to = s69.onNt(nt) 
+                      val to = s79.onNt(nt) 
                       (
                         to,
-                        (nt.right, s69) :: stack,
+                        (nt.right, s79) :: stack,
                         tokens.some,
                       ).left.some
                     case tok: Tok.`|` =>
                       (
-                        s49,
-                        (tok.left, s69) :: stack,
+                        s119,
+                        (tok.left, s79) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok =>
@@ -7957,15 +8460,15 @@ object lexer {
             },
             {
               case _: NonTerminal.GroupInnerTail =>
-                s51
+                s61
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
           )
         
-        s70 =
+        s80 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            70,
+            80,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -8022,85 +8525,121 @@ object lexer {
             },
           )
         
-        s71 =
+        s81 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            71,
+            81,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.`[` =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      val to = s81.onNt(nt) 
                       (
-                        s75,
-                        (tok.left, s71) :: stack,
+                        to,
+                        (nt.right, s81) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`>>` =>
+                      (
+                        s125,
+                        (tok.left, s81) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok: Tok.escChars =>
-                      (
-                        s85,
-                        (tok.left, s71) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      (
-                        s121,
-                        (tok.left, s71) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s71.onNt(nt) 
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      val to = s81.onNt(nt) 
                       (
                         to,
-                        (nt.right, s71) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.char =>
-                      (
-                        s50,
-                        (tok.left, s71) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`)` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s71.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s71) :: stack,
+                        (nt.right, s81) :: stack,
                         tokens.some,
                       ).left.some
                     case tok: Tok.`(` =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      val to = s81.onNt(nt) 
                       (
-                        s71,
-                        (tok.left, s71) :: stack,
+                        to,
+                        (nt.right, s81) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.escChar =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      val to = s81.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s81) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`@mode:` =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      val to = s81.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s81) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`<-` =>
+                      (
+                        s33,
+                        (tok.left, s81) :: stack,
                         tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.char =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      val to = s81.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s81) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`->` =>
+                      (
+                        s8,
+                        (tok.left, s81) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      val to = s81.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s81) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.OptToMode._2
+                      val to = s81.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s81) :: stack,
+                        tokens.some,
                       ).left.some
                     case tok =>
                       None
                   }
                 case None =>
-                  None
+                  val nt: NonTerminal = NonTerminal.OptToMode._2
+                  val to = s81.onNt(nt) 
+                  (
+                    to,
+                    (nt.right, s81) :: stack,
+                    None,
+                  ).left.some
               }
             },
             {
-              case _: NonTerminal.SequenceSimple =>
-                s69
-              case _: NonTerminal.Regex =>
-                s67
-              case _: NonTerminal.CharClass =>
-                s57
-              case _: NonTerminal.Group =>
-                s91
-              case _: NonTerminal.GroupInnerHead =>
-                s31
+              case _: NonTerminal.OptToMode =>
+                s110
+              case _: NonTerminal.ToMode =>
+                s55
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
           )
         
-        s72 =
+        s82 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            72,
+            82,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -8261,149 +8800,9 @@ object lexer {
             },
           )
         
-        s73 =
+        s83 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            73,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`[` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      val to = s73.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s73) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`>>` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      val to = s73.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s73) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.escChars =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      val to = s73.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s73) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`(` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      val to = s73.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s73) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.term =>
-                      (
-                        s117,
-                        (tok.left, s73) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`@mode:` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      val to = s73.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s73) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`<-` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      val to = s73.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s73) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.char =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      val to = s73.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s73) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`\"` =>
-                      (
-                        s90,
-                        (tok.left, s73) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`@` =>
-                      (
-                        s61,
-                        (tok.left, s73) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      val to = s73.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s73) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`->` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      val to = s73.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s73) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      val to = s73.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s73) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                      val to = s73.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s73) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  val nt: NonTerminal = NonTerminal.AnonList5Head._2
-                  val to = s73.onNt(nt) 
-                  (
-                    to,
-                    (nt.right, s73) :: stack,
-                    None,
-                  ).left.some
-              }
-            },
-            {
-              case _: NonTerminal.YieldType =>
-                s19
-              case _: NonTerminal.Yield =>
-                s93
-              case _: NonTerminal.Raw =>
-                s125
-              case _: NonTerminal.AnonList5Head =>
-                s66
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s74 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            74,
+            83,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -8447,498 +8846,6 @@ object lexer {
             },
           )
         
-        s75 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            75,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
-                      val to = s75.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s75) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`^` =>
-                      (
-                        s12,
-                        (tok.left, s75) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
-                      val to = s75.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s75) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.char =>
-                      val nt: NonTerminal = NonTerminal.`Opt_^`._2
-                      val to = s75.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s75) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.`Opt_^` =>
-                s102
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s76 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            76,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`@mode:` =>
-                      (
-                        s7,
-                        (tok.left, s76) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  val nt: NonTerminal = NonTerminal.AnonList2Tail._2
-                  val to = s76.onNt(nt) 
-                  (
-                    to,
-                    (nt.right, s76) :: stack,
-                    None,
-                  ).left.some
-              }
-            },
-            {
-              case _: NonTerminal.AnonList2Tail =>
-                s28
-              case _: NonTerminal.Mode =>
-                s43
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s77 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            77,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`@mode:` =>
-                      (
-                        s7,
-                        (tok.left, s77) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.AnonList1Head =>
-                s2
-              case _: NonTerminal.Mode =>
-                s76
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s78 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            78,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.int =>
-                      (
-                        s8,
-                        (tok.left, s78) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`]` =>
-                      val nt: NonTerminal = NonTerminal.Opt_int._2
-                      val to = s78.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s78) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.Opt_int =>
-                s98
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s79 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            79,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChar._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`]` =>
-                      stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChar._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChar._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChar._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s80 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            80,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.int =>
-                      (
-                        s37,
-                        (tok.left, s80) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`}` =>
-                      val nt: NonTerminal = NonTerminal.Opt_int._2
-                      val to = s80.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s80) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.Opt_int =>
-                s94
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s81 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            81,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.GroupInnerTail._2
-                      val to = s81.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s81) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      (
-                        s108,
-                        (tok.left, s81) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.GroupInnerTail =>
-                s34
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s82 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            82,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  stack match {
-                    case (Right(_2: NonTerminal.AnonList2Tail), _) :: (Right(_1: NonTerminal.Mode), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.AnonList2Tail._1(_1, _2)
-                      val to = poppedState.onNt(nt)
-                      (
-                        to,
-                        (nt.right, poppedState) :: stack,
-                        None,
-                      ).left.some
-                    case _ =>
-                      None
-                  }
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s83 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            83,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
         s84 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             84,
@@ -8946,70 +8853,14 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.escChars =>
+                    case tok: Tok.int =>
                       (
-                        s47,
+                        s9,
                         (tok.left, s84) :: stack,
                         tokens.tail.toNel,
                       ).left.some
-                    case tok: Tok.`(` =>
-                      (
-                        s120,
-                        (tok.left, s84) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      (
-                        s36,
-                        (tok.left, s84) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`*` =>
-                      (
-                        s53,
-                        (tok.left, s84) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.char =>
-                      (
-                        s42,
-                        (tok.left, s84) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`[` =>
-                      (
-                        s41,
-                        (tok.left, s84) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`{` =>
-                      (
-                        s40,
-                        (tok.left, s84) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`?` =>
-                      (
-                        s65,
-                        (tok.left, s84) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`+` =>
-                      (
-                        s4,
-                        (tok.left, s84) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s84.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s84) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                    case tok: Tok.`]` =>
+                      val nt: NonTerminal = NonTerminal.Opt_int._2
                       val to = s84.onNt(nt) 
                       (
                         to,
@@ -9024,16 +8875,8 @@ object lexer {
               }
             },
             {
-              case _: NonTerminal.SequenceSimple =>
-                s20
-              case _: NonTerminal.Regex =>
-                s84
-              case _: NonTerminal.CharClass =>
-                s35
-              case _: NonTerminal.Group =>
-                s86
-              case _: NonTerminal.Quant =>
-                s18
+              case _: NonTerminal.Opt_int =>
+                s97
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
@@ -9048,8 +8891,21 @@ object lexer {
                   tokens.head match {
                     case tok: Tok.escChars =>
                       stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChar._2(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`]` =>
+                      stack match {
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChar._2(_1)
                           val to = poppedState.onNt(nt)
                           (
                             to,
@@ -9061,34 +8917,8 @@ object lexer {
                       }
                     case tok: Tok.escChar =>
                       stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChar._2(_1)
                           val to = poppedState.onNt(nt)
                           (
                             to,
@@ -9100,86 +8930,8 @@ object lexer {
                       }
                     case tok: Tok.char =>
                       stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChar._2(_1)
                           val to = poppedState.onNt(nt)
                           (
                             to,
@@ -9209,6 +8961,437 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.int =>
+                      (
+                        s45,
+                        (tok.left, s86) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`}` =>
+                      val nt: NonTerminal = NonTerminal.Opt_int._2
+                      val to = s86.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s86) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _: NonTerminal.Opt_int =>
+                s93
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s87 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            87,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      (
+                        s37,
+                        (tok.left, s87) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.escChars =>
+                      (
+                        s58,
+                        (tok.left, s87) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`(` =>
+                      (
+                        s52,
+                        (tok.left, s87) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.escChar =>
+                      (
+                        s43,
+                        (tok.left, s87) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.char =>
+                      (
+                        s51,
+                        (tok.left, s87) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s87.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s87) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s87.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s87) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _: NonTerminal.CharClass =>
+                s42
+              case _: NonTerminal.SequenceSimple =>
+                s112
+              case _: NonTerminal.Group =>
+                s91
+              case _: NonTerminal.Regex =>
+                s98
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s88 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            88,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.GroupInnerTail._2
+                      val to = s88.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s88) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      (
+                        s87,
+                        (tok.left, s88) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _: NonTerminal.GroupInnerTail =>
+                s41
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s89 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            89,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._4(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s90 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            90,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`>>` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s90.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s90) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.escChars =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s90.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s90) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`(` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s90.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s90) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.escChar =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s90.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s90) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`@mode:` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s90.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s90) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`<-` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s90.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s90) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.char =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s90.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s90) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`,` =>
+                      (
+                        s48,
+                        (tok.left, s90) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`[` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s90.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s90) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`->` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s90.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s90) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s90.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s90) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                      val to = s90.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s90) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  val nt: NonTerminal = NonTerminal.AnonList6Tail._2
+                  val to = s90.onNt(nt) 
+                  (
+                    to,
+                    (nt.right, s90) :: stack,
+                    None,
+                  ).left.some
+              }
+            },
+            {
+              case _: NonTerminal.AnonList6Tail =>
+                s0
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s91 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            91,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
                     case tok: Tok.escChars =>
                       stack match {
                         case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
@@ -9340,337 +9523,6 @@ object lexer {
                           None
                       }
                     case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s87 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            87,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChar =>
-                      (
-                        s70,
-                        (tok.left, s87) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.chars =>
-                      (
-                        s54,
-                        (tok.left, s87) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`\"` =>
-                      val nt: NonTerminal = NonTerminal.AnonList8Tail._2
-                      val to = s87.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s87) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.Char =>
-                s88
-              case _: NonTerminal.AnonList8Tail =>
-                s13
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s88 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            88,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChar =>
-                      (
-                        s70,
-                        (tok.left, s88) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.chars =>
-                      (
-                        s54,
-                        (tok.left, s88) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`\"` =>
-                      val nt: NonTerminal = NonTerminal.AnonList8Tail._2
-                      val to = s88.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s88) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.Char =>
-                s88
-              case _: NonTerminal.AnonList8Tail =>
-                s14
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s89 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            89,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`@mode:` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList4Tail._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  stack match {
-                    case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.AnonList4Tail._1(_1, _2)
-                      val to = poppedState.onNt(nt)
-                      (
-                        to,
-                        (nt.right, poppedState) :: stack,
-                        None,
-                      ).left.some
-                    case _ =>
-                      None
-                  }
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s90 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            90,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChar =>
-                      (
-                        s70,
-                        (tok.left, s90) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.chars =>
-                      (
-                        s54,
-                        (tok.left, s90) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.Char =>
-                s87
-              case _: NonTerminal.AnonList7Head =>
-                s96
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s91 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            91,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`(` =>
                       stack match {
                         case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
                           val nt: NonTerminal = NonTerminal.Regex._1(_1)
@@ -9703,74 +9555,38 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`[` =>
-                      (
-                        s41,
-                        (tok.left, s92) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChars =>
-                      (
-                        s47,
-                        (tok.left, s92) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`(` =>
-                      (
-                        s120,
-                        (tok.left, s92) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      (
-                        s36,
-                        (tok.left, s92) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.char =>
-                      (
-                        s42,
-                        (tok.left, s92) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s92.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s92) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s92.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s92) :: stack,
-                        tokens.some,
-                      ).left.some
+                    case tok: Tok.`@mode:` =>
+                      stack match {
+                        case (Right(_3: NonTerminal.AnonList3Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@mode:`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Mode(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
                     case tok =>
                       None
                   }
                 case None =>
-                  None
+                  stack match {
+                    case (Right(_3: NonTerminal.AnonList3Head), _) :: (Left(_2: Tok.mode), _) :: (Left(_1: Tok.`@mode:`), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.Mode(_1, _2, _3)
+                      val to = poppedState.onNt(nt)
+                      (
+                        to,
+                        (nt.right, poppedState) :: stack,
+                        None,
+                      ).left.some
+                    case _ =>
+                      None
+                  }
               }
             },
             {
-              case _: NonTerminal.SequenceSimple =>
-                s81
-              case _: NonTerminal.Regex =>
-                s84
-              case _: NonTerminal.CharClass =>
-                s35
-              case _: NonTerminal.AnonList3Head =>
-                s56
-              case _: NonTerminal.Group =>
-                s86
-              case _: NonTerminal.Line =>
-                s60
-              case _: NonTerminal.GroupInnerHead =>
-                s124
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
@@ -9783,116 +9599,20 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`>>` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s93.onNt(nt) 
+                    case tok: Tok.`}` =>
                       (
-                        to,
-                        (nt.right, s93) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.escChars =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s93.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s93) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`(` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s93.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s93) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s93.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s93) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`@mode:` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s93.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s93) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`<-` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s93.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s93) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.char =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s93.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s93) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`,` =>
-                      (
-                        s45,
+                        s46,
                         (tok.left, s93) :: stack,
                         tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`[` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s93.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s93) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`->` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s93.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s93) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s93.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s93) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                      val to = s93.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s93) :: stack,
-                        tokens.some,
                       ).left.some
                     case tok =>
                       None
                   }
                 case None =>
-                  val nt: NonTerminal = NonTerminal.AnonList6Tail._2
-                  val to = s93.onNt(nt) 
-                  (
-                    to,
-                    (nt.right, s93) :: stack,
-                    None,
-                  ).left.some
+                  None
               }
             },
             {
-              case _: NonTerminal.AnonList6Tail =>
-                s48
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
@@ -9905,12 +9625,149 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`}` =>
-                      (
-                        s38,
-                        (tok.left, s94) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Right(_1: NonTerminal.Group), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Regex._1(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
                     case tok =>
                       None
                   }
@@ -9931,140 +9788,10 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.escChars =>
+                    case tok: Tok.`]` =>
                       stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`;` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                        case (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.CCChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList10Tail._1(_1, _2)
                           val to = poppedState.onNt(nt)
                           (
                             to,
@@ -10094,11 +9821,25 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`\"` =>
+                    case tok: Tok.escChar =>
                       (
-                        s105,
+                        s80,
                         (tok.left, s96) :: stack,
                         tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.chars =>
+                      (
+                        s64,
+                        (tok.left, s96) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`\"` =>
+                      val nt: NonTerminal = NonTerminal.AnonList8Tail._2
+                      val to = s96.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s96) :: stack,
+                        tokens.some,
                       ).left.some
                     case tok =>
                       None
@@ -10108,6 +9849,10 @@ object lexer {
               }
             },
             {
+              case _: NonTerminal.Char =>
+                s96
+              case _: NonTerminal.AnonList8Tail =>
+                s73
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
@@ -10120,35 +9865,17 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`@mode:` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList3Head(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                    case tok: Tok.`]` =>
+                      (
+                        s14,
+                        (tok.left, s97) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok =>
                       None
                   }
                 case None =>
-                  stack match {
-                    case (Right(_2: NonTerminal.AnonList4Tail), _) :: (Right(_1: NonTerminal.Line), poppedState) :: stack =>
-                      val nt: NonTerminal = NonTerminal.AnonList3Head(_1, _2)
-                      val to = poppedState.onNt(nt)
-                      (
-                        to,
-                        (nt.right, poppedState) :: stack,
-                        None,
-                      ).left.some
-                    case _ =>
-                      None
-                  }
+                  None
               }
             },
             {
@@ -10164,11 +9891,75 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`]` =>
+                    case tok: Tok.escChars =>
                       (
-                        s11,
+                        s58,
                         (tok.left, s98) :: stack,
                         tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`(` =>
+                      (
+                        s52,
+                        (tok.left, s98) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.escChar =>
+                      (
+                        s43,
+                        (tok.left, s98) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`*` =>
+                      (
+                        s63,
+                        (tok.left, s98) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.char =>
+                      (
+                        s51,
+                        (tok.left, s98) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`[` =>
+                      (
+                        s37,
+                        (tok.left, s98) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`{` =>
+                      (
+                        s50,
+                        (tok.left, s98) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`?` =>
+                      (
+                        s77,
+                        (tok.left, s98) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`+` =>
+                      (
+                        s7,
+                        (tok.left, s98) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s98.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s98) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s98.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s98) :: stack,
+                        tokens.some,
                       ).left.some
                     case tok =>
                       None
@@ -10178,6 +9969,16 @@ object lexer {
               }
             },
             {
+              case _: NonTerminal.SequenceSimple =>
+                s24
+              case _: NonTerminal.Regex =>
+                s98
+              case _: NonTerminal.CharClass =>
+                s42
+              case _: NonTerminal.Group =>
+                s91
+              case _: NonTerminal.Quant =>
+                s20
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
@@ -10191,6 +9992,19 @@ object lexer {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
                       stack match {
                         case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
                           val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
@@ -10217,19 +10031,6 @@ object lexer {
                           None
                       }
                     case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
                       stack match {
                         case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
                           val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
@@ -10307,7 +10108,7 @@ object lexer {
                         case _ =>
                           None
                       }
-                    case tok: Tok.`)` =>
+                    case tok: Tok.`;` =>
                       stack match {
                         case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
                           val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
@@ -10320,7 +10121,7 @@ object lexer {
                         case _ =>
                           None
                       }
-                    case tok: Tok.`(` =>
+                    case tok: Tok.`|` =>
                       stack match {
                         case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
                           val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
@@ -10353,18 +10154,181 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_3: Tok.`)`), _) :: (Right(_2: NonTerminal.GroupInnerHead), _) :: (Left(_1: Tok.`(`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Group(_1, _2, _3)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s101 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            101,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
                     case tok: Tok.int =>
                       (
-                        s37,
-                        (tok.left, s100) :: stack,
+                        s45,
+                        (tok.left, s101) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok: Tok.`}` =>
                       val nt: NonTerminal = NonTerminal.Opt_int._2
-                      val to = s100.onNt(nt) 
+                      val to = s101.onNt(nt) 
                       (
                         to,
-                        (nt.right, s100) :: stack,
+                        (nt.right, s101) :: stack,
                         tokens.some,
                       ).left.some
                     case tok =>
@@ -10376,15 +10340,15 @@ object lexer {
             },
             {
               case _: NonTerminal.Opt_int =>
-                s21
+                s25
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
           )
         
-        s101 =
+        s102 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            101,
+            102,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -10428,30 +10392,58 @@ object lexer {
             },
           )
         
-        s102 =
+        s103 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            102,
+            103,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.`[` =>
+                      (
+                        s37,
+                        (tok.left, s103) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok: Tok.escChars =>
                       (
-                        s119,
-                        (tok.left, s102) :: stack,
+                        s58,
+                        (tok.left, s103) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`(` =>
+                      (
+                        s52,
+                        (tok.left, s103) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok: Tok.escChar =>
                       (
-                        s115,
-                        (tok.left, s102) :: stack,
+                        s43,
+                        (tok.left, s103) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok: Tok.char =>
                       (
-                        s17,
-                        (tok.left, s102) :: stack,
+                        s51,
+                        (tok.left, s103) :: stack,
                         tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s103.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s103) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s103.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s103) :: stack,
+                        tokens.some,
                       ).left.some
                     case tok =>
                       None
@@ -10461,20 +10453,28 @@ object lexer {
               }
             },
             {
-              case _: NonTerminal.CCChars =>
-                s122
-              case _: NonTerminal.AnonList9Head =>
-                s24
-              case _: NonTerminal.CCChar =>
-                s10
+              case _: NonTerminal.SequenceSimple =>
+                s88
+              case _: NonTerminal.Regex =>
+                s98
+              case _: NonTerminal.CharClass =>
+                s42
+              case _: NonTerminal.Group =>
+                s91
+              case _: NonTerminal.Line =>
+                s3
+              case _: NonTerminal.GroupInnerHead =>
+                s107
+              case _: NonTerminal.AnonList3Head =>
+                s92
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
           )
         
-        s103 =
+        s104 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            103,
+            104,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -10635,23 +10635,54 @@ object lexer {
             },
           )
         
-        s104 =
+        s105 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            104,
+            105,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  stack match {
+                    case (Right(_2: NonTerminal.AnonList2Tail), _) :: (Right(_1: NonTerminal.Mode), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.AnonList2Tail._1(_1, _2)
+                      val to = poppedState.onNt(nt)
+                      (
+                        to,
+                        (nt.right, poppedState) :: stack,
+                        None,
+                      ).left.some
+                    case _ =>
+                      None
+                  }
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s106 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            106,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
                     case tok: Tok.`,` =>
                       (
-                        s100,
-                        (tok.left, s104) :: stack,
+                        s101,
+                        (tok.left, s106) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok: Tok.`}` =>
                       (
-                        s58,
-                        (tok.left, s104) :: stack,
+                        s70,
+                        (tok.left, s106) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok =>
@@ -10667,9 +10698,198 @@ object lexer {
             },
           )
         
-        s105 =
+        s107 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            105,
+            107,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`;` =>
+                      (
+                        s35,
+                        (tok.left, s107) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s108 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            108,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s109 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            109,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -10700,322 +10920,6 @@ object lexer {
             },
           )
         
-        s106 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            106,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`]` =>
-                      stack match {
-                        case (Right(_2: NonTerminal.AnonList10Tail), _) :: (Right(_1: NonTerminal.CCChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.AnonList10Tail._1(_1, _2)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s107 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            107,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_1: Tok.`+`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Quant._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s108 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            108,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`[` =>
-                      (
-                        s41,
-                        (tok.left, s108) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChars =>
-                      (
-                        s47,
-                        (tok.left, s108) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`(` =>
-                      (
-                        s120,
-                        (tok.left, s108) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      (
-                        s36,
-                        (tok.left, s108) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.char =>
-                      (
-                        s42,
-                        (tok.left, s108) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s108.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s108) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s108.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s108) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.CharClass =>
-                s35
-              case _: NonTerminal.SequenceSimple =>
-                s113
-              case _: NonTerminal.Group =>
-                s86
-              case _: NonTerminal.Regex =>
-                s84
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s109 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            109,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`,` =>
-                      stack match {
-                        case (Left(_1: Tok.int), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Opt_int._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`}` =>
-                      stack match {
-                        case (Left(_1: Tok.int), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.Opt_int._1(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
         s110 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             110,
@@ -11023,46 +10927,129 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
                     case tok: Tok.escChars =>
-                      (
-                        s119,
-                        (tok.left, s110) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`]` =>
-                      val nt: NonTerminal = NonTerminal.AnonList10Tail._2
-                      val to = s110.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s110) :: stack,
-                        tokens.some,
-                      ).left.some
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
                     case tok: Tok.escChar =>
-                      (
-                        s115,
-                        (tok.left, s110) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`@mode:` =>
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
                     case tok: Tok.char =>
-                      (
-                        s17,
-                        (tok.left, s110) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`;` =>
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
                     case tok =>
                       None
                   }
                 case None =>
-                  None
+                  stack match {
+                    case (Right(_4: NonTerminal.OptToMode), _) :: (Right(_3: NonTerminal.AnonList5Head), _) :: (Left(_2: Tok.`;`), _) :: (Right(_1: NonTerminal.GroupInnerHead), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.Line(_1, _2, _3, _4)
+                      val to = poppedState.onNt(nt)
+                      (
+                        to,
+                        (nt.right, poppedState) :: stack,
+                        None,
+                      ).left.some
+                    case _ =>
+                      None
+                  }
               }
             },
             {
-              case _: NonTerminal.AnonList10Tail =>
-                s106
-              case _: NonTerminal.CCChars =>
-                s110
-              case _: NonTerminal.CCChar =>
-                s10
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
@@ -11077,13 +11064,13 @@ object lexer {
                   tokens.head match {
                     case tok: Tok.`,` =>
                       (
-                        s80,
+                        s86,
                         (tok.left, s111) :: stack,
                         tokens.tail.toNel,
                       ).left.some
                     case tok: Tok.`}` =>
                       (
-                        s103,
+                        s104,
                         (tok.left, s111) :: stack,
                         tokens.tail.toNel,
                       ).left.some
@@ -11107,9 +11094,17 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`@start:` =>
+                    case tok: Tok.`;` =>
+                      val nt: NonTerminal = NonTerminal.GroupInnerTail._2
+                      val to = s112.onNt(nt) 
                       (
-                        s39,
+                        to,
+                        (nt.right, s112) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      (
+                        s87,
                         (tok.left, s112) :: stack,
                         tokens.tail.toNel,
                       ).left.some
@@ -11121,8 +11116,8 @@ object lexer {
               }
             },
             {
-              case _: NonTerminal.Lexer =>
-                s25
+              case _: NonTerminal.GroupInnerTail =>
+                s65
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
@@ -11131,42 +11126,6 @@ object lexer {
         s113 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             113,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`;` =>
-                      val nt: NonTerminal = NonTerminal.GroupInnerTail._2
-                      val to = s113.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s113) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      (
-                        s108,
-                        (tok.left, s113) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.GroupInnerTail =>
-                s55
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s114 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            114,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -11351,9 +11310,9 @@ object lexer {
             },
           )
         
-        s115 =
+        s114 =
           Grammar.State[Tok, NonTerminal, NtRoot](
-            115,
+            114,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -11428,6 +11387,180 @@ object lexer {
                   }
                 case None =>
                   None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s115 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            115,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`>>` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`@mode:` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`<-` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`->` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`;` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  stack match {
+                    case (Right(_2: NonTerminal.AnonList6Tail), _) :: (Right(_1: NonTerminal.Yield), poppedState) :: stack =>
+                      val nt: NonTerminal = NonTerminal.AnonList5Head._1(_1, _2)
+                      val to = poppedState.onNt(nt)
+                      (
+                        to,
+                        (nt.right, poppedState) :: stack,
+                        None,
+                      ).left.some
+                    case _ =>
+                      None
+                  }
               }
             },
             {
@@ -11515,27 +11648,30 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_1: Tok.term), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.YieldType._2(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                    case tok: Tok.`@mode:` =>
+                      (
+                        s76,
+                        (tok.left, s117) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok =>
                       None
                   }
                 case None =>
-                  None
+                  val nt: NonTerminal = NonTerminal.AnonList2Tail._2
+                  val to = s117.onNt(nt) 
+                  (
+                    to,
+                    (nt.right, s117) :: stack,
+                    None,
+                  ).left.some
               }
             },
             {
+              case _: NonTerminal.AnonList2Tail =>
+                s74
+              case _: NonTerminal.Mode =>
+                s54
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
@@ -11550,8 +11686,21 @@ object lexer {
                   tokens.head match {
                     case tok: Tok.escChars =>
                       stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChars._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`]` =>
+                      stack match {
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChars._3(_1)
                           val to = poppedState.onNt(nt)
                           (
                             to,
@@ -11563,34 +11712,8 @@ object lexer {
                       }
                     case tok: Tok.escChar =>
                       stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChars._3(_1)
                           val to = poppedState.onNt(nt)
                           (
                             to,
@@ -11602,86 +11725,8 @@ object lexer {
                       }
                     case tok: Tok.char =>
                       stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`[` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_4: Tok.`]`), _) :: (Right(_3: NonTerminal.AnonList9Head), _) :: (Right(_2: NonTerminal.`Opt_^`), _) :: (Left(_1: Tok.`[`), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._1(_1, _2, _3, _4)
+                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CCChars._3(_1)
                           val to = poppedState.onNt(nt)
                           (
                             to,
@@ -11711,58 +11756,52 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
+                    case tok: Tok.`[` =>
+                      (
+                        s59,
+                        (tok.left, s119) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChars._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`]` =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChars._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s89,
+                        (tok.left, s119) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChars._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s124,
+                        (tok.left, s119) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`|` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s119.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s119) :: stack,
+                        tokens.some,
+                      ).left.some
                     case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.escChars), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CCChars._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
+                      (
+                        s60,
+                        (tok.left, s119) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`)` =>
+                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
+                      val to = s119.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s119) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok: Tok.`(` =>
+                      (
+                        s39,
+                        (tok.left, s119) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
                     case tok =>
                       None
                   }
@@ -11771,6 +11810,14 @@ object lexer {
               }
             },
             {
+              case _: NonTerminal.CharClass =>
+                s67
+              case _: NonTerminal.SequenceSimple =>
+                s34
+              case _: NonTerminal.Group =>
+                s94
+              case _: NonTerminal.Regex =>
+                s66
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
@@ -11783,49 +11830,9 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.`[` =>
+                    case tok: Tok.`@mode:` =>
                       (
-                        s75,
-                        (tok.left, s120) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChars =>
-                      (
-                        s85,
-                        (tok.left, s120) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      (
-                        s121,
-                        (tok.left, s120) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`|` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s120.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s120) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.char =>
-                      (
-                        s50,
-                        (tok.left, s120) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`)` =>
-                      val nt: NonTerminal = NonTerminal.SequenceSimple._2
-                      val to = s120.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s120) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.`(` =>
-                      (
-                        s71,
+                        s76,
                         (tok.left, s120) :: stack,
                         tokens.tail.toNel,
                       ).left.some
@@ -11837,16 +11844,10 @@ object lexer {
               }
             },
             {
-              case _: NonTerminal.SequenceSimple =>
+              case _: NonTerminal.AnonList1Head =>
                 s69
-              case _: NonTerminal.Regex =>
-                s67
-              case _: NonTerminal.CharClass =>
-                s57
-              case _: NonTerminal.Group =>
-                s91
-              case _: NonTerminal.GroupInnerHead =>
-                s3
+              case _: NonTerminal.Mode =>
+                s117
               case _ =>
                 ??? // NOTE : This should not be possible...
             },
@@ -11859,140 +11860,10 @@ object lexer {
               tokens match {
                 case Some(tokens) =>
                   tokens.head match {
-                    case tok: Tok.escChars =>
-                      stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.escChar =>
-                      stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`*` =>
-                      stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`|` =>
-                      stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.char =>
-                      stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
                     case tok: Tok.`[` =>
                       stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`{` =>
-                      stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`?` =>
-                      stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`+` =>
-                      stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`)` =>
-                      stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
-                          val to = poppedState.onNt(nt)
-                          (
-                            to,
-                            (nt.right, poppedState) :: stack,
-                            tokens.some,
-                          ).left.some
-                        case _ =>
-                          None
-                      }
-                    case tok: Tok.`(` =>
-                      stack match {
-                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
-                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
+                        case (Left(_1: Tok.term), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.YieldType._2(_1)
                           val to = poppedState.onNt(nt)
                           (
                             to,
@@ -12018,110 +11889,6 @@ object lexer {
         s122 =
           Grammar.State[Tok, NonTerminal, NtRoot](
             122,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.escChars =>
-                      (
-                        s119,
-                        (tok.left, s122) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.`]` =>
-                      val nt: NonTerminal = NonTerminal.AnonList10Tail._2
-                      val to = s122.onNt(nt) 
-                      (
-                        to,
-                        (nt.right, s122) :: stack,
-                        tokens.some,
-                      ).left.some
-                    case tok: Tok.escChar =>
-                      (
-                        s115,
-                        (tok.left, s122) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok: Tok.char =>
-                      (
-                        s17,
-                        (tok.left, s122) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _: NonTerminal.AnonList10Tail =>
-                s0
-              case _: NonTerminal.CCChars =>
-                s110
-              case _: NonTerminal.CCChar =>
-                s10
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s123 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            123,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.mode =>
-                      (
-                        s26,
-                        (tok.left, s123) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s124 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            124,
-            { (stack, tokens) =>
-              tokens match {
-                case Some(tokens) =>
-                  tokens.head match {
-                    case tok: Tok.`;` =>
-                      (
-                        s73,
-                        (tok.left, s124) :: stack,
-                        tokens.tail.toNel,
-                      ).left.some
-                    case tok =>
-                      None
-                  }
-                case None =>
-                  None
-              }
-            },
-            {
-              case _ =>
-                ??? // NOTE : This should not be possible...
-            },
-          )
-        
-        s125 =
-          Grammar.State[Tok, NonTerminal, NtRoot](
-            125,
             { (stack, tokens) =>
               tokens match {
                 case Some(tokens) =>
@@ -12152,7 +11919,240 @@ object lexer {
             },
           )
         
-        s112
+        s123 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            123,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChar =>
+                      (
+                        s80,
+                        (tok.left, s123) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.chars =>
+                      (
+                        s64,
+                        (tok.left, s123) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok: Tok.`\"` =>
+                      val nt: NonTerminal = NonTerminal.AnonList8Tail._2
+                      val to = s123.onNt(nt) 
+                      (
+                        to,
+                        (nt.right, s123) :: stack,
+                        tokens.some,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _: NonTerminal.Char =>
+                s96
+              case _: NonTerminal.AnonList8Tail =>
+                s19
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s124 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            124,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.escChars =>
+                      stack match {
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.escChar =>
+                      stack match {
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`*` =>
+                      stack match {
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`|` =>
+                      stack match {
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.char =>
+                      stack match {
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`[` =>
+                      stack match {
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`{` =>
+                      stack match {
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`?` =>
+                      stack match {
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`+` =>
+                      stack match {
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`)` =>
+                      stack match {
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok: Tok.`(` =>
+                      stack match {
+                        case (Left(_1: Tok.escChar), poppedState) :: stack =>
+                          val nt: NonTerminal = NonTerminal.CharClass._3(_1)
+                          val to = poppedState.onNt(nt)
+                          (
+                            to,
+                            (nt.right, poppedState) :: stack,
+                            tokens.some,
+                          ).left.some
+                        case _ =>
+                          None
+                      }
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s125 =
+          Grammar.State[Tok, NonTerminal, NtRoot](
+            125,
+            { (stack, tokens) =>
+              tokens match {
+                case Some(tokens) =>
+                  tokens.head match {
+                    case tok: Tok.mode =>
+                      (
+                        s31,
+                        (tok.left, s125) :: stack,
+                        tokens.tail.toNel,
+                      ).left.some
+                    case tok =>
+                      None
+                  }
+                case None =>
+                  None
+              }
+            },
+            {
+              case _ =>
+                ??? // NOTE : This should not be possible...
+            },
+          )
+        
+        s22
       },
     )
   
