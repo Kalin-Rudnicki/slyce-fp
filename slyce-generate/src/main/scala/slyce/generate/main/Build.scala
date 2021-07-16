@@ -708,27 +708,19 @@ object Build {
                       s"case $matchStr :: stack =>",
                       indented(
                         s"val nt: NonTerminal = $ntRef",
-                        "poppedState.onNt(nt) match {",
+                        "val to = poppedState.onNt(nt)",
+                        "(",
                         indented(
-                          "case Alive(to) =>",
-                          indented(
-                            "(",
-                            indented(
-                              "to,",
-                              "(nt.right, poppedState) :: stack,",
-                              s"$retToks,",
-                            ),
-                            ").left.pure[Attempt]",
-                          ),
-                          "case dead @ Dead(_) =>",
-                          indented(
-                            "dead",
-                          ),
+                          "to,",
+                          "(nt.right, poppedState) :: stack,",
+                          s"$retToks,",
                         ),
-                        "}",
+                        ").left.some",
                       ),
                       "case _ =>",
-                      indented(s"""Dead(Marked("This should be impossible (1)... $matchStr") :: Nil)"""),
+                      indented(
+                        "None",
+                      ),
                     ),
                     "}",
                   )
@@ -736,24 +728,14 @@ object Build {
                   // TODO (KR) : Might need changes here as well...
                   inline(
                     s"val nt: NonTerminal = $ntName",
-                    s"s${state.id}.onNt(nt) match {",
+                    s"val to = s${state.id}.onNt(nt) ",
+                    "(",
                     indented(
-                      "case Alive(to) =>",
-                      indented(
-                        "(",
-                        indented(
-                          "to,",
-                          s"(nt.right, s${state.id}) :: stack,",
-                          s"$retToks,",
-                        ),
-                        ").left.pure[Attempt]",
-                      ),
-                      "case dead @ Dead(_) =>",
-                      indented(
-                        "dead",
-                      ),
+                      "to,",
+                      s"(nt.right, s${state.id}) :: stack,",
+                      s"$retToks,",
                     ),
-                    "}",
+                    ").left.some",
                   )
               }
             }
@@ -792,7 +774,7 @@ object Build {
                                             s"(tok.left, s${state.id}) :: stack,",
                                             "tokens.tail.toNel,",
                                           ),
-                                          ").left.pure[Attempt]",
+                                          ").left.some",
                                         )
                                       case reduce @ ParsingTable.ParseState.Reduce(_, _) =>
                                         makeReduce(reduce, "tokens.some")
@@ -802,7 +784,7 @@ object Build {
                             },
                           "case tok =>",
                           indented(
-                            """Dead(Marked("Unexpected token", tok.span) :: Nil)""",
+                            "None",
                           ),
                         ),
                         "}",
@@ -825,17 +807,14 @@ object Build {
                                 "stack match {",
                                 indented(
                                   "case (Right(ntRoot: NtRoot), _) :: Nil =>",
-                                  indented("ntRoot.right.pure[Attempt]"),
+                                  indented("ntRoot.right.some"),
                                   "case _ =>",
-                                  indented("""Dead(Marked("This should be impossible (2)...") :: Nil)"""),
+                                  indented("None"),
                                 ),
                                 "}",
                               )
                             } else {
-                              inline(
-                                "// TODO : Get access to Source",
-                                """Dead(Marked("Unexpected EOF") :: Nil)""",
-                              )
+                              "None"
                             }
                         },
                       ),
@@ -849,11 +828,11 @@ object Build {
                       case (nonTerminal, shift) =>
                         inline(
                           s"case _: ${scopedIdentifierName(nonTerminal, true)} =>",
-                          indented(s"s${shift.to.value.id}.pure[Attempt]"),
+                          indented(s"s${shift.to.value.id}"),
                         )
                     },
                     "case _ =>",
-                    indented("""Dead(Marked("This should be impossible (3)...") :: Nil)"""),
+                    indented("??? // NOTE : This should not be possible..."),
                   ),
                   "},",
                 ),

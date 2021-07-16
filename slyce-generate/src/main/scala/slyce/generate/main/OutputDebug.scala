@@ -49,6 +49,13 @@ object OutputDebug {
           border := "1px solid black",
         )
 
+        "td .tooltip-text" - (
+          display := "none",
+        )
+        "td:hover .tooltip-text" - (
+          display := "block",
+        )
+
         "a" - (
           textDecoration := "none",
           color := "black",
@@ -712,7 +719,26 @@ object OutputDebug {
             },
           )
 
-        def parsingTableToHtml(parsingTable: Attempt[ParsingTable]): Frag =
+        def parsingTableToHtml(parsingTable: Attempt[ParsingTable]): Frag = {
+          def stateId(idx: Int): Frag =
+            a(
+              span(
+                idx,
+                padding := "3px 10px",
+                margin := "5px 0px",
+              ),
+              id := s"parsing-state-$idx",
+            )
+          def stateRef(idx: Int): Frag =
+            a(
+              span(
+                idx,
+                padding := "3px 10px",
+                margin := "5px 0px",
+              ),
+              href := s"#parsing-state-$idx",
+            )
+
           subSection("Parsing Table")(
             sectionOrErrors(parsingTable) { parsingTable =>
               val finishTerms =
@@ -732,14 +758,27 @@ object OutputDebug {
               def nonTerminalIdx(nonTerm: ExpandedGrammar.Identifier.NonTerminal): Int =
                 allTerminals.size + allNonTerminals.indexOf(nonTerm.toString)
 
+              def tooltip(idx: Int): Frag =
+                span(
+                  `class` := "tooltip-text",
+                  color := "green",
+                  if (idx < allTerminals.size)
+                    allTerminals(idx)
+                  else
+                    allNonTerminals(idx - allTerminals.size),
+                )
+
+              val allSize = allTerminals.size + allNonTerminals.size
+
               List[Frag](
                 subSection("Parsing Table")(
                   setting("Start State")(
-                    p(parsingTable.startState.id),
+                    stateRef(parsingTable.startState.id),
                   ),
                   setting("Table")(
                     table(
                       tr(
+                        th("State", padding := "0 25px", minWidth := "70px", rowspan := 2),
                         th(colspan := allTerminals.size)("Terminals"),
                         th(colspan := allNonTerminals.size)("NonTerminals"),
                       ),
@@ -747,11 +786,42 @@ object OutputDebug {
                         allTerminals.map(t => th(padding := "0 25px", minWidth := "70px")(t)),
                         allNonTerminals.map(t => th(padding := "0 25px", minWidth := "70px")(t)),
                       ),
-                      parsingTable.states.map { state =>
-                        tr(
-                          td(s"State #${state.id}"),
-                          td(TODO),
-                        )
+                      parsingTable.states.map {
+                        state =>
+                          val finishesOnMap: Map[Int, Frag] =
+                            state.finishesOn
+                              .map(t => (terminalIdx(t), span("[NtRoot]")))
+                              .toMap
+                          val onTermMap: Map[Int, Frag] =
+                            state.terminalActions.map {
+                              case (terminal, action) =>
+                                (
+                                  terminalIdx(terminal),
+                                  action match {
+                                    case ParsingTable.ParseState.Shift(to) =>
+                                      span("Shift: ", stateRef(to.value.id))
+                                    case ParsingTable.ParseState.Reduce(produces, _) =>
+                                      span(s"Reduce: ${produces._1.toString}[${produces._2}]")
+                                  },
+                                )
+                            }
+                          val onNonTermMap: Map[Int, Frag] =
+                            state.nonTerminalActions.map {
+                              case (nonTerminal, shift) =>
+                                (nonTerminalIdx(nonTerminal), span("Shift: ", stateRef(shift.to.value.id)))
+                            }
+
+                          val combinedMap = finishesOnMap ++ onTermMap ++ onNonTermMap
+
+                          tr(
+                            td(stateId(state.id), verticalAlign := "top", textAlign := "center"),
+                            0.until(allSize).toList.map { idx =>
+                              td(
+                                combinedMap.getOrElse(idx, ()),
+                                tooltip(idx),
+                              )
+                            },
+                          )
                       },
                     ),
                   ),
@@ -759,6 +829,7 @@ object OutputDebug {
               )
             },
           )
+        }
 
         def cata[T](good: BuildOutput => T, bad: PartialBuildOutput => Attempt[T]): Attempt[T] =
           aBuildOutput match {

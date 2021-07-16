@@ -607,7 +607,3 @@ object Main {
   }
 
 }
-/*
-  -o, --output-dir  <arg>         Directory to output generated files in
-                                  In same tree structure as inputDir
- */

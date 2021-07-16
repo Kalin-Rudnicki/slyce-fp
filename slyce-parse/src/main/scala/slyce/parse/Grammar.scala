@@ -9,7 +9,7 @@ import slyce.core._
 
 final case class Grammar[Tok <: Token, Nt, NtRoot <: Nt](state0: Grammar.State[Tok, Nt, NtRoot]) {
 
-  def buildTree(tokens: List[Tok]): Attempt[NtRoot] = {
+  def buildTree(source: Source, tokens: List[Tok]): Attempt[NtRoot] = {
 
     @tailrec
     def loop(
@@ -21,7 +21,7 @@ final case class Grammar[Tok <: Token, Nt, NtRoot <: Nt](state0: Grammar.State[T
         stack,
         tokens,
       ) match {
-        case Alive(res) =>
+        case Some(res) =>
           res match {
             case Left((newCurrentState, newStack, newTokens)) =>
               loop(
@@ -32,8 +32,13 @@ final case class Grammar[Tok <: Token, Nt, NtRoot <: Nt](state0: Grammar.State[T
             case Right(ntRoot) =>
               ntRoot.pure[Attempt]
           }
-        case dead @ Dead(_) =>
-          dead
+        case None =>
+          tokens match {
+            case Some(tokens) =>
+              Dead(Marked(s"Unexpected token [s${currentState.id}]: ${tokens.head.tokName}", tokens.head.span) :: Nil)
+            case None =>
+              Dead(Marked(s"Unexpected EOF [s${currentState.id}]", Span.EOF(source)) :: Nil)
+          }
       }
 
     loop(
@@ -50,7 +55,7 @@ object Grammar {
 
   final case class State[Tok <: Token, Nt, NtRoot <: Nt](
       id: Int,
-      handleStack: (Stack[Tok, Nt, NtRoot], Maybe[NonEmptyList[Tok]]) => Attempt[
+      handleStack: (Stack[Tok, Nt, NtRoot], Maybe[NonEmptyList[Tok]]) => Maybe[
         (
             State[Tok, Nt, NtRoot],
             Stack[Tok, Nt, NtRoot],
@@ -58,7 +63,7 @@ object Grammar {
         ) \/
           NtRoot,
       ],
-      onNt: Nt => Attempt[State[Tok, Nt, NtRoot]],
+      onNt: Nt => State[Tok, Nt, NtRoot],
   )
 
 }
