@@ -23,6 +23,8 @@ final case class ExpandedGrammar private (
 object ExpandedGrammar {
 
   val LiftType = "LiftType"
+  val Operator = "Operator"
+  val Operand = "Operand"
 
   final case class Alias(
       named: Identifier.NonTerminal,
@@ -60,6 +62,12 @@ object ExpandedGrammar {
 
     final case class Lift(
         idxs: NonEmptyList[Int],
+    ) extends Extra
+
+    final case class LiftExpr(
+        baseName: String,
+        assocs: NonEmptyList[Grammar.AssocNonTerminal.Type],
+        idxs: NonEmptyList[(Int, Boolean)],
     ) extends Extra
 
   }
@@ -250,11 +258,28 @@ object ExpandedGrammar {
     def expandStandardNonTerminal(
         name: Identifier.NonTerminal,
         snt: Grammar.StandardNonTerminal,
-        exprBaseId: Maybe[Identifier.NonTerminal],
+        exprExtras: Maybe[(String, NonEmptyList[Grammar.AssocNonTerminal.Type])],
     ): Attempt[Expansion[Identifier]] = {
 
       snt match {
         case Grammar.StandardNonTerminal.`:`(reductions) =>
+          val mAddWiths: Maybe[Identifier => With] =
+            exprExtras match {
+              case Some(_) =>
+                // TODO (KR) :
+                None
+              case None =>
+                None
+            }
+          val lift: Maybe[ExtraFor] =
+            exprExtras match {
+              case Some(_) =>
+                // TODO (KR) :
+                None
+              case None =>
+                None
+            }
+
           for {
             eReductions <- reductions.map(expandList).traverse
             tmpENt = Expansion.combine(eReductions)(ers => NT(name, ers))
@@ -262,27 +287,48 @@ object ExpandedGrammar {
             .copy(generatedNts = tmpENt.data :: tmpENt.generatedNts)
             .map(_ => name)
         case Grammar.StandardNonTerminal.^(reductions) =>
-          val mAddWiths: Maybe[Identifier => With] =
-            exprBaseId match {
-              case Some(exprBaseId) =>
-                None
+          val mAddWiths: Identifier => Maybe[With] =
+            exprExtras match {
+              case Some((n, _)) => {
+                case Identifier.NonTerminal.NamedNt(n2) if n == n2 => None
+                case id                                            => With(id, Identifier.NonTerminal.AssocNt(n, 1), Operand).some
+              }
               case None =>
-                Some(With(_, name, LiftType))
+                With(_, name, LiftType).some
             }
-          val lift: Maybe[ExtraFor] =
-            exprBaseId match {
-              case Some(exprBaseId) =>
-                None
+          val lift: ExtraFor =
+            exprExtras match {
+              case Some((n, assocs)) =>
+                val base = Identifier.NonTerminal.AssocNt(n, 1)
+                ExtraFor(
+                  base,
+                  Extra.LiftExpr(
+                    n,
+                    assocs.reverse,
+                    reductions.map { r =>
+                      (
+                        r.unIgnoredIdx,
+                        r.unIgnored.value match {
+                          case Grammar.Identifier.NonTerminal(n2) => n == n2
+                          case _                                  => false
+                        },
+                      )
+                    },
+                  ),
+                )
               case None =>
-                ExtraFor(name, Extra.Lift(reductions.map(_.unIgnoredIdx))).some
+                ExtraFor(
+                  name,
+                  Extra.Lift(reductions.map(_.unIgnoredIdx)),
+                )
             }
 
-          // TODO (KR) : Need extra information for lifting
+          // TODO (KR) : Do same sort of self-reference expansion for normal `^` as well?
           for {
-            eReductions <- reductions.map(expandIgnoredList(_, mAddWiths)).traverse
+            eReductions <- reductions.map(expandIgnoredList(_, mAddWiths.some)).traverse
             tmpENt = Expansion.combine(eReductions)(ers => NT(name, ers))
           } yield tmpENt
-            .add(generatedNts = tmpENt.data :: Nil, extras = lift.toList)
+            .add(generatedNts = tmpENt.data :: Nil, extras = lift :: Nil)
             .map(_ => name)
       }
     }
@@ -331,7 +377,7 @@ object ExpandedGrammar {
           val (ma, myId) = createMyId
 
           for {
-            eStart <- expandIgnoredList(lnt.start, Some(With(_, myId, LiftType)))
+            eStart <- expandIgnoredList(lnt.start, Some(With(_, myId, LiftType).some))
             sR1 = NT.Reduction(eStart.data.elements.appended(myId), eStart.data.liftIdx)
             sNt = NT(myId, sR1, NT.Reduction())
           } yield Expansion(
@@ -349,8 +395,8 @@ object ExpandedGrammar {
           val (ma, myHeadId, myTailId) = createMyIds
 
           for {
-            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, LiftType)))
-            eRepeat <- expandIgnoredList(repeat, Some(With(_, myHeadId, LiftType)))
+            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, LiftType).some))
+            eRepeat <- expandIgnoredList(repeat, Some(With(_, myHeadId, LiftType).some))
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
             rR1 = NT.Reduction(eRepeat.data.elements.appended(myTailId), eRepeat.data.liftIdx)
             sNt = NT(myHeadId, sR1, NT.Reduction())
@@ -376,7 +422,7 @@ object ExpandedGrammar {
           val (ma, myHeadId, myTailId) = createMyIds
 
           for {
-            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, LiftType)))
+            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, LiftType).some))
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
             sNt = NT(myHeadId, sR1)
             rNt = NT(myTailId, sR1, NT.Reduction())
@@ -401,8 +447,8 @@ object ExpandedGrammar {
           val (ma, myHeadId, myTailId) = createMyIds
 
           for {
-            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, LiftType)))
-            eRepeat <- expandIgnoredList(repeat, Some(With(_, myHeadId, LiftType)))
+            eStart <- expandIgnoredList(lnt.start, Some(With(_, myHeadId, LiftType).some))
+            eRepeat <- expandIgnoredList(repeat, Some(With(_, myHeadId, LiftType).some))
             sR1 = NT.Reduction(eStart.data.elements.appended(myTailId), eStart.data.liftIdx)
             rR1 = NT.Reduction(eRepeat.data.elements.appended(myTailId), eRepeat.data.liftIdx)
             sNt = NT(myHeadId, sR1)
@@ -464,8 +510,8 @@ object ExpandedGrammar {
                   ),
                 ) :: Nil,
                 Nil,
-                Nil, // TODO (KR) : sumTypes
-                Nil, // TODO (KR) : extras
+                With(opExpansion.data, Identifier.NonTerminal.AssocNt(name.name, 1), Operator) :: Nil,
+                Nil,
               )
             } yield Expansion.join(
               myExpansion,
@@ -476,7 +522,7 @@ object ExpandedGrammar {
             expandStandardNonTerminal(
               Identifier.NonTerminal.AssocNt(name.name, idx),
               ant.base,
-              Identifier.NonTerminal.AssocNt(name.name, 1).some,
+              (name.name, ant.assocs.map(_._1.value)).some,
             )
         }
 
@@ -502,7 +548,7 @@ object ExpandedGrammar {
 
     def expandIgnoredList(
         il: IgnoredList[Marked[Grammar.Element]],
-        mWith: Maybe[Identifier => With] = None,
+        mWith: Maybe[Identifier => Maybe[With]] = None,
     ): Attempt[Expansion[NT.Reduction]] =
       for {
         beforeExpansions <- il.before.map(expandElement(_)).traverse
@@ -513,7 +559,7 @@ object ExpandedGrammar {
 
     def expandElement(
         element: Marked[Grammar.Element],
-        mWith: Maybe[Identifier => With] = None,
+        mWith: Maybe[Identifier => Maybe[With]] = None,
     ): Attempt[Expansion[Identifier]] = {
 
       val (isOpt, elem) = element.value.toNonOpt
@@ -521,7 +567,7 @@ object ExpandedGrammar {
 
       def addWithIfExists(expansion: Expansion[Identifier]): Expansion[Identifier] =
         mWith match {
-          case Some(withF) => expansion.copy(withs = withF(expansion.data) :: expansion.withs)
+          case Some(withF) => expansion.copy(withs = withF(expansion.data).toList ::: expansion.withs)
           case None        => expansion
         }
 

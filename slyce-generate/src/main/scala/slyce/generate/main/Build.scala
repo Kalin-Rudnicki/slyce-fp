@@ -12,6 +12,7 @@ import klib.utils._
 import slyce.core._
 import slyce.generate._
 import slyce.generate.building._
+import slyce.generate.input._
 
 object Build {
 
@@ -513,6 +514,88 @@ object Build {
                                           ),
                                           "}",
                                         ),
+                                      )
+                                    case ExpandedGrammar.Extra.LiftExpr(baseName, assocs, idxs) =>
+                                      val exprStr = s"Expression[$ntName.${ExpandedGrammar.Operand}, $ntName.${ExpandedGrammar.Operator}]"
+                                      val finalName = s"$baseName${assocs.size + 1}"
+
+                                      def makeExpr(left: IndentedString, op: IndentedString, right: IndentedString): IndentedString =
+                                        inline(
+                                          s"$exprStr(",
+                                          indented(
+                                            left,
+                                            op,
+                                            right,
+                                          ),
+                                          ")",
+                                        )
+
+                                      inline(
+                                        s"def toExpr: $exprStr = {",
+                                        indented(
+                                          assocs.toList.zipWithIndex
+                                            .map { case (assoc, idx) => (assoc, idx + 1) }
+                                            .map {
+                                              case (assoc, idx) =>
+                                                inline(
+                                                  s"def toExpr$idx(expr: $baseName$idx): $exprStr =",
+                                                  indented(
+                                                    "expr match {",
+                                                    indented(
+                                                      s"case $baseName$idx._1(left, op, right) =>",
+                                                      indented(
+                                                        assoc match {
+                                                          case Grammar.AssocNonTerminal.Type.Left =>
+                                                            makeExpr(
+                                                              s"toExpr$idx(left),",
+                                                              "op,",
+                                                              s"toExpr${idx + 1}(right),",
+                                                            )
+                                                          case Grammar.AssocNonTerminal.Type.Right =>
+                                                            makeExpr(
+                                                              s"toExpr${idx + 1}(left),",
+                                                              "op,",
+                                                              s"toExpr$idx(right),",
+                                                            )
+                                                        },
+                                                      ),
+                                                      s"case $baseName$idx._2(child) =>",
+                                                      indented(
+                                                        s"toExpr${idx + 1}(child)",
+                                                      ),
+                                                    ),
+                                                    "}",
+                                                  ),
+                                                  Break,
+                                                )
+                                            },
+                                          inline(
+                                            s"def toExpr${assocs.size + 1}(expr: $finalName): $exprStr =",
+                                            indented(
+                                              "expr match {",
+                                              indented(
+                                                idxs.toList.zipWithIndex
+                                                  .map { case (tuple, idx) => (tuple, idx + 1) }
+                                                  .map {
+                                                    case ((liftIdx, isSelf), i) =>
+                                                      inline(
+                                                        s"case expr: $finalName._$i =>",
+                                                        indented(
+                                                          if (isSelf)
+                                                            s"toExpr1(expr._$liftIdx)"
+                                                          else
+                                                            s"$exprStr(expr._$liftIdx)",
+                                                        ),
+                                                      )
+                                                  },
+                                              ),
+                                              "}",
+                                            ),
+                                          ),
+                                          Break,
+                                          "toExpr1(this)",
+                                        ),
+                                        "}",
                                       )
                                   },
                                   Break,
