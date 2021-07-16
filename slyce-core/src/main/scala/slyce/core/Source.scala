@@ -408,7 +408,7 @@ object Source {
     IO.readFile(file)
       .map(Source(_, file.toString.some))
 
-  def showAll(
+  def markAll(
       msgs: List[Marked[String]],
       config: Config = Config.Default,
   ): String = {
