@@ -3,39 +3,9 @@
 // =====|  |=====
 
 val MyOrg = "io.github.kalin-rudnicki"
+val MyScalaVersion = "2.13.4"
 val githubUsername = "Kalin-Rudnicki"
 val githubProject = "slyce-fp"
-
-ThisBuild / organization := MyOrg
-ThisBuild / organizationName := "kalin-rudnicki"
-ThisBuild / organizationHomepage := Some(url(s"https://github.com/$githubUsername/$githubProject"))
-
-ThisBuild / scmInfo := Some(
-  ScmInfo(
-    url(s"https://github.com/$githubUsername/$githubProject"),
-    s"scm:git@github.com:$githubUsername/$githubProject.git",
-  ),
-)
-ThisBuild / developers := List(
-  Developer(
-    id = "Kalin-Rudnicki",
-    name = "Kalin Rudnicki",
-    email = "kalin.rudnicki@gmail.com",
-    url = url(s"https://github.com/$githubUsername"),
-  ),
-)
-
-ThisBuild / description := "A (flex/bison)-esque parser generator for scala."
-ThisBuild / licenses := List("MIT" -> new URL("https://opensource.org/licenses/MIT"))
-ThisBuild / homepage := Some(url(s"https://github.com/$githubUsername/$githubProject"))
-
-ThisBuild / pomIncludeRepository := { _ => false }
-ThisBuild / publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
-  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
-ThisBuild / publishMavenStyle := true
 
 // =====|  |=====
 
@@ -43,8 +13,42 @@ val SharedSettings =
   Seq(
     organization := MyOrg,
     version := "1.1.1",
-    scalaVersion := "2.13.4",
+    scalaVersion := MyScalaVersion,
     resolvers += Resolver.mavenLocal,
+  )
+
+val PublishSettings =
+  Seq(
+    //
+    description := "A (flex/bison)-esque parser generator for scala.",
+    licenses := List("MIT" -> new URL("https://opensource.org/licenses/MIT")),
+    homepage := Some(url(s"https://github.com/$githubUsername/$githubProject")),
+    //
+    organizationName := "kalin-rudnicki",
+    organizationHomepage := Some(url(s"https://github.com/$githubUsername/$githubProject")),
+    //
+    scmInfo := Some(
+      ScmInfo(
+        url(s"https://github.com/$githubUsername/$githubProject"),
+        s"scm:git@github.com:$githubUsername/$githubProject.git",
+      ),
+    ),
+    developers := List(
+      Developer(
+        id = "Kalin-Rudnicki",
+        name = "Kalin Rudnicki",
+        email = "kalin.rudnicki@gmail.com",
+        url = url(s"https://github.com/$githubUsername"),
+      ),
+    ),
+    //
+    pomIncludeRepository := { _ => false },
+    publishTo := {
+      val nexus = "https://oss.sonatype.org/"
+      if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
+      else Some("releases" at nexus + "service/local/staging/deploy/maven2")
+    },
+    publishMavenStyle := true,
   )
 
 lazy val `slyce-core` =
@@ -94,6 +98,7 @@ lazy val `slyce-parse` =
     .settings(
       name := "slyce-parse",
       SharedSettings,
+      PublishSettings,
     )
     .dependsOn(
       `slyce-core`,

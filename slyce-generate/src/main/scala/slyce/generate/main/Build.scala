@@ -584,7 +584,7 @@ object Build {
                                                           if (isSelf)
                                                             s"toExpr1(expr._$liftIdx)"
                                                           else
-                                                            s"$exprStr(expr._$liftIdx)",
+                                                            s"Expression[$ntName.${ExpandedGrammar.Operand}](expr._$liftIdx)",
                                                         ),
                                                       )
                                                   },
