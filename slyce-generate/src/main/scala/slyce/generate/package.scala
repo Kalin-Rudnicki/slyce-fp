@@ -1,10 +1,12 @@
 package slyce
 
+import scala.annotation.tailrec
+import scala.collection.immutable.Set
+
 import klib.Implicits._
 import klib.fp.types._
-import slyce.core._
 
-import scala.annotation.tailrec
+import slyce.core._
 
 package object generate {
 

@@ -1,6 +1,7 @@
 package slyce.generate.building
 
 import scala.annotation.tailrec
+import scala.collection.immutable.Set
 
 import klib.Implicits._
 import klib.fp.types._
@@ -17,47 +18,6 @@ final case class Dfa private (
 
 object Dfa {
 
-  // REMOVE : ...
-  import IndentedString._
-  import klib.utils.Logger.{helpers => L}
-  import klib.utils.Logger.helpers.Implicits._
-  private val logger: Logger = Logger(Logger.LogLevel.Debug)
-  private implicit class NfaStateSetOps(nfaStates: Set[Nfa.State]) {
-
-    def yieldedTerminals(highlight: Set[String]): List[String] =
-      nfaStates
-        .flatMap(_.end.toList.flatMap(_.yields.yieldsTerminals))
-        .toList
-        .sorted
-        .map { str =>
-          if (highlight.contains(str))
-            str.toColorString.green.toString
-          else
-            str.toColorString.yellow.toString
-        }
-
-    def logged(label: String, highlight: Set[String] = Set.empty): Logger.Event =
-      L(
-        L.log.debug(label),
-        L.indented(
-          yieldedTerminals(highlight).map(L.log.debug(_)),
-        ),
-      )
-
-    def loggedIfAny(label: String, highlight: Set[String] = Set.empty): Maybe[Logger.Event] = {
-      val yt = yieldedTerminals(highlight)
-      yt.nonEmpty.maybe {
-        L(
-          L.log.debug(label),
-          L.indented(
-            yieldedTerminals(highlight).map(L.log.debug(_)),
-          ),
-        )
-      }
-    }
-
-  }
-
   private def expandEpsilons(states: Set[Nfa.State]): Set[Nfa.State] = {
     val all = findAll(states)(_.epsilonTransitions.map(_.value))
     val filtered = all.filter { state =>
@@ -71,18 +31,17 @@ object Dfa {
 
     val allNfaStates: Set[Nfa.State] =
       findAll(nfa.modes.toList.map(_._2.value.value).toSet) { state =>
-        state.transition.map(_._2.value).toSet |
-          state.epsilonTransitions.map(_.value)
+        state.epsilonTransitions.map(_.value) ++ state.transition.map(_._2.value).toOption
       }
 
     allNfaStates
-      .flatMap(_.end.map(_.yields.toMode))
+      .flatMap(_.end.map(_.yields.toMode).toOption)
       .toList
       .flatMap { toMode =>
         toMode.value match {
-          case Yields.ToMode.To(name)   => toMode.map(_ => name).some
-          case Yields.ToMode.Push(name) => toMode.map(_ => name).some
-          case _                        => None
+          case Yields.ToMode.To(name)   => toMode.map(_ => name).someOpt
+          case Yields.ToMode.Push(name) => toMode.map(_ => name).someOpt
+          case _                        => scala.None
         }
       }
       .map { name =>
@@ -100,7 +59,7 @@ object Dfa {
               k -> (expanded, IState.fromNfaStates(expanded))
           }
 
-        val blocked1 = nfaStatesJoined.flatMap(_._2._2._2)
+        val blocked1 = nfaStatesJoined.flatMap(_._2._2._2.toOption)
 
         val modeMap =
           nfaStatesJoined.map {
@@ -125,7 +84,7 @@ object Dfa {
               loop(
                 newSeen,
                 converted.map { case (nfaStates, (iState, _)) => (nfaStates, iState) }.toMap,
-                converted.flatMap(_._2._2) ::: blocked,
+                converted.flatMap(_._2._2.toOption) ::: blocked,
               )
             }
 
@@ -183,7 +142,7 @@ object Dfa {
   ) {
 
     def children: Set[Set[Nfa.State]] =
-      (elseTransition.toList ::: transitions.toList.flatMap(_._2)).toSet
+      (elseTransition.toList ::: transitions.toList.flatMap(_._2.toOption)).toSet
 
   }
   private object IState {
@@ -224,15 +183,15 @@ object Dfa {
       val mElse: Maybe[Set[Nfa.State]] =
         transitionPairs
           .flatMap {
-            case (InfiniteSet.Exclusive(_), state) => state.some
-            case _                                 => None
+            case (InfiniteSet.Exclusive(_), state) => state.someOpt
+            case _                                 => scala.None
           }
           .toSet
           .ensure(_.nonEmpty)
           .map(expandEpsilons)
 
       val end: Maybe[(Yields[String], Maybe[Blocked])] = {
-        val ends: List[Lexer.Mode.Line] = expandedStates.toList.flatMap(_.end)
+        val ends: List[Lexer.Mode.Line] = expandedStates.toList.flatMap(_.end.toOption)
         val endsSorted = ends.sortBy(_.priority)
         endsSorted.toNel.map { nel =>
           val yields = nel.head.yields

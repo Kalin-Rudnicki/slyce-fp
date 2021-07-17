@@ -26,7 +26,7 @@ object ParsingTable {
       end: Boolean,
   ) {
     override def toString: String =
-      s"Follow(${(terminals.toList.map(_.toString) ++ end.maybe("$")).mkString(", ")})"
+      s"Follow(${(terminals.toList.map(_.toString) ++ end.maybe("$").toOption).mkString(", ")})"
   }
 
   final case class ParseState(
@@ -107,9 +107,9 @@ object ParsingTable {
                   w.first.nonTerminals |
                     w.remaining.flatMap {
                       case (nonTerminal: ExpandedGrammar.Identifier.NonTerminal) :: _ =>
-                        nonTerminal.some
+                        nonTerminal.someOpt
                       case _ =>
-                        None
+                        scala.None
                     }.toSet,
                   w.first.epsilon,
                 ),
@@ -353,9 +353,8 @@ object ParsingTable {
 
       // NOTE : This might change if I end up doing CLR(N), maybe not though
       val combinedEntries =
-        allEntries
+        allEntries.toList
           .groupMap(e => (e.produces, e.rSeen, e.unseen))(_.lookahead)
-          .toList
           .map {
             case ((produces, rSeen, unseen), lookaheads) =>
               Entry(
@@ -363,7 +362,7 @@ object ParsingTable {
                 rSeen,
                 unseen,
                 Follow(
-                  lookaheads.flatMap(_.terminals),
+                  lookaheads.flatMap(_.terminals).toSet,
                   lookaheads.exists(_.end),
                 ),
               )
@@ -373,7 +372,7 @@ object ParsingTable {
       State(
         combinedEntries,
         combinedEntries.toList
-          .flatMap(_.maybeAdvance)
+          .flatMap(_.maybeAdvance.toOption)
           .groupMap(_._1)(_._2)
           .map { case (k, v) => (k, v.toSet) },
       )

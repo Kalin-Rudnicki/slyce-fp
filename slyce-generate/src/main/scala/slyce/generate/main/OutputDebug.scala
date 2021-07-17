@@ -417,8 +417,7 @@ object OutputDebug {
 
               val allNfaStates: Set[Nfa.State] =
                 findAll(nfa.modes.toList.map(_._2.value.value).toSet) { state =>
-                  state.transition.map(_._2.value).toSet |
-                    state.epsilonTransitions.map(_.value)
+                  state.epsilonTransitions.map(_.value) ++ state.transition.map(_._2.value).toOption
                 }
 
               val nfaStateMap = allNfaStates.toList.zipWithIndex.toMap

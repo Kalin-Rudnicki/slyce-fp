@@ -50,21 +50,21 @@ object Build {
         }
         val grammarNTReferences = ntReferences.flatMap {
           case (inNt, ri, rei, nt: ExpandedGrammar.Identifier.NonTerminal) =>
-            (inNt, ri, rei, nt).some
+            (inNt, ri, rei, nt).someOpt
           case _ =>
-            None
+            scala.None
         }
         val grammarTReferences = ntReferences.flatMap {
           case (inNt, ri, rei, t: ExpandedGrammar.Identifier.Terminal) =>
-            (inNt, ri, rei, t).some
+            (inNt, ri, rei, t).someOpt
           case _ =>
-            None
+            scala.None
         }
         val grammarRawReferences = ntReferences.flatMap {
           case (inNt, ri, rei, r: ExpandedGrammar.Identifier.Raw) =>
-            (inNt, ri, rei, r).some
+            (inNt, ri, rei, r).someOpt
           case _ =>
-            None
+            scala.None
         }
 
         // TODO (KR) : Checks
@@ -195,8 +195,8 @@ object Build {
       output.deDuplicatedExpandedGrammar.nts
         .flatMap {
           _.name match {
-            case ExpandedGrammar.Identifier.NonTerminal.AnonListNt(key, _) => key.some
-            case _                                                         => None
+            case ExpandedGrammar.Identifier.NonTerminal.AnonListNt(key, _) => key.someOpt
+            case _                                                         => scala.None
           }
         }
         .zipWithIndex
@@ -262,7 +262,7 @@ object Build {
 
     def identifierWithString(identifier: ExpandedGrammar.Identifier): String =
       withsByIdentifier(identifier).flatMap { w =>
-        (withsByNonTerminal(w.nt)(w.name).size > 1).maybe(s" with ${withName(w)}")
+        (withsByNonTerminal(w.nt)(w.name).size > 1).maybe(s" with ${withName(w)}").toOption
       }.mkString
 
     def rawName(raw: ExpandedGrammar.Identifier.Raw): String =
@@ -841,7 +841,7 @@ object Build {
                           state.terminalActions.toList
                             .flatMap {
                               case (on, action) =>
-                                on.map((_, action))
+                                on.map((_, action)).toOption
                             }
                             .map {
                               case (term, action) =>

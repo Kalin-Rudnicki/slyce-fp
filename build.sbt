@@ -2,18 +2,25 @@
 
 // =====|  |=====
 
+val Scala_2_12 = "2.12.10"
+val Scala_2_13 = "2.13.4"
+
 val MyOrg = "io.github.kalin-rudnicki"
-val MyScalaVersion = "2.13.4"
 val githubUsername = "Kalin-Rudnicki"
 val githubProject = "slyce-fp"
 
 // =====|  |=====
 
+val ScalaVersionSettings =
+  Seq(
+    scalaVersion := Scala_2_13,
+    crossScalaVersions := Seq(Scala_2_12, Scala_2_13),
+  )
+
 val SharedSettings =
   Seq(
     organization := MyOrg,
-    version := "1.1.2",
-    scalaVersion := MyScalaVersion,
+    version := "1.1.3",
     resolvers += Resolver.mavenLocal,
   )
 
@@ -58,9 +65,10 @@ lazy val `slyce-core` =
     .settings(
       name := "slyce-core",
       SharedSettings,
+      ScalaVersionSettings,
       buildInfoKeys := Seq[BuildInfoKey](version),
       buildInfoPackage := "slyce",
-      libraryDependencies += "kalin-rudnicki" %% "klib-core" % "0.5.11", // TODO (KR) :
+      libraryDependencies += MyOrg %% "klib-core" % "0.6.3",
       BuildUtils.buildReadme,
     )
 
@@ -70,6 +78,7 @@ lazy val `slyce-generate-parsers` =
     .settings(
       name := "slyce-generate-parsers",
       SharedSettings,
+      ScalaVersionSettings,
     )
     .dependsOn(
       `slyce-parse`,
@@ -81,6 +90,7 @@ lazy val `slyce-generate` =
     .settings(
       name := "slyce-generate",
       SharedSettings,
+      ScalaVersionSettings,
       libraryDependencies ++= Seq(
         "com.lihaoyi" %% "scalatags" % "0.9.2",
         "com.github.japgolly.scalacss" %% "ext-scalatags" % "0.7.0",
@@ -98,6 +108,7 @@ lazy val `slyce-parse` =
     .settings(
       name := "slyce-parse",
       SharedSettings,
+      ScalaVersionSettings,
       PublishSettings,
     )
     .dependsOn(
@@ -110,7 +121,18 @@ lazy val `slyce-examples` =
     .settings(
       name := "slyce-examples",
       SharedSettings,
+      ScalaVersionSettings,
     )
     .dependsOn(
       `slyce-parse`,
+    )
+
+lazy val `slyce-plugin` =
+  project
+    .in(file("slyce-plugin"))
+    .enablePlugins(SbtPlugin)
+    .settings(
+      name := "slyce-plugin",
+      SharedSettings,
+      scalaVersion := Scala_2_12,
     )

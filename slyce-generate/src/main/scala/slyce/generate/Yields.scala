@@ -13,8 +13,8 @@ final case class Yields[I](
   def yieldsTerminals: Set[String] =
     yields.flatMap {
       _.value match {
-        case Yields.Yield.Terminal(name, _) => name.some
-        case _                              => None
+        case Yields.Yield.Terminal(name, _) => name.someOpt
+        case _                              => scala.None
       }
     }.toSet
 

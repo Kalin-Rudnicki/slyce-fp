@@ -433,7 +433,7 @@ object Source {
     val fromUnknown =
       unknownSource.flatten.ensure(_.nonEmpty).map(Source("").mark(_, config))
 
-    (fromKnown ++ fromUnknown).mkString("\n\n")
+    (fromKnown ++ fromUnknown.toOption).mkString("\n\n")
   }
 
   final case class Config(

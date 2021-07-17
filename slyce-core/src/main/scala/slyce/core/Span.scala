@@ -63,7 +63,7 @@ object Span {
 
   def joinHasSourcesNE(span0: HasSource, spanN: HasSource*): HasSource = {
     val all = span0 :: spanN.toList
-    val highlights = all.flatMap { case highlight: Highlight => highlight.some; case _ => None }
+    val highlights = all.flatMap { case highlight: Highlight => highlight.someOpt; case _ => scala.None }
     highlights.toNel match {
       case Some(highlights) => joinHighlightsNE(highlights.head, highlights.tail: _*)
       case None             => span0
@@ -72,7 +72,7 @@ object Span {
 
   def joinSpans(spans: Span*): Span = {
     val all = spans.toList
-    val hasSources = all.flatMap { case hasSource: HasSource => hasSource.some; case _ => None }
+    val hasSources = all.flatMap { case hasSource: HasSource => hasSource.someOpt; case _ => scala.None }
     hasSources.toNel match {
       case Some(hasSources) => joinHasSourcesNE(hasSources.head, hasSources.tail: _*)
       case None             => Unknown

@@ -143,7 +143,7 @@ object Main {
                 case Lex.NonTerminal.YieldType._3(raw) =>
                   Yields.Yield
                     .Const(
-                      raw.lift.toNonEmptyList.map {
+                      raw.lift.toNonEmptyList.toList.map {
                         _.lift match {
                           case chars: Lex.Tok.chars     => chars.text
                           case escChar: Lex.Tok.escChar => convertEscChar(escChar).toString
@@ -224,7 +224,7 @@ object Main {
                 case Gram.NonTerminal.Raw(_, raw, _) =>
                   Grammar.Identifier
                     .raw(
-                      raw.toNonEmptyList.map {
+                      raw.toNonEmptyList.toList.map {
                         _.lift match {
                           case chars: Gram.Tok.chars =>
                             chars.text
@@ -484,8 +484,8 @@ object Main {
           .toList
           .map { case (k, v) => k -> v.toMap }
       pairTs = groupedFileMap.map { case (name, map) => makePair(myPkg, name, map, nameMap) }
-      pairs = pairTs.flatMap(_._1)
-      logEvents = pairTs.flatMap(_._2)
+      pairs = pairTs.flatMap(_._1.toOption)
+      logEvents = pairTs.flatMap(_._2.toOption)
 
       _ <- logEvents.nonEmpty ? logger(L(logEvents, L.break())) | ().pure[IO]
 
