@@ -12,7 +12,7 @@ val githubProject = "slyce-fp"
 val SharedSettings =
   Seq(
     organization := MyOrg,
-    version := "1.1.1",
+    version := "1.1.2",
     scalaVersion := MyScalaVersion,
     resolvers += Resolver.mavenLocal,
   )

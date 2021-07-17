@@ -13,6 +13,7 @@ object BuildUtils {
       val readmeTmpl = IO.read(new File("README.tmpl.md"))
       val latestRelease = IO.read(latestReleaseFile)
 
+      // TODO (KR) : Switch to something similar for %version% (hook in with publish)
       val substituted =
         List(
           ("%version%", version.value),

@@ -19,8 +19,8 @@ import slyce.generate.parsers.{lexer => Lex, grammar => Gram} // change these an
 import slyce.parse.Attempt
 
 object Main {
-  val LexerExtension = "slf"
-  val GrammarExtension = "sgf"
+  private val LexerExtension = "slf"
+  private val GrammarExtension = "sgf"
 
   final case class Pair(
       pkg: List[String],
@@ -407,58 +407,124 @@ object Main {
 
   }
 
+  private val fnaeReg = "^([^.]+)\\.([^.]+)$".r
+  private def fileNameAndExt(file: File): ?[(String, String)] = {
+    val name = file.getName
+    name match {
+      case fnaeReg(baseName, ext) => (baseName, ext).pure[?]
+      case _                      => ?.dead(Message(s"Invalid file name: $name"))
+    }
+  }
+
+  private def makePair(
+      pkg: List[String],
+      name: String,
+      map: Map[String, File],
+      nameMap: Maybe[String],
+  ): (Maybe[Pair], Maybe[Logger.Event]) = {
+    val lexer = map.get(LexerExtension).toMaybe
+    val grammar = map.get(GrammarExtension).toMaybe
+    // TODO (KR) :
+    val extras = map.keySet &~ Set(LexerExtension, GrammarExtension)
+
+    lazy val scopedName = s"${pkg.mkString(".")}.$name"
+
+    (lexer, grammar) match {
+      case (Some(lexer), Some(grammar)) =>
+        (
+          Pair(
+            pkg = pkg,
+            baseName = nameMap.cata(_.replaceAll("%n", name), name),
+            lexerFile = lexer,
+            grammarFile = grammar,
+          ).some,
+          None,
+        )
+      case (Some(_), None) =>
+        (
+          None,
+          L.log.warning(s"$scopedName: Found lexer but not grammar").some,
+        )
+      case (None, Some(_)) =>
+        (
+          None,
+          L.log.warning(s"$scopedName: Found grammar but not lexer").some,
+        )
+      case (None, None) =>
+        (
+          None,
+          L.log.warning(s"$scopedName: Didn't find lexer or grammar").some,
+        )
+    }
+  }
+
+  def findPairs(
+      dir: File,
+      rPkg: List[String],
+      nameMap: Maybe[String],
+      logger: Logger,
+  ): IO[List[Pair]] =
+    for {
+      exists <- dir.exists.pure[IO]
+      _ <- exists ? ().pure[IO] | IO.error(Message(s"Directory does not exist: $dir"))
+      isDir <- dir.isDirectory.pure[IO]
+      _ <- isDir ? ().pure[IO] | IO.error(Message(s"Not a directory: $dir"))
+      myPkg = rPkg.reverse
+
+      cf <- dir.listFiles.pure[IO].map(_.toList)
+      childFilePairs <- cf.map(f => f.isDirectory.pure[IO].map((f, _))).traverse
+      (childDirs, childFiles) = childFilePairs.partitionMap {
+        case (file, isDir) => isDir ? scala.Left(file) | scala.Right(file)
+      }
+
+      childFilesWithExtras <- childFiles.map(f => fileNameAndExt(f).map((f, _))).traverse.toIO
+      groupedFileMap =
+        childFilesWithExtras
+          .groupMap(_._2._1)(p => (p._2._2, p._1))
+          .toList
+          .map { case (k, v) => k -> v.toMap }
+      pairTs = groupedFileMap.map { case (name, map) => makePair(myPkg, name, map, nameMap) }
+      pairs = pairTs.flatMap(_._1)
+      logEvents = pairTs.flatMap(_._2)
+
+      _ <- logEvents.nonEmpty ? logger(L(logEvents, L.break())) | ().pure[IO]
+
+      fromChildDirs <- childDirs.map(d => findPairs(d, d.getName :: rPkg, nameMap, logger)).traverse
+    } yield (pairs :: fromChildDirs).flatten
+
+  def findPairsAndGenerate(
+      logger: Logger,
+      inputDir: File,
+      outputDir: File,
+      nameMap: Maybe[String],
+      debugOutputDir: Maybe[File],
+      tokenize: Boolean,
+  ): IO[Unit] = {
+
+    for {
+      pairs <- findPairs(inputDir, Nil, nameMap, logger)
+      _ <- logger(
+        L(
+          L.log.info(s"Found ${pairs.size} source(s):"),
+          L.indented(
+            pairs.map(p => L.log.info(s"${p.pkg.mkString(".")}.${p.baseName}")),
+          ),
+          L.break(),
+        ),
+      )
+
+      _ <- pairs.map {
+        _.generate(
+          logger,
+          outputDir,
+          debugOutputDir,
+          tokenize,
+        )
+      }.traverse
+    } yield ()
+  }
+
   def main(args: Array[String]): Unit = {
-    val fnaeReg = "^([^.]+)\\.([^.]+)$".r
-    def fileNameAndExt(file: File): ?[(String, String)] = {
-      val name = file.getName
-      name match {
-        case fnaeReg(baseName, ext) => (baseName, ext).pure[?]
-        case _                      => ?.dead(Message(s"Invalid file name: $name"))
-      }
-    }
-
-    def makePair(
-        pkg: List[String],
-        name: String,
-        map: Map[String, File],
-        nameMap: Maybe[String],
-    ): (Maybe[Pair], Maybe[Logger.Event]) = {
-      val lexer = map.get(LexerExtension).toMaybe
-      val grammar = map.get(GrammarExtension).toMaybe
-      // TODO (KR) :
-      val extras = map.keySet &~ Set(LexerExtension, GrammarExtension)
-
-      lazy val scopedName = s"${pkg.mkString(".")}.$name"
-
-      (lexer, grammar) match {
-        case (Some(lexer), Some(grammar)) =>
-          (
-            Pair(
-              pkg = pkg,
-              baseName = nameMap.cata(_.replaceAll("%n", name), name),
-              lexerFile = lexer,
-              grammarFile = grammar,
-            ).some,
-            None,
-          )
-        case (Some(_), None) =>
-          (
-            None,
-            L.log.warning(s"$scopedName: Found lexer but not grammar").some,
-          )
-        case (None, Some(_)) =>
-          (
-            None,
-            L.log.warning(s"$scopedName: Found grammar but not lexer").some,
-          )
-        case (None, None) =>
-          (
-            None,
-            L.log.warning(s"$scopedName: Didn't find lexer or grammar").some,
-          )
-      }
-    }
-
     // =====| generate |=====
 
     val generate = {
@@ -468,6 +534,9 @@ object Main {
           helpWidth(125)
 
           version(s"Slyce v${slyce.BuildInfo.version}")
+
+          private val filesGroup = group("--- Files ---")
+          private val miscGroup = group("--- Misc ---")
 
           banner {
             s"""
@@ -488,20 +557,30 @@ object Main {
               |""".stripMargin
           }
 
+          val sourceDir: ScallopOption[File] =
+            opt(
+              descr = "Helper that is the same as specifying -i [source-dir]/slyce -i [source-dir]/scala",
+              group = filesGroup,
+            )
+
           val inputDir: ScallopOption[File] =
             opt(
-              required = true,
               descr = "Directory to recursively search for .slf & .sgf files",
+              group = filesGroup,
             )
           val outputDir: ScallopOption[File] =
             opt(
-              required = true,
               descr = {
                 """Directory to output generated files
                   |(in same tree structure as inputDir)""".stripMargin
               },
+              group = filesGroup,
             )
-          val debugOutputDir: ScallopOption[File] = opt(descr = "Write html debug output for generation")
+          val debugOutputDir: ScallopOption[File] =
+            opt(
+              descr = "Write html debug output for generation",
+              group = filesGroup,
+            )
 
           val nameMap: ScallopOption[String] = opt(
             descr = {
@@ -509,6 +588,7 @@ object Main {
                 |ex: ex.(slf/sgf) => -n "%n2" => ex2.scala
                 |""".stripMargin
             },
+            group = miscGroup,
           )
 
           val tokenize: ScallopOption[Boolean] =
@@ -516,7 +596,18 @@ object Main {
               default = false.someOpt,
               prefix = "dont-",
               descrYes = "Display tokens for all parsed files",
+              group = miscGroup,
             )
+
+          requireOne(
+            sourceDir,
+            inputDir,
+          )
+
+          codependent(
+            inputDir,
+            outputDir,
+          )
 
           verify()
         }
@@ -524,34 +615,19 @@ object Main {
 
         Executable
           .fromConf(Conf) { (logger, conf) =>
-            def findPairs(dir: File, rPkg: List[String]): IO[List[Pair]] =
-              for {
-                exists <- dir.exists.pure[IO]
-                _ <- exists ? ().pure[IO] | IO.error(Message(s"Directory does not exist: $dir"))
-                isDir <- dir.isDirectory.pure[IO]
-                _ <- isDir ? ().pure[IO] | IO.error(Message(s"Not a directory: $dir"))
-                myPkg = rPkg.reverse
-
-                cf <- dir.listFiles.pure[IO].map(_.toList)
-                childFilePairs <- cf.map(f => f.isDirectory.pure[IO].map((f, _))).traverse
-                (childDirs, childFiles) = childFilePairs.partitionMap {
-                  case (file, isDir) => isDir ? scala.Left(file) | scala.Right(file)
-                }
-
-                childFilesWithExtras <- childFiles.map(f => fileNameAndExt(f).map((f, _))).traverse.toIO
-                groupedFileMap =
-                  childFilesWithExtras
-                    .groupMap(_._2._1)(p => (p._2._2, p._1))
-                    .toList
-                    .map { case (k, v) => k -> v.toMap }
-                pairTs = groupedFileMap.map { case (name, map) => makePair(myPkg, name, map, conf.nameMap.toOption.toMaybe) }
-                pairs = pairTs.flatMap(_._1)
-                logEvents = pairTs.flatMap(_._2)
-
-                _ <- logEvents.nonEmpty ? logger(L(logEvents, L.break())) | ().pure[IO]
-
-                fromChildDirs <- childDirs.map(d => findPairs(d, d.getName :: rPkg)).traverse
-              } yield (pairs :: fromChildDirs).flatten
+            val (inputDir, outputDir) =
+              conf.sourceDir.toOption.toMaybe match {
+                case Some(sourceDir) =>
+                  (
+                    new File(sourceDir, "slyce"),
+                    new File(sourceDir, "scala"),
+                  )
+                case None =>
+                  (
+                    conf.inputDir(),
+                    conf.outputDir(),
+                  )
+              }
 
             for {
               _ <- logger(
@@ -559,55 +635,20 @@ object Main {
                   L.log.info("=====| Generate - all |====="),
                   L.break(),
                   // keep ?
-                  L.log.info(s" input-dir: ${conf.inputDir()}"),
-                  L.log.info(s"output-dir: ${conf.outputDir()}"),
+                  L.log.info(s" input-dir: $inputDir"),
+                  L.log.info(s"output-dir: $outputDir"),
                   L.break(),
                 ),
               )
 
-              pairs <- findPairs(conf.inputDir(), Nil)
-              _ <- logger(
-                L(
-                  L.log.info(s"Found ${pairs.size} source(s):"),
-                  L.indented(
-                    pairs.map(p => L.log.info(s"${p.pkg.mkString(".")}.${p.baseName}")),
-                  ),
-                  L.break(),
-                ),
+              _ <- findPairsAndGenerate(
+                logger,
+                inputDir,
+                outputDir,
+                conf.nameMap.toOption.toMaybe,
+                conf.debugOutputDir.toOption.toMaybe,
+                conf.tokenize(),
               )
-
-              _ <- pairs.map {
-                _.generate(
-                  logger,
-                  conf.outputDir(),
-                  conf.debugOutputDir.toOption.toMaybe,
-                  conf.tokenize(),
-                )
-              }.traverse
-            } yield ()
-          }
-      }
-
-      // --- one ---
-
-      val one = {
-        final class Conf(args: Seq[String]) extends Executable.Conf(args) {
-          // TODO (KR) :
-
-          verify()
-        }
-        object Conf extends Executable.ConfBuilder(new Conf(_))
-
-        Executable
-          .fromConf(Conf) { (logger, conf) =>
-            for {
-              _ <- logger(
-                L(
-                  L.log.info("=====| Generate - one |====="),
-                  L.break(),
-                ),
-              )
-              _ <- IO.error(Message("TODO")): IO[Unit]
             } yield ()
           }
       }
@@ -617,8 +658,6 @@ object Main {
       Executable
         .fromSubCommands(
           "all" -> all,
-          // TODO (KR) : Implement
-          // "one" -> one,
         )
     }
 

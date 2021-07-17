@@ -231,21 +231,21 @@ object parser {
   lazy val parser: Parser[Tok, NonTerminal, NtRoot] =
     Parser[Tok, NonTerminal, NtRoot](
       Lexer[Tok] {
-        var s5: Lexer.State[Tok] = null
+        var s2: Lexer.State[Tok] = null
         var s0: Lexer.State[Tok] = null
         var s1: Lexer.State[Tok] = null
-        var s2: Lexer.State[Tok] = null
         var s3: Lexer.State[Tok] = null
         var s4: Lexer.State[Tok] = null
+        var s5: Lexer.State[Tok] = null
         var s6: Lexer.State[Tok] = null
         var s7: Lexer.State[Tok] = null
         var s8: Lexer.State[Tok] = null
         var s9: Lexer.State[Tok] = null
         var s10: Lexer.State[Tok] = null
         
-        s5 =
+        s2 =
           Lexer.State[Tok](
-            5,
+            2,
             char => {
               val int = char.toInt
               
@@ -254,9 +254,9 @@ object parser {
               else if (int == 47) // '/'
                 s1.some
               else if (int >= 97 && int <= 122) // 'a'-'z'
-                s2.some
+                s4.some
               else if (int >= 48 && int <= 57) // '0'-'9'
-                s9.some
+                s10.some
               else if (int >= 40 && int <= 41) // '('-')'
                 s0.some
               else if (int == 59) // ';'
@@ -266,15 +266,15 @@ object parser {
               else if (int == 126) // '~'
                 s0.some
               else if (int == 43) // '+'
-                s6.some
+                s7.some
               else if (int >= 9 && int <= 10) // '\t'-'\n'
-                s8.some
+                s6.some
               else if (int == 32) // ' '
-                s8.some
+                s6.some
               else if (int == 94) // '^'
                 s3.some
               else if (int == 45) // '-'
-                s7.some
+                s8.some
               else
                 None
             },
@@ -311,34 +311,6 @@ object parser {
             ).some,
           )
         
-        s2 =
-          Lexer.State[Tok](
-            2,
-            char => {
-              val int = char.toInt
-              
-              if (int >= 48 && int <= 57) // '0'-'9'
-                s2.some
-              else if (int >= 65 && int <= 90) // 'A'-'Z'
-                s2.some
-              else if (int == 95) // '_'
-                s2.some
-              else if (int >= 97 && int <= 122) // 'a'-'z'
-                s2.some
-              else
-                None
-            },
-            Lexer.Yields[Tok](
-              List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.variable(_, _).pure[Attempt]
-                ),
-              ),
-              Lexer.Yields.ToMode.Same,
-            ).some,
-          )
-        
         s3 =
           Lexer.State[Tok](
             3,
@@ -362,6 +334,34 @@ object parser {
               
               if (int >= 48 && int <= 57) // '0'-'9'
                 s4.some
+              else if (int >= 65 && int <= 90) // 'A'-'Z'
+                s4.some
+              else if (int == 95) // '_'
+                s4.some
+              else if (int >= 97 && int <= 122) // 'a'-'z'
+                s4.some
+              else
+                None
+            },
+            Lexer.Yields[Tok](
+              List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.variable(_, _).pure[Attempt]
+                ),
+              ),
+              Lexer.Yields.ToMode.Same,
+            ).some,
+          )
+        
+        s5 =
+          Lexer.State[Tok](
+            5,
+            char => {
+              val int = char.toInt
+              
+              if (int >= 48 && int <= 57) // '0'-'9'
+                s5.some
               else
                 None
             },
@@ -382,10 +382,6 @@ object parser {
             _ => None,
             Lexer.Yields[Tok](
               List(
-                Lexer.Yields.Yield[Tok](
-                  (None,None),
-                  Tok.addOp(_, _).pure[Attempt]
-                ),
               ),
               Lexer.Yields.ToMode.Same,
             ).some,
@@ -394,14 +390,7 @@ object parser {
         s7 =
           Lexer.State[Tok](
             7,
-            char => {
-              val int = char.toInt
-              
-              if (int >= 48 && int <= 57) // '0'-'9'
-                s9.some
-              else
-                None
-            },
+            _ => None,
             Lexer.Yields[Tok](
               List(
                 Lexer.Yields.Yield[Tok](
@@ -416,9 +405,20 @@ object parser {
         s8 =
           Lexer.State[Tok](
             8,
-            _ => None,
+            char => {
+              val int = char.toInt
+              
+              if (int >= 48 && int <= 57) // '0'-'9'
+                s10.some
+              else
+                None
+            },
             Lexer.Yields[Tok](
               List(
+                Lexer.Yields.Yield[Tok](
+                  (None,None),
+                  Tok.addOp(_, _).pure[Attempt]
+                ),
               ),
               Lexer.Yields.ToMode.Same,
             ).some,
@@ -431,8 +431,22 @@ object parser {
               val int = char.toInt
               
               if (int >= 48 && int <= 57) // '0'-'9'
+                s5.some
+              else
+                None
+            },
+            None,
+          )
+        
+        s10 =
+          Lexer.State[Tok](
+            10,
+            char => {
+              val int = char.toInt
+              
+              if (int == 46) // '.'
                 s9.some
-              else if (int == 46) // '.'
+              else if (int >= 48 && int <= 57) // '0'-'9'
                 s10.some
               else
                 None
@@ -448,22 +462,8 @@ object parser {
             ).some,
           )
         
-        s10 =
-          Lexer.State[Tok](
-            10,
-            char => {
-              val int = char.toInt
-              
-              if (int >= 48 && int <= 57) // '0'-'9'
-                s4.some
-              else
-                None
-            },
-            None,
-          )
         
-        
-        s5
+        s2
       },
       Grammar[Tok, NonTerminal, NtRoot] {
         var s0: Grammar.State[Tok, NonTerminal, NtRoot] = null
