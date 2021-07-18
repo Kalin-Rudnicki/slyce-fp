@@ -4,10 +4,10 @@
 A flex/bison inspired parser generator for Scala.
 
 The current easiest way to use slyce is to download the latest release on github, and run:  
-`java -jar slyce-generate-1.1.3.jar generate all --help`  
-`java -jar slyce-generate-1.1.3.jar generate all -i slyce-dir -o scala-dir`  
+`java -jar slyce-generate-2.0.0.jar generate all --help`  
+`java -jar slyce-generate-2.0.0.jar generate all -i slyce-dir -o scala-dir`  
 (There are plans in the near future to create an SBT plugin)  
-I also recommend running: `java -jar slyce-generate-1.1.3.jar --help --`
+I also recommend running: `java -jar slyce-generate-2.0.0.jar --help --`
 which will show you the help page explaining klib's `Executable` Logger config (`-l` is quite useful)
 
 I am currently working on trying to publish the sources, but for now, if you would like to add `slyce-parse` as a
@@ -23,8 +23,8 @@ dependency, you will need to clone the project, and `sbt "project slyce-parse" p
     - Example: `slyce-root/pkgA/pkgB/example.slf` & `slyce-root/pkgA/pkgB/example.sgf`
 3) Define your tokenizer in `___.slf`
 4) Define your grammar in `___.sgf`
-5) `java -jar slyce-generate-1.1.3.jar generate all -i slyce-dir -o scala-dir`
-6) `libraryDependencies += "kalin-rudnicki" %% "slyce-parse" % "1.1.3"`
+5) `java -jar slyce-generate-2.0.0.jar generate all -i slyce-dir -o scala-dir`
+6) `libraryDependencies += "kalin-rudnicki" %% "slyce-parse" % "2.0.0"`
 7)
    ```scala
    import klib.Implicits._

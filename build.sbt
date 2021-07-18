@@ -5,6 +5,8 @@
 val Scala_2_12 = "2.12.10"
 val Scala_2_13 = "2.13.4"
 
+val SlyceVersion = "2.0.0"
+
 val MyOrg = "io.github.kalin-rudnicki"
 val githubUsername = "Kalin-Rudnicki"
 val githubProject = "slyce-fp"
@@ -20,7 +22,7 @@ val ScalaVersionSettings =
 val SharedSettings =
   Seq(
     organization := MyOrg,
-    version := "1.1.3",
+    version := SlyceVersion,
     resolvers += Resolver.mavenLocal,
   )
 
@@ -127,6 +129,11 @@ lazy val `slyce-examples` =
       `slyce-parse`,
     )
 
+// NOTE : In order to get IntelliJ to be able to import project:
+//      : 1) Un-Comment [1] & Comment [2]
+//      : 2) Ctrl + Shift + O (or click the red reload button in top right)
+//      : 3) Comment [1]    & Un-Comment [2]
+//      : 4) Close the notification to try and re-import settings
 lazy val `slyce-plugin` =
   project
     .in(file("slyce-plugin"))
@@ -135,4 +142,8 @@ lazy val `slyce-plugin` =
       name := "slyce-plugin",
       SharedSettings,
       scalaVersion := Scala_2_12,
+      // libraryDependencies += MyOrg %% "slyce-generate" % SlyceVersion, // [1]
+    )
+    .dependsOn(
+      `slyce-generate`, // [2]
     )
