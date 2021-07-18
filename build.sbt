@@ -53,7 +53,8 @@ lazy val `slyce-core` =
       buildInfoKeys := Seq[BuildInfoKey](version),
       buildInfoPackage := "slyce",
       libraryDependencies += MyOrg %% "klib-core" % "0.6.3",
-      BuildUtils.buildTmpls,
+      // TODO (KR) : un-comment
+      // BuildUtils.buildTmpls,
     )
 
 lazy val `slyce-generate-parsers` =
@@ -62,7 +63,8 @@ lazy val `slyce-generate-parsers` =
     .settings(
       name := "slyce-generate-parsers",
       ScalaVersionSettings,
-      slycePairs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
+      // TODO (KR) : un-comment
+      // slycePairs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
     )
     .dependsOn(
       `slyce-parse`,
@@ -79,7 +81,8 @@ lazy val `slyce-generate` =
         "com.github.japgolly.scalacss" %% "ext-scalatags" % "0.7.0",
       ),
       assembly / assemblyJarName := s"slyce-generate-${version.value}.jar",
-      BuildUtils.buildJar,
+      // TODO (KR) : un-comment
+      // BuildUtils.buildJar,
     )
     .dependsOn(
       `slyce-generate-parsers`,
@@ -102,7 +105,8 @@ lazy val `slyce-examples` =
     .settings(
       name := "slyce-examples",
       ScalaVersionSettings,
-      slycePairs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
+      // TODO (KR) : un-comment
+      // slycePairs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
     )
     .dependsOn(
       `slyce-parse`,
