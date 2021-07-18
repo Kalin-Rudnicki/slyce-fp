@@ -3,8 +3,7 @@ import sbt.Keys._
 import sbtassembly.AssemblyKeys._
 
 // TODO (KR) : un-comment
-object BuildUtils {}
-/*
+// object BuildUtils {}
 
 import klib.Implicits._
 import klib.fp.types.{IO => KIO, _}
@@ -122,5 +121,3 @@ object BuildUtils {
       }.evaluated
 
 }
-
- */
