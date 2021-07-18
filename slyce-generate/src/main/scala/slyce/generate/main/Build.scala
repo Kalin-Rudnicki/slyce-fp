@@ -753,11 +753,11 @@ object Build {
           inline(
             "Lexer[Tok] {",
             indented(
-              output.dfa.states.toList.map { state =>
+              output.dfa.states.toList.sortBy(_.id).map { state =>
                 defineState(state)
               },
               Break,
-              output.dfa.states.toList.map { state =>
+              output.dfa.states.toList.sortBy(_.id).map { state =>
                 makeState(state)
               },
               Break,
