@@ -1,0 +1,2 @@
+tmpls/root:.
+tmpls/wiki:wiki

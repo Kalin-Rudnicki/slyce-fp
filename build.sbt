@@ -71,7 +71,7 @@ lazy val `slyce-core` =
       buildInfoKeys := Seq[BuildInfoKey](version),
       buildInfoPackage := "slyce",
       libraryDependencies += MyOrg %% "klib-core" % "0.6.3",
-      BuildUtils.buildReadme,
+      BuildUtils.buildTmpls,
     )
 
 lazy val `slyce-generate-parsers` =
