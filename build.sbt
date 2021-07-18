@@ -5,11 +5,15 @@
 val Scala_2_12 = "2.12.10"
 val Scala_2_13 = "2.13.4"
 
-val SlyceVersion = "2.0.0"
-
 val MyOrg = "io.github.kalin-rudnicki"
 val githubUsername = "Kalin-Rudnicki"
 val githubProject = "slyce-fp"
+
+ThisBuild / dynverVTagPrefix := false
+ThisBuild / dynverSonatypeSnapshots := true
+
+ThisBuild / version ~= (_.replace('+', '-'))
+ThisBuild / dynver ~= (_.replace('+', '-'))
 
 // =====|  |=====
 
@@ -36,29 +40,6 @@ val ScalaVersionSettings =
     scalaVersion := Scala_2_13,
     crossScalaVersions := Seq(Scala_2_12, Scala_2_13),
   )
-
-/*
-val PublishSettings =
-  Seq(
-    //
-    //
-    //
-    scmInfo := Some(
-      ScmInfo(
-        url(s"https://github.com/$githubUsername/$githubProject"),
-        s"scm:git@github.com:$githubUsername/$githubProject.git",
-      ),
-    ),
-    //
-    pomIncludeRepository := { _ => false },
-    publishTo := {
-      val nexus = "https://oss.sonatype.org/"
-      if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
-      else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-    },
-    publishMavenStyle := true,
-  )
- */
 
 // =====|  |=====
 
@@ -121,12 +102,7 @@ lazy val `slyce-examples` =
     .settings(
       name := "slyce-examples",
       ScalaVersionSettings,
-      slycePairs ++= Seq(
-        SlyceConfig(
-          input = SlyceInput.SrcDir,
-          output = SlyceOutput.SrcDir,
-        ),
-      ),
+      slycePairs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
     )
     .dependsOn(
       `slyce-parse`,
@@ -144,7 +120,7 @@ lazy val `slyce-plugin` =
     .settings(
       name := "slyce-plugin",
       scalaVersion := Scala_2_12,
-      // libraryDependencies += MyOrg %% "slyce-generate" % SlyceVersion, // [1]
+      // libraryDependencies += MyOrg %% "slyce-generate" % "2.0.0", // [1]
     )
     .dependsOn(
       `slyce-generate`, // [2]

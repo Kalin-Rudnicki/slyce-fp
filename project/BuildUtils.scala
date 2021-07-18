@@ -42,6 +42,13 @@ object BuildUtils {
             ("%latest-release%", latestRelease),
           )
 
+          _ <- kLogger(
+            L(
+              L(substitutions.map(L.log.info(_))),
+              L.break(),
+            ),
+          )
+
           tmplPairText <- KIO.readFile(new File("tmpl-map.txt"))
           tmplPairs <-
             tmplPairText
