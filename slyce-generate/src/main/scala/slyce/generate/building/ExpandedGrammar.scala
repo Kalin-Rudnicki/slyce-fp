@@ -752,12 +752,24 @@ object ExpandedGrammar {
         )
       }
 
+    val unaliasedWiths =
+      expandedGrammar.withs.map { w =>
+        With(
+          identifier = w.identifier match {
+            case nt: Identifier.NonTerminal => unaliasNt(nt)
+            case id                         => id
+          },
+          nt = w.nt,
+          name = w.name,
+        )
+      }.distinct
+
     ExpandedGrammar(
       startNt = expandedGrammar.startNt,
       nts = deReferenceAliases.distinct,
       aliases = filteredAliases,
       extras = expandedGrammar.extras.distinct, // TODO (KR) : unalias as well?
-      withs = expandedGrammar.withs.distinct, // TODO (KR) : unalias as well?
+      withs = unaliasedWiths,
     )
   }
 

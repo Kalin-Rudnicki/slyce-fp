@@ -694,9 +694,9 @@ object OutputDebug {
                 setting("Withs")(
                   table(
                     tr(
-                      th("Identifier", width := "200px"),
-                      th("NT", width := "200px"),
-                      th("Name", width := "200px"),
+                      th("Identifier", width := "250px"),
+                      th("NT", width := "250px"),
+                      th("Name", width := "100px"),
                     ),
                     expandedGrammar.withs.map {
                       case ExpandedGrammar.With(identifier, nt, name) =>
@@ -710,8 +710,17 @@ object OutputDebug {
                 ),
                 br,
                 setting("Extras")(
-                  ul(
-                    expandedGrammar.extras.map(e => li(e.toString)),
+                  table(
+                    tr(
+                      th("For", width := "250px"),
+                      th("Extra", width := "500px"),
+                    ),
+                    expandedGrammar.extras.map { extraFor =>
+                      tr(
+                        td(extraFor.nt.toString),
+                        td(extraFor.extra.toString),
+                      )
+                    },
                   ),
                 ),
               )
