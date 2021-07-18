@@ -81,12 +81,7 @@ lazy val `slyce-generate-parsers` =
       name := "slyce-generate-parsers",
       SharedSettings,
       ScalaVersionSettings,
-      slycePairs ++= Seq(
-        SlyceConfig(
-          input = SlyceInput.SrcDir,
-          output = SlyceOutput.SrcDir,
-        ),
-      ),
+      slycePairs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
     )
     .dependsOn(
       `slyce-parse`,
