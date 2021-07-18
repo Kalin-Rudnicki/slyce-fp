@@ -52,7 +52,7 @@ lazy val `slyce-core` =
       ScalaVersionSettings,
       buildInfoKeys := Seq[BuildInfoKey](version),
       buildInfoPackage := "slyce",
-      libraryDependencies += MyOrg %% "klib-core" % "0.6.3",
+      libraryDependencies += MyOrg %% "klib-core" % "1.0.1",
       // TODO (KR) : un-comment
       // BuildUtils.buildTmpls,
     )
