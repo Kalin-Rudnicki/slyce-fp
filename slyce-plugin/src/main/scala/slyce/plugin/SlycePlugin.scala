@@ -16,7 +16,7 @@ object SlycePlugin extends AutoPlugin {
 
   object autoImport {
 
-    val slyce: TaskKey[Unit] = taskKey("slyce")
+    val slyce: InputKey[Unit] = inputKey("slyce")
     val slyceConfigs: SettingKey[Seq[SlyceConfig]] = settingKey("slyceConfigs")
 
     sealed trait SlyceInput
