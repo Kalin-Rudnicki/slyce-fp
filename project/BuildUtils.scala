@@ -2,7 +2,6 @@ import sbt._
 import sbt.Keys._
 import sbtassembly.AssemblyKeys._
 
-// TODO (KR) : un-comment
 object BuildUtils {}
 
 /*
@@ -123,4 +122,5 @@ object BuildUtils {
       }.evaluated
 
 }
+
  */
