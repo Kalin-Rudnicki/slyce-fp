@@ -156,4 +156,5 @@ lazy val `slyce-root` =
       `slyce-parse`,
       `slyce-generate-parsers`,
       `slyce-generate`,
+      `slyce-plugin`,
     )
