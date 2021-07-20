@@ -3,8 +3,9 @@ import sbt.Keys._
 import sbtassembly.AssemblyKeys._
 
 // TODO (KR) : un-comment
-// object BuildUtils {}
+object BuildUtils {}
 
+/*
 import klib.Implicits._
 import klib.fp.types.{IO => KIO, _}
 import klib.utils.{Logger => KLogger, _}
@@ -23,6 +24,7 @@ object BuildUtils {
           rPkg: List[String],
           addSelfToPath: Boolean,
       ): KIO[List[(List[String], String)]] =
+        // TODO (KR) : This needs to be wrapped in IO
         if (file.isDirectory)
           for {
             children <- file.listFiles.toList.pure[KIO]
@@ -121,3 +123,4 @@ object BuildUtils {
       }.evaluated
 
 }
+ */

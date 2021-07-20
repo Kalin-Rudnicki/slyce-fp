@@ -20,10 +20,14 @@ ThisBuild / dynver ~= (_.replace('+', '-'))
 inThisBuild(
   Seq(
     organization := MyOrg,
-    resolvers += Resolver.mavenLocal,
+    resolvers ++= Seq(
+      Resolver.mavenLocal,
+      Resolver.sonatypeRepo("public"),
+    ),
     //
     description := "A (flex/bison)-esque parser generator for scala.",
     licenses := List("MIT" -> new URL("https://opensource.org/licenses/MIT")),
+    homepage := Some(url(s"https://github.com/$githubUsername/$githubProject")),
     developers := List(
       Developer(
         id = "Kalin-Rudnicki",
@@ -32,6 +36,7 @@ inThisBuild(
         url = url(s"https://github.com/$githubUsername"),
       ),
     ),
+    sonatypeCredentialHost := "s01.oss.sonatype.org",
   ),
 )
 
@@ -52,9 +57,12 @@ lazy val `slyce-core` =
       ScalaVersionSettings,
       buildInfoKeys := Seq[BuildInfoKey](version),
       buildInfoPackage := "slyce",
-      libraryDependencies += MyOrg %% "klib-core" % "1.0.1",
+      libraryDependencies ++= Seq(
+        MyOrg %% "klib-core" % "1.1.0",
+      ),
+      sonatypeCredentialHost := "s01.oss.sonatype.org",
       // TODO (KR) : un-comment
-      BuildUtils.buildTmpls,
+      // BuildUtils.buildTmpls,
     )
 
 lazy val `slyce-generate-parsers` =
@@ -63,8 +71,9 @@ lazy val `slyce-generate-parsers` =
     .settings(
       name := "slyce-generate-parsers",
       ScalaVersionSettings,
+      sonatypeCredentialHost := "s01.oss.sonatype.org",
       // TODO (KR) : un-comment
-      slycePairs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
+      // slycePairs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
     )
     .dependsOn(
       `slyce-parse`,
@@ -81,8 +90,10 @@ lazy val `slyce-generate` =
         "com.github.japgolly.scalacss" %% "ext-scalatags" % "0.7.0",
       ),
       assembly / assemblyJarName := s"slyce-generate-${version.value}.jar",
+      publish / skip := true,
+      sonatypeCredentialHost := "s01.oss.sonatype.org",
       // TODO (KR) : un-comment
-      BuildUtils.buildJar,
+      // BuildUtils.buildJar,
     )
     .dependsOn(
       `slyce-generate-parsers`,
@@ -94,6 +105,7 @@ lazy val `slyce-parse` =
     .settings(
       name := "slyce-parse",
       ScalaVersionSettings,
+      sonatypeCredentialHost := "s01.oss.sonatype.org",
     )
     .dependsOn(
       `slyce-core`,
@@ -105,8 +117,9 @@ lazy val `slyce-examples` =
     .settings(
       name := "slyce-examples",
       ScalaVersionSettings,
+      sonatypeCredentialHost := "s01.oss.sonatype.org",
       // TODO (KR) : un-comment
-      slycePairs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
+      // slycePairs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
     )
     .dependsOn(
       `slyce-parse`,
@@ -124,8 +137,23 @@ lazy val `slyce-plugin` =
     .settings(
       name := "slyce-plugin",
       scalaVersion := Scala_2_12,
+      sonatypeCredentialHost := "s01.oss.sonatype.org",
       // libraryDependencies += MyOrg %% "slyce-generate" % "2.0.0", // [1]
     )
     .dependsOn(
       `slyce-generate`, // [2]
+    )
+
+lazy val `slyce-root` =
+  project
+    .in(file("."))
+    .settings(
+      publish / skip := true,
+      sonatypeCredentialHost := "s01.oss.sonatype.org",
+    )
+    .aggregate(
+      `slyce-core`,
+      `slyce-parse`,
+      `slyce-generate-parsers`,
+      `slyce-generate`,
     )
