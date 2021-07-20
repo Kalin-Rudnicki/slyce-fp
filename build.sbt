@@ -61,7 +61,7 @@ lazy val `slyce-core` =
         MyOrg %% "klib-core" % "1.1.0",
       ),
       sonatypeCredentialHost := "s01.oss.sonatype.org",
-      // BuildUtils.buildTmpls,
+      BuildUtils.buildTmpls,
     )
 
 lazy val `slyce-generate-parsers` =
@@ -71,7 +71,7 @@ lazy val `slyce-generate-parsers` =
       name := "slyce-generate-parsers",
       ScalaVersionSettings,
       sonatypeCredentialHost := "s01.oss.sonatype.org",
-      // slycePairs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
+      slyceConfigs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
     )
     .dependsOn(
       `slyce-parse`,
@@ -89,7 +89,7 @@ lazy val `slyce-generate` =
       ),
       assembly / assemblyJarName := s"slyce-generate-${version.value}.jar",
       sonatypeCredentialHost := "s01.oss.sonatype.org",
-      // BuildUtils.buildJar,
+      BuildUtils.buildJar,
     )
     .dependsOn(
       `slyce-generate-parsers`,
@@ -114,7 +114,7 @@ lazy val `slyce-examples` =
       name := "slyce-examples",
       ScalaVersionSettings,
       sonatypeCredentialHost := "s01.oss.sonatype.org",
-      // slycePairs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
+      slyceConfigs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
     )
     .dependsOn(
       `slyce-parse`,
@@ -133,7 +133,7 @@ lazy val `slyce-plugin` =
       name := "slyce-plugin",
       scalaVersion := Scala_2_12,
       sonatypeCredentialHost := "s01.oss.sonatype.org",
-      // libraryDependencies += MyOrg %% "slyce-generate" % "2.1.3", // [1]
+      // libraryDependencies += MyOrg %% "slyce-generate" % "2.1.4", // [1]
     )
     .dependsOn(
       `slyce-generate`, // [2]

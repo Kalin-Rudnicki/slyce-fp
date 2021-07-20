@@ -14,16 +14,16 @@ Lets go over these each briefly...
 
 - `"slyce-generate"` jar
   - Can be downloaded from the github repository
-  - Current latest release is: `2.0.0`
+  - Current latest release is: `2.1.5`
   - Command-line utility for generating parsers
   - 
     ```sh
     # generate args help
-    java -jar slyce-generate-2.0.0.jar -- generate all --help
+    java -jar slyce-generate-2.1.5.jar -- generate all --help
     # logger args help
-    java -jar slyce-generate-2.0.0.jar --help --
+    java -jar slyce-generate-2.1.5.jar --help --
     # basic example usage
-    java -jar slyce-generate-2.0.0.jar -s your-project-name/src/main
+    java -jar slyce-generate-2.1.5.jar -s your-project-name/src/main
     ```
 - `"sylce-plugin"` plugin
   - See [Adding Slyce as a dependency](#adding-slyce-as-a-dependency)
