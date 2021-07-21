@@ -120,3 +120,7 @@ Adding it to a separate project will mean sbt will not have to worry about re-co
 (as long as you're not putting any other code there).  
 At least from my testing, if it is in the same project as the code that is using it,
 it will have to be re-compiled every time.
+
+## wiki
+
+Check out the [wiki](https://github.com/Kalin-Rudnicki/slyce-fp/wiki)
