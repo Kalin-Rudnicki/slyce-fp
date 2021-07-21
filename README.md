@@ -10,51 +10,113 @@ As an overview, the main 3 things that Slyce provides are:
 - `"slyce-parse"` library
 - `"sylce-plugin"` plugin
 
-Lets go over these each briefly...
+### `"slyce-generate"` jar
+This can be downloaded from [github releases](https://github.com/Kalin-Rudnicki/slyce-fp/releases).  
+It gives you a command line utility for generating parsers using slyce.  
+(It is definitely going to be less straight-forward than using the plugin).  
+```sh
+# generate-help
+java -jar slyce-generate-2.1.5.jar --help
+# logger-help
+java -jar slyce-generate-2.1.5.jar --help --
+# basic usage
+java -jar slyce-generate-2.1.5.jar generate all -s your-project-name/src/main
+```
 
-- `"slyce-generate"` jar
-  - Can be downloaded from the github repository
-  - Current latest release is: `2.1.5`
-  - Command-line utility for generating parsers
-  - 
-    ```sh
-    # generate args help
-    java -jar slyce-generate-2.1.5.jar -- generate all --help
-    # logger args help
-    java -jar slyce-generate-2.1.5.jar --help --
-    # basic example usage
-    java -jar slyce-generate-2.1.5.jar -s your-project-name/src/main
-    ```
-- `"sylce-plugin"` plugin
-  - See [Adding Slyce as a dependency](#adding-slyce-as-a-dependency)
-  -
-    ```
+### `"slyce-plugin"`
+
+```scala
+// project/plugins.sbt
+addSbtPlugin("io.github.kalin-rudnicki" % "slyce-plugin" % "2.1.5")
+```
+```scala
+// build.sbt
+project
+  .in(file("your-project-name"))
+  .settings(
+    // [your other settings]...
+    slyceConfigs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
+  )
+```
+
+### `"slyce-parse"`
+
+```scala
+// build.sbt
+project
+  .in(file("your-project-name"))
+  .settings(
+    // [your other settings]...
+    libraryDependencies += "io.github.kalin-rudnicki" %% "slyce-parse" % "2.1.5",
+  )
+```
+
+You have a choice between using the command line utility or sbt plugin for generating your parsers,
+but adding `slyce-parse` as a dependency is required, as it is used by the generated files.  
+All `slyce-_____` libraries depend on my own FP/utils library [klib](https://github.com/Kalin-Rudnicki/klib).
+
+### Basic setup with `slyce-plugin` & `slyce-parse`
+
+Setup sbt:
+```scala
+// project/plugins.sbt
+addSbtPlugin("io.github.kalin-rudnicki" % "slyce-plugin" % "2.1.5")
+```
+```scala
+// build.sbt
+lazy val `your-project-name-parsers` =
+    project
+      .in(file("your-project-name-parsers"))
+      .settings(
+        // [your other settings]...
+        libraryDependencies += "io.github.kalin-rudnicki" %% "slyce-parse" % "2.1.5",
+        slyceConfigs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir),
+      )
+lazy val `your-project-name` =
     project
       .in(file("your-project-name"))
-      .settings(
-        // ... (other stuff)
-        slycePairs += SlyceConfig(SlyceInput.SrcDir, SlyceOutput.SrcDir) // more on this later
+      .dependsOn(
+        `your-project-name-parsers`,
       )
-    ```
-  -
-    ```sh
-    sbt slyce
-    ```
-- `"slyce-parse"` library
-  - See [Adding Slyce as a dependency](#adding-slyce-as-a-dependency)
-  - You have a choice of if you would rather use the plugin or command line utility,
-    but this one is required. It will be used by the generated files.
-  - You don't really need to interact with this at all, as everything is done for you
-  - That being said, it might be worth familiarizing yourself with [Source](https://github.com/Kalin-Rudnicki/slyce-fp/blob/master/slyce-core/src/main/scala/slyce/core/Source.scala),  
-    as it has a really great ability to display marked up versions of the files you parse.  
-    (More on this [here-TODO])
+```
 
-## Adding Slyce as a dependency
+Add slyce files:
+```
+project-root
+|-- your-project-name-parsers
+|   |-- src
+|   |   |-- main
+|   |   |   |-- slyce
+|   |   |   |   |-- pkg1
+|   |   |   |   |   |-- pkg2
+|   |   |   |   |   |   |-- parsers
+|   |   |   |   |   |   |   |-- Parser1.slf
+|   |   |   |   |   |   |   |-- Parser1.sgf
+```
 
-Unfortunately, with the current state of the build,
-it is borderline impossible for someone else to be able to add Slyce as a dependency
-without me walking them through the stages of deleting and re-adding to sbt to get it to self-generate.
+Then run:
+```sh
+sbt slyce
+```
 
-The good news is that I am currently in the process of trying to be able to publish to sonatype,
-at which point in will be very easy to add it as a dependency just like you would expect.
-At that point, I will update this section.
+Which will generate:
+```
+project-root
+|-- your-project-name-parsers
+|   |-- src
+|   |   |-- main
+|   |   |   |-- scala
+|   |   |   |   |-- pkg1
+|   |   |   |   |   |-- pkg2
+|   |   |   |   |   |   |-- parsers
+|   |   |   |   |   |   |   |-- Parser1.scala
+```
+
+If you notice here, we actually generated the files in `your-project-name-parsers`, instead of `your-project-name`.
+This is because the generated files can be relatively large,
+and something about them at the time being causes sbt to struggle a little bit
+(on the order of tens of seconds).  
+Adding it to a separate project will mean sbt will not have to worry about re-compiling them unless you re-generate them.  
+(as long as you're not putting any other code there).  
+At least from my testing, if it is in the same project as the code that is using it,
+it will have to be re-compiled every time.
